@@ -23,7 +23,7 @@
             class="mb-6"
           ></v-img>
 
-          <h1 class="text-h3 mb-4">Welcome to Nichess</h1>
+          <h1 class="text-h4 mb-4">Welcome to Nichess</h1>
           <p class="text-h6 mb-4">
             Chess where pieces have special abilities and health points.
           </p>
@@ -37,14 +37,14 @@
             <v-list-item
               prepend-icon="mdi-robot"
             >
-              <v-list-item-title class="custom-title">Play against AI</v-list-item-title>
+              <v-list-item-title class="custom-title mb-2">Play against AI</v-list-item-title>
               Read the <router-link to="/rules" class="custom-link">rules</router-link> or start a <a @click="showNewGameDialog=true" class="custom-link">new game</a> against the computer.
             </v-list-item>
 
             <v-list-item
               prepend-icon="mdi-web"
             >
-              <v-list-item-title class="custom-title">Play on Urbit</v-list-item-title>
+              <v-list-item-title class="custom-title mb-2">Play on Urbit</v-list-item-title>
                 Urbit is a peer-to-peer network that allows you to play against other people and 
                 test new Nichess variants.
                 <br>See <router-link to="/urbit" class="custom-link">this</router-link> guide for more.
@@ -54,7 +54,7 @@
             <v-list-item
               prepend-icon="mdi-account-group"
             >
-              <v-list-item-title class="custom-title">Social</v-list-item-title>
+              <v-list-item-title class="custom-title mb-2">Social</v-list-item-title>
               <a class="custom-link" href="https://www.x.com/nichessgame">X account</a>
               <br>X community
               <br>X group chat
@@ -64,7 +64,7 @@
             <v-list-item
               prepend-icon="mdi-github"
             >
-              <v-list-item-title class="custom-title">Free and Open Source</v-list-item-title>
+              <v-list-item-title class="custom-title mb-2">Free and Open Source</v-list-item-title>
               All the code and AI models are available on our 
               <a class="custom-link" href="https://github.com/nichessgame">GitHub page</a>
               under FOSS licenses.
@@ -73,7 +73,7 @@
             <v-list-item
               prepend-icon="mdi-youtube"
             >
-              <v-list-item-title class="custom-title">AI Games</v-list-item-title>
+              <v-list-item-title class="custom-title mb-2">AI Games</v-list-item-title>
               Watch our AI play against itself.
               <br>This is currently the best way to see what the game is like if both sides play
               well.

@@ -37,7 +37,7 @@
     {
       title: 'Nichess GitHub',
       icon: `mdi-github`,
-      href: 'https://github.com/nichess-game',
+      href: 'https://github.com/nichessgame',
     },
   ]
 </script>

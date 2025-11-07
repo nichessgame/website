@@ -5,7 +5,7 @@
       simple to use and Urbit will only be used by the developers.</p>
     <p class="mt-2">
       <b>NOTE:</b> There is no matchmaking system. If you want to play against someone, you'll need
-      to know their ship name.
+      to know their username.
     </p>
     <h3 class="mt-6"> 1. Get an Urbit ship</h3>
     <p class="mt-2">
