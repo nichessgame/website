@@ -81,7 +81,7 @@ const router = useRouter()
 
 <style scoped>
 .custom-link {
-  color:CornflowerBlue;
+  color: #6393ea;
   text-decoration: underline;
 }
 

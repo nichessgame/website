@@ -31,7 +31,7 @@
       +code
     </p>
     <p class="mt-2">
-      Open http://localhost or http://localhost:8080 in your web browser and paste the password that you got from the
+      Open http://localhost:8080 in your web browser and paste the password that you got from the
       +code command. When you're done using your comet, press Ctrl + D to shut it down.
     </p>
     <h4 class="mt-2">1.2 Get a free ship from Tlon</h4>
@@ -60,7 +60,7 @@
     <h3 class="mt-6"> 2. Install Nichess</h3>
     <p class="mt-2"> Once you're logged in, open the terminal app and run:</p>
     <p class="ml-2 mt-2 code">
-      |install ~tamryn-moldep %nichess
+      |install ~riclur-macned %nichess
     </p>
     <h3 class="mt-6"> 3. Find a game</h3>
     <p class="mt-2">
