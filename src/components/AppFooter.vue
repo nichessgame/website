@@ -26,7 +26,7 @@
   const items = [
     {
       title: 'Nichess YouTube',
-      icon: `mdi-youtube`,
+      icon: `$mdiYoutube`,
       href: 'https://www.youtube.com/@nichessgame',
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       title: 'Nichess GitHub',
-      icon: `mdi-github`,
+      icon: `$mdiGithub`,
       href: 'https://github.com/nichessgame',
     },
   ]
