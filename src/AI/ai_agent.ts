@@ -48,8 +48,6 @@ export class AIAgent {
   constructor() {}
 
   async init(): void {
-    // TODO: Github pages needs this?
-    //const modelPath = '/nichess/model.json'; // TODO: remove /nichess if local
     const modelPath = '/model.json';
     await tf.setBackend('webgl');
     await tf.ready();
@@ -168,8 +166,6 @@ export class AIAgent {
       let mcts = new MCTS(1.25, gs.num_players(), gs.num_moves(), 0, 1.4, 0.25);
       
       let leafs: Array<GameState | null> = new Array(batchSize);
-      //let vs: Array<Float32Array> = new Array(batchSize);
-      //let pis: Array<Float32Array> = new Array(batchSize);
       // 1. build batch of leafs
       // 2. predict
       // 3. backprop
