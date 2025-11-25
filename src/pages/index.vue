@@ -56,8 +56,9 @@
             >
               <v-list-item-title class="custom-title mb-2">Social</v-list-item-title>
               <a class="custom-link" href="https://www.x.com/nichessgame">X account</a>
-              <br>X community
-              <br>X group chat
+              <br><a class="custom-link" href="https://x.com/i/communities/1993398352315400235">X community</a>
+              <br><a class="custom-link" href="https://x.com/i/chat/group_join/g1993403016347635959/C17DNh73Gx">X group chat</a>
+              <br><a class="custom-link" href="https://www.youtube.com/@nichessgame">YouTube channel</a>
               <br>Email: contact@nichess.org
             </v-list-item>
 
@@ -74,7 +75,7 @@
               prepend-icon="$mdiYoutube"
             >
               <v-list-item-title class="custom-title mb-2">AI Games</v-list-item-title>
-              Watch our AI play against itself.
+              <a class="custom-link" href="https://youtube.com/playlist?list=PLN0TnHkszmgQSnFrvF_ANIzX8GmDD5GFR">Watch</a> our AI play against itself.
               <br>This is currently the best way to see what the game is like if both sides play
               well.
             </v-list-item>
