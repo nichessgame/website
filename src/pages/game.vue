@@ -18,6 +18,10 @@
     <div v-else class="mt-2">
           <v-btn prepend-icon="mdi-sword-cross" @click="showNewGameDialog = true">New Game</v-btn>
     </div>
+    <div v-if="modelLoading" class="model-status mt-4">
+      <v-progress-linear indeterminate color="grey" class="mb-2"></v-progress-linear>
+      <div>Downloading AI model... This may take a while.</div>
+    </div>
     <div class="mt-2">
       Number of nodes explored by the AI: {{ numNodesExplored }}
     </div>
@@ -58,6 +62,7 @@ const aiHistory = [];
 const showNewGameDialog = ref(false)
 const numNodesExplored = ref(0)
 const gameOver = ref(false)
+const modelLoading = ref(false)
 
 const chessSquares = [
     'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1',
@@ -72,6 +77,19 @@ const chessSquares = [
 
 boardWorker.onmessage = (event) => {
   console.log(event.data)
+  const { type } = event.data;
+  if (type === 'model-status') {
+    if (event.data.status === 'starting') {
+      modelLoading.value = true;
+    } else if (event.data.status === 'ready') {
+      modelLoading.value = false;
+    } else if (event.data.status === 'error') {
+      modelLoading.value = false;
+      console.error('Model load error:', event.data.message);
+    }
+    return;
+  }
+
   const { id, move, debug } = event.data;
   if (id !== props.gameId || id === "") return;
   
