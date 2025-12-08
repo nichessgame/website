@@ -13,10 +13,10 @@
     />
 
     <div v-if="gameOver" class="mt-2">
-      <v-btn variant="outlined" class="gold" prepend-icon="mdi-sword-cross" @click="showNewGameDialog = true">New Game</v-btn>
+      <v-btn variant="outlined" class="gold" prepend-icon="$mdiSwordCross" @click="showNewGameDialog = true">New Game</v-btn>
     </div>
     <div v-else class="mt-2">
-          <v-btn prepend-icon="mdi-sword-cross" @click="showNewGameDialog = true">New Game</v-btn>
+          <v-btn prepend-icon="$mdiSwordCross" @click="showNewGameDialog = true">New Game</v-btn>
     </div>
     <div v-if="modelLoading" class="model-status mt-4">
       <v-progress-linear indeterminate color="grey" class="mb-2"></v-progress-linear>
