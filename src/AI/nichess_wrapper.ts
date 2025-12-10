@@ -25,8 +25,8 @@ export class GameWrapper {
     }
   }
 
-  repetitionsDraw(): boolean {
-    return this.game.repetitionsDraw;
+  isGameDraw(): boolean {
+    return this.game.isGameDraw();
   }
 
   computeValids(): Array<number> {

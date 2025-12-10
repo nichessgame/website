@@ -53,7 +53,7 @@ export class NichessGS implements GameState {
   }
 
   scores(): Array<number> | undefined {
-    if(this.gameWrapper.repetitionsDraw()) {
+    if(this.gameWrapper.isGameDraw()) {
       return [0, 0, 1]
     }
     let winner: Player | undefined = this.gameWrapper.game.winner()
