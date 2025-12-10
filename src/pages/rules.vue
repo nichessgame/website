@@ -165,6 +165,34 @@
           </v-card-text>
         </v-card>
 
+        <v-card
+          id="threefold-repetition"
+          class="mb-6"
+        >
+          <v-card-title> Threefold Repetition </v-card-title>
+          <v-card-text>
+            <v-row align="center">
+              <v-col cols="12" md="8">
+                <p class="mb-2">If the same position occurs three times, the game automatically ends in a draw.</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+
+        <v-card
+          id="three-hundred-thirty-three-move-rule"
+          class="mb-6"
+        >
+          <v-card-title> 333-Move Rule </v-card-title>
+          <v-card-text>
+            <v-row align="center">
+              <v-col cols="12" md="8">
+                <p class="mb-2">If the game reaches move 333, it automatically ends in a draw.</p>
+                <p class="mb-2"><b>Note:</b> Move here refers to an action taken by a single player. Two Nichess moves are equivalent to one chess move.</p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
 
 
       </v-col>
@@ -177,32 +205,34 @@ const rules = [
   {
     id: 'king',
     name: 'King',
-    image: new URL('@/assets/logo.png', import.meta.url).href
   },
   {
     id: 'queen',
     name: 'Queen',
-    image: new URL('@/assets/logo.png', import.meta.url).href
   },
   {
     id: 'pawn',
     name: 'Pawn',
-    image: new URL('@/assets/logo.png', import.meta.url).href
   },
   {
     id: 'maenad',
     name: 'Maenad',
-    image: new URL('@/assets/logo.png', import.meta.url).href
   },
   {
     id: 'pirate',
     name: 'Pirate',
-    image: new URL('@/assets/logo.png', import.meta.url).href
   },
   {
     id: 'knight',
     name: 'Knight',
-    image: new URL('@/assets/logo.png', import.meta.url).href
+  },
+  {
+    id: 'threefold-repetition',
+    name: 'Threefold Repetition',
+  },
+  {
+    id: 'three-hundred-thirty-three-move-rule',
+    name: '333-Move Rule',
   },
 
 
