@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mt-6" max-width="900">
+  <v-container class="mt-2" max-width="900">
     <v-card class="pa-6" elevation="4">
       <h1 class="text-h4 mb-6">Frequently Asked Questions</h1>
       <v-expansion-panels variant="accordion">

@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="900">
+  <v-container class="mt-2" max-width="900">
     <v-row>
       <v-col cols="12" md="3">
         <v-list>

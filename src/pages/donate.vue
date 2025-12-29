@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mt-6" max-width="900">
+  <v-container class="mt-2" max-width="900">
     <v-card class="pa-6" elevation="4">
       <div class="text-h4"> Donate </div>
       <div class="mt-4">

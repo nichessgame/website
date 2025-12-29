@@ -1,15 +1,9 @@
 <template>
-  <v-container class="fill-height" max-width="900">
+  <v-container class="mt-2" max-width="900">
     <NewGameDialog v-model="showNewGameDialog" />
     <v-row class="text-center" justify="center">
       <v-col cols="12">
         <div class="d-sm-block d-md-none">
-          <v-img
-            src="@/assets/logo.png"
-            max-height="100"
-            contain
-            class="mb-6"
-          ></v-img>
           <h1 class="text-h5 mb-4">Welcome to Nichess</h1>
           <p class="mb-4 ml-2 mr-2">
             Chess where pieces have special abilities and health points.
@@ -32,8 +26,8 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-card class="pa-6" elevation="4">
-          <v-list lines="three">
+        <v-card class="pa-2" elevation="4">
+          <v-list lines="two">
             <v-list-item
               prepend-icon="$mdiRobot"
             >
