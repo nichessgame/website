@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mt-2" max-width="900">
+  <v-container class="mt-md-10 mt-2" max-width="900">
     <NewGameDialog v-model="showNewGameDialog" />
     <v-row class="text-center" justify="center">
       <v-col cols="12">
