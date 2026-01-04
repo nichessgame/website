@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         Create a new game
-        <v-btn icon="mdi-close" variant="text" @click="dialog = false"></v-btn>
+        <v-btn icon="$mdiClose" variant="text" @click="dialog = false"></v-btn>
       </v-card-title>
       
       <v-card-text>
