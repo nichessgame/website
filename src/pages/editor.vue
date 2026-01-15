@@ -54,10 +54,10 @@
       />
     </div>
 
-    <!-- FEN display -->
-    <div class="fen-display mt-4">
-      <div class="fen-label">Board State (FEN):</div>
-      <div class="fen-string">{{ currentFen }}</div>
+    <!-- Board string display -->
+    <div class="board-string-display mt-4">
+      <div class="board-string-label">Board State:</div>
+      <div class="board-string">{{ currentBoardString }}</div>
     </div>
   </v-container>
 </template>
@@ -109,7 +109,7 @@ const healthOptions = [10, 20, 30, 40, 50, 60];
 const sideToMove = ref('Player 1');
 const sideToMoveOptions = ['Player 1', 'Player 2'];
 
-const currentFen = ref('');
+const currentBoardString = ref('');
 let boardAPI;
 
 // Board configuration
@@ -161,7 +161,7 @@ function selectPiece(pieceType) {
 }
 
 function handleMove(move) {
-  updateFen();
+  updateBoardString();
 }
 
 function handleSquareSelect(square) {
@@ -185,29 +185,29 @@ function handleSquareSelect(square) {
   boardAPI.putPiece(selectedPiece.value, squareIndex, hp);
 
   // Update FEN display
-  updateFen();
+  updateBoardString();
 }
 
 function handleBoardCreated(api) {
   boardAPI = api;
-  updateFen();
+  updateBoardString();
 }
 
-function updateFen() {
+function updateBoardString() {
   if (boardAPI) {
-    currentFen.value = boardAPI.getFen();
+    currentBoardString.value = boardAPI.getFen();
   }
 }
 
 function setStartingPosition() {
   boardAPI.setPosition("0|0-warrior-60,0-knight-60,0-assassin-10,0-mage-10,0-king-10,0-assassin-10,0-knight-60,0-warrior-60,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-warrior-60,1-knight-60,1-assassin-10,1-mage-10,1-king-10,1-assassin-10,1-knight-60,1-warrior-60,")
-  updateFen();
+  updateBoardString();
   selectedPiece.value = 'HAND'
 }
 
 function clearPosition() {
   boardAPI.setPosition("0|empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,")
-  updateFen();
+  updateBoardString();
   selectedPiece.value = 'HAND'
 }
 
@@ -215,7 +215,7 @@ watch(sideToMove, (newValue) => {
   if (boardAPI) {
     const player = newValue === 'Player 1' ? Player.PLAYER_1 : Player.PLAYER_2;
     boardAPI.setCurrentPlayer(player);
-    updateFen();
+    updateBoardString();
   }
 });
 </script>
@@ -284,20 +284,20 @@ watch(sideToMove, (newValue) => {
   gap: 8px;
 }
 
-.fen-display {
+.board-string-display {
   background-color: #1a1a1a;
   padding: 16px;
   border-radius: 8px;
   border: 1px solid #444;
 }
 
-.fen-label {
+.board-string-label {
   color: #999;
   font-size: 14px;
   margin-bottom: 8px;
 }
 
-.fen-string {
+.board-string {
   color: #fff;
   font-family: monospace;
   font-size: 14px;
