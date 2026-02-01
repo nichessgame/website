@@ -18,6 +18,17 @@ self.onmessage = async (event: MessageEvent) => {
       self.postMessage({ type: 'model-status', status: 'ready', id: event.data?.id ?? '' });
     }
 
+    // Check if this is an evaluation request (no search, just neural net prediction)
+    if (event.data.type === 'evaluate') {
+      const evaluation = aiAgent.evaluate(event.data.boardString);
+      self.postMessage({
+        type: 'evaluation-result',
+        id: event.data.id,
+        evaluation: evaluation
+      });
+      return;
+    }
+
     let searchResult: [PlayerAction, string] = await aiAgent.runSearch(event.data.difficulty, 20, event.data.history);
     let action = searchResult[0];
     let debugStr = searchResult[1];

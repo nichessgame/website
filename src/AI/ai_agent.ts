@@ -92,6 +92,19 @@ export class AIAgent {
     })
   }
 
+  evaluate(boardString: string): { policy: Array<number>, value: Array<number> } {
+    let result = { policy: [], value: [] };
+    tf.tidy(() => {
+      let gs: NichessGS = new NichessGS({encodedBoard: boardString});
+      let netData = new NetData([], null, gs);
+      let batch = [netData];
+      this.nnPredictBatch(batch, 1);
+      result.policy = batch[0].pi;
+      result.value = batch[0].v;
+    });
+    return result;
+  }
+
   async runSearch(difficulty: number, batchSize: number, history): [PlayerAction, string] {
     let nichessAction: PlayerAction;
     let selectedAction: number;

@@ -3,7 +3,9 @@ import { defineStore } from 'pinia'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    boardWorker: null
+    boardWorker: null,
+    modelReady: false,
+    modelLoading: false
   }),
   actions: {
     initBoardWorker() {
@@ -19,6 +21,12 @@ export const useAppStore = defineStore('app', {
         this.boardWorker.terminate();
         this.boardWorker = null;
       }
+    },
+    setModelReady(ready) {
+      this.modelReady = ready;
+    },
+    setModelLoading(loading) {
+      this.modelLoading = loading;
     }
   }
 })

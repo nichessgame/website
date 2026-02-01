@@ -81,10 +81,14 @@ boardWorker.onmessage = (event) => {
   if (type === 'model-status') {
     if (event.data.status === 'starting') {
       modelLoading.value = true;
+      appStore.setModelLoading(true);
     } else if (event.data.status === 'ready') {
       modelLoading.value = false;
+      appStore.setModelLoading(false);
+      appStore.setModelReady(true);
     } else if (event.data.status === 'error') {
       modelLoading.value = false;
+      appStore.setModelLoading(false);
       console.error('Model load error:', event.data.message);
     }
     return;
@@ -92,7 +96,7 @@ boardWorker.onmessage = (event) => {
 
   const { id, move, debug } = event.data;
   if (id !== props.gameId || id === "") return;
-  
+
   numNodesExplored.value = debug;
   const [srcIdx, dstIdx] = move.split('.').map(Number);
   // TODO: this doesn't work for the SKIP action which is -1.-1

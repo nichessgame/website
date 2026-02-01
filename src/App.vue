@@ -13,6 +13,7 @@
           <NewGameDialog v-model="showNewGameDialog" />
           <v-btn to="/faq" prepend-icon="$mdiInformation" :active="false" class="nav-button">FAQ</v-btn>
           <v-btn to="/rules" prepend-icon="$mdiScriptText" :active="false" class="nav-button">Rules</v-btn>
+          <v-btn to="/tools" prepend-icon="$mdiTools" :active="false" class="nav-button">Tools</v-btn>
           <v-btn to="/donate" prepend-icon="$mdiGift" :active="false" class="donate">Donate</v-btn>
         </div>
       </v-container>
@@ -41,6 +42,13 @@
           prepend-icon="$mdiScriptText"
           title="Rules"
           to="/rules"
+          :active="false"
+          class="nav-button"
+        />
+        <v-list-item
+          prepend-icon="$mdiTools"
+          title="Tools"
+          to="/tools"
           :active="false"
           class="nav-button"
         />
