@@ -54,6 +54,59 @@
       />
     </div>
 
+    <!-- Move index lookup -->
+    <div class="move-index-lookup mt-4">
+      <div class="move-index-label">Neural Net Move Index Lookup (Squares to Index):</div>
+      <div class="move-index-label">*Invalid inputs will produce invalid results</div>
+      <div class="move-index-controls">
+        <v-select
+          v-model="sourceSquare"
+          :items="squareOptions"
+          label="Source Square"
+          variant="outlined"
+          density="compact"
+          style="min-width: 120px;"
+        ></v-select>
+        <v-select
+          v-model="destSquare"
+          :items="squareOptions"
+          label="Destination Square"
+          variant="outlined"
+          density="compact"
+          style="min-width: 120px;"
+        ></v-select>
+        <div class="move-index-result">
+          Move Index: <span class="move-index-value">{{ moveIndex }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reverse move index lookup -->
+    <div class="move-index-lookup mt-4">
+      <div class="move-index-label">Neural Net Move Index Lookup (Index to Squares):</div>
+      <div class="move-index-label">*Invalid inputs will produce invalid results</div>
+      <div class="move-index-controls">
+        <v-text-field
+          v-model.number="reverseMoveIndex"
+          type="number"
+          label="Move Index"
+          variant="outlined"
+          density="compact"
+          style="min-width: 120px; max-width: 150px;"
+          :min="0"
+          :max="4096"
+          :rules="[moveIndexRule]"
+          @update:model-value="validateMoveIndex"
+        ></v-text-field>
+        <div class="move-index-result">
+          Source: <span class="move-index-value">{{ reverseSourceSquare }}</span>
+        </div>
+        <div class="move-index-result">
+          Destination: <span class="move-index-value">{{ reverseDestSquare }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Board string display -->
     <div class="board-string-display mt-4">
       <div class="board-string-label">Board State:</div>
@@ -63,10 +116,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
 import { PieceType, Player } from 'nichess';
+import { AgentCache } from '@/AI/agent_cache';
 
 // Import piece icons
 import openHand from '@/assets/open-hand.svg';
@@ -111,6 +165,83 @@ const sideToMoveOptions = ['Player 1', 'Player 2'];
 
 const currentBoardString = ref('');
 let boardAPI;
+
+// Square options for move index lookup (a1 to h8)
+const squareOptions = [];
+for (let rank = 1; rank <= 8; rank++) {
+  for (let file = 0; file < 8; file++) {
+    squareOptions.push(String.fromCharCode(97 + file) + rank);
+  }
+}
+
+const sourceSquare = ref('a1');
+const destSquare = ref('a1');
+
+// Convert square notation (e.g., 'a1') to index (0-63)
+// a1=0, b1=1, ..., h1=7, a2=8, ..., h8=63
+function squareToIndex(square) {
+  const file = square.charCodeAt(0) - 97; // 'a' = 0, 'b' = 1, etc.
+  const rank = parseInt(square[1]) - 1;   // '1' = 0, '2' = 1, etc.
+  return rank * 8 + file;
+}
+
+const moveIndex = computed(() => {
+  const srcIndex = squareToIndex(sourceSquare.value);
+  const dstIndex = squareToIndex(destSquare.value);
+  return AgentCache.srcSquareToDstSquareToMoveIndex[srcIndex][dstIndex];
+});
+
+// Reverse move index lookup (index to squares)
+const reverseMoveIndex = ref(0);
+
+// Convert index (0-63) to square notation (e.g., 'a1')
+function indexToSquare(index) {
+  const file = String.fromCharCode(97 + (index % 8)); // 'a' + file
+  const rank = Math.floor(index / 8) + 1;
+  return file + rank;
+}
+
+// Validation rule for move index input
+const moveIndexRule = (value) => {
+  if (value === '' || value === null || value === undefined) return true;
+  const num = Number(value);
+  if (isNaN(num)) return 'Must be a number';
+  if (num < 0 || num > 4096) return 'Must be between 0 and 4096';
+  if (!Number.isInteger(num)) return 'Must be an integer';
+  return true;
+};
+
+// Clamp move index to valid range
+function validateMoveIndex(value) {
+  if (value === '' || value === null || value === undefined) {
+    reverseMoveIndex.value = 0;
+    return;
+  }
+  const num = Number(value);
+  if (isNaN(num)) {
+    reverseMoveIndex.value = 0;
+  } else {
+    reverseMoveIndex.value = Math.max(0, Math.min(4096, Math.floor(num)));
+  }
+}
+
+const reverseSourceSquare = computed(() => {
+  const idx = reverseMoveIndex.value;
+  if (idx < 0 || idx > 4096 || !AgentCache.moveIndexToSrcAndDstSquare[idx]) {
+    return '-';
+  }
+  const srcIndex = AgentCache.moveIndexToSrcAndDstSquare[idx][0];
+  return indexToSquare(srcIndex);
+});
+
+const reverseDestSquare = computed(() => {
+  const idx = reverseMoveIndex.value;
+  if (idx < 0 || idx > 4096 || !AgentCache.moveIndexToSrcAndDstSquare[idx]) {
+    return '-';
+  }
+  const dstIndex = AgentCache.moveIndexToSrcAndDstSquare[idx][1];
+  return indexToSquare(dstIndex);
+});
 
 // Board configuration
 const boardConfig = reactive({
@@ -282,6 +413,37 @@ watch(sideToMove, (newValue) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.move-index-lookup {
+  background-color: #1a1a1a;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.move-index-label {
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.move-index-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.move-index-result {
+  color: #fff;
+  font-family: monospace;
+  font-size: 16px;
+}
+
+.move-index-value {
+  color: #ffd700;
+  font-weight: bold;
 }
 
 .board-string-display {
