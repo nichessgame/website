@@ -1,10 +1,12 @@
 <template>
   <v-container max-width="1000px" class="pa-0">
-    <TheChessboard
-      @board-created="handleBoardCreated"
-      :board-config="boardConfig"
-      class="mt-10"
-    />
+    <div ref="chessboardContainer" class="chessboard-container">
+      <TheChessboard
+        @board-created="handleBoardCreated"
+        :board-config="boardConfig"
+        class="mt-10"
+      />
+    </div>
 
     <!-- Control Buttons -->
     <div class="control-buttons mt-4">
@@ -178,7 +180,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
 
@@ -190,6 +192,7 @@ const boardConfig = reactive({
 });
 
 let boardAPI = null;
+const chessboardContainer = ref(null);
 const moveHistoryText = ref('');
 const parsedMoves = ref([]);
 const currentMoveIndex = ref(0);
@@ -200,12 +203,49 @@ const loadMessage = ref({ text: '', type: 'info' });
 const viewMode = ref(false);
 const copyMessage = ref({ text: '', type: 'info', show: false });
 let playbackInterval = null;
+let wheelThrottle = false;
 
 function handleBoardCreated(api) {
   boardAPI = api;
   currentMoveIndex.value = 0;
   parsedMoves.value = [];
 }
+
+function handleWheel(event) {
+  // Always prevent page scroll first
+  event.preventDefault();
+  event.stopPropagation();
+
+  // Don't process moves during playback or if throttled
+  if (isPlaying.value || wheelThrottle) return;
+
+  // Throttle wheel events to prevent too rapid scrolling
+  wheelThrottle = true;
+  setTimeout(() => {
+    wheelThrottle = false;
+  }, 20);
+
+  // deltaY > 0 means scrolling down (backward in history)
+  // deltaY < 0 means scrolling up (forward in history)
+  if (event.deltaY > 0) {
+    undoMove();
+  } else if (event.deltaY < 0) {
+    redoMove();
+  }
+}
+
+onMounted(() => {
+  if (chessboardContainer.value) {
+    // Add wheel event listener with passive: false to allow preventDefault
+    chessboardContainer.value.addEventListener('wheel', handleWheel, { passive: false });
+  }
+});
+
+onBeforeUnmount(() => {
+  if (chessboardContainer.value) {
+    chessboardContainer.value.removeEventListener('wheel', handleWheel);
+  }
+});
 
 function undoMove() {
   if (boardAPI && currentMoveIndex.value > 0) {
@@ -482,6 +522,10 @@ function loadMoveHistory() {
 </script>
 
 <style scoped>
+.chessboard-container {
+  cursor: default;
+}
+
 .control-buttons {
   display: flex;
   gap: 16px;
