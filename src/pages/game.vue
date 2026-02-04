@@ -30,7 +30,7 @@
       <div v-else>
         <div class="move-list">
           <div v-for="(move, index) in moveHistory" :key="index" class="move-item">
-            <span class="move-number">{{ Math.floor(index/2) + 1 }}{{ index % 2 === 0 ? '.' : '...' }}</span>
+            <span class="move-number">{{ index + 1 }}.</span>
             <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
           </div>
         </div>
