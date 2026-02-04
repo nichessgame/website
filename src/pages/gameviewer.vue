@@ -188,7 +188,8 @@ const boardConfig = reactive({
   animation: {
     enabled: true,
     duration: 200
-  }
+  },
+  viewOnly: true,
 });
 
 let boardAPI = null;
