@@ -7,6 +7,11 @@
           title="Board Editor"
           to="/editor"
         />
+        <v-list-item
+          title="Game Viewer"
+          to="/gameviewer"
+        />
+
       </v-list>
     </v-card>
   </v-container>
