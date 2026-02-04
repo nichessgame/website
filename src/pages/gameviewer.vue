@@ -234,17 +234,37 @@ function handleWheel(event) {
   }
 }
 
+function handleKeyDown(event) {
+  // Don't process during playback
+  if (isPlaying.value) return;
+
+  // Check for arrow keys
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    undoMove();
+  } else if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    redoMove();
+  }
+}
+
 onMounted(() => {
   if (chessboardContainer.value) {
     // Add wheel event listener with passive: false to allow preventDefault
     chessboardContainer.value.addEventListener('wheel', handleWheel, { passive: false });
   }
+
+  // Add keyboard event listener for arrow keys
+  document.addEventListener('keydown', handleKeyDown);
 });
 
 onBeforeUnmount(() => {
   if (chessboardContainer.value) {
     chessboardContainer.value.removeEventListener('wheel', handleWheel);
   }
+
+  // Remove keyboard event listener
+  document.removeEventListener('keydown', handleKeyDown);
 });
 
 function undoMove() {
