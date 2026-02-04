@@ -93,14 +93,24 @@
     <div class="move-history-section mt-4">
       <div class="history-header">
         <div class="history-label">Move History:</div>
-        <v-btn
-          v-if="parsedMoves.length > 0"
-          @click="toggleViewMode"
-          variant="outlined"
-          size="small"
-        >
-          {{ viewMode ? 'Edit' : 'View' }}
-        </v-btn>
+        <div class="history-buttons" v-if="parsedMoves.length > 0">
+          <v-btn
+            v-if="viewMode"
+            @click="copyMoveHistory"
+            variant="outlined"
+            size="small"
+            prepend-icon="$mdiContentCopy"
+          >
+            Copy
+          </v-btn>
+          <v-btn
+            @click="toggleViewMode"
+            variant="outlined"
+            size="small"
+          >
+            {{ viewMode ? 'Edit' : 'View' }}
+          </v-btn>
+        </div>
       </div>
 
       <!-- Input Mode -->
@@ -136,6 +146,13 @@
 
       <!-- Viewing Mode -->
       <div v-else class="move-history-view mt-2">
+        <!-- Copy Message Display -->
+        <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+          <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+          <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+          <span>{{ copyMessage.text }}</span>
+        </div>
+
         <div v-if="parsedMoves.length === 0" class="no-moves">No moves loaded</div>
         <div v-else class="move-list">
           <div
@@ -145,7 +162,7 @@
             @click="jumpToMove(index + 1)"
           >
             <span class="move-number">{{ index + 1 }}.</span>
-            <span class="move-notation">{{ move.from }} → {{ move.to }}</span>
+            <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
           </div>
         </div>
       </div>
@@ -181,6 +198,7 @@ const moveDelay = ref(1000);
 const soundEnabled = ref(false);
 const loadMessage = ref({ text: '', type: 'info' });
 const viewMode = ref(false);
+const copyMessage = ref({ text: '', type: 'info', show: false });
 let playbackInterval = null;
 
 function handleBoardCreated(api) {
@@ -237,6 +255,36 @@ function redoAll() {
 
 function toggleViewMode() {
   viewMode.value = !viewMode.value;
+  copyMessage.value.show = false;
+}
+
+async function copyMoveHistory() {
+  if (parsedMoves.value.length === 0) return;
+
+  // Format moves back to text
+  const formattedText = parsedMoves.value
+    .map((move, index) => `${index + 1}.${move.from} -> ${move.to}`)
+    .join('\n');
+
+  try {
+    await navigator.clipboard.writeText(formattedText);
+    copyMessage.value = {
+      text: 'Move history copied to clipboard!',
+      type: 'success',
+      show: true
+    };
+
+    // Hide message after 3 seconds
+    setTimeout(() => {
+      copyMessage.value.show = false;
+    }, 3000);
+  } catch (err) {
+    copyMessage.value = {
+      text: 'Failed to copy to clipboard',
+      type: 'error',
+      show: true
+    };
+  }
 }
 
 function jumpToMove(targetIndex) {
@@ -365,6 +413,10 @@ function loadMoveHistory() {
     return;
   }
 
+  // Save current state in case we need to restore it
+  const previousMoves = parsedMoves.value;
+  const previousMoveIndex = currentMoveIndex.value;
+
   // Parse the move history
   const parseResult = parseMoveHistory(moveHistoryText.value);
 
@@ -383,7 +435,7 @@ function loadMoveHistory() {
 
   // Reset the board to starting position
   boardAPI.resetBoard();
-  currentMoveIndex.value = 0;
+  let tempMoveIndex = 0;
 
   // Apply all moves to the board and check legality
   for (let i = 0; i < moves.length; i++) {
@@ -395,18 +447,22 @@ function loadMoveHistory() {
         text: `Illegal move at line ${move.lineNum}: ${move.from} -> ${move.to}`,
         type: 'error'
       };
-      // Reset board since we had an error
+
+      // Restore previous state
       boardAPI.resetBoard();
-      currentMoveIndex.value = 0;
-      parsedMoves.value = [];
+      if (previousMoves.length > 0) {
+        for (let j = 0; j < previousMoveIndex; j++) {
+          boardAPI.move(previousMoves[j]);
+        }
+      }
       return;
     }
 
     boardAPI.move(move);
-    currentMoveIndex.value++;
+    tempMoveIndex++;
   }
 
-  // Successfully loaded all moves
+  // Successfully loaded all moves - now update the state
   parsedMoves.value = moves;
 
   // Reset to start position so user can step through
@@ -475,6 +531,11 @@ function loadMoveHistory() {
   color: #ccc;
   font-size: 16px;
   font-weight: 600;
+}
+
+.history-buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .move-history-view {
@@ -578,5 +639,28 @@ function loadMoveHistory() {
   background-color: rgba(33, 150, 243, 0.15);
   border: 1px solid rgba(33, 150, 243, 0.3);
   color: #42a5f5;
+}
+
+.copy-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  background-color: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #66bb6a;
+}
+
+.copy-message .message-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.copy-message.message-error {
+  background-color: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #ef5350;
 }
 </style>
