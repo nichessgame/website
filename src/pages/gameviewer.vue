@@ -65,34 +65,15 @@
       </v-btn>
     </div>
 
-    <!-- Playback Configuration -->
-    <div class="playback-config mt-4">
-      <div class="config-row">
-        <label class="config-label">Time between moves (ms):</label>
-        <v-text-field
-          v-model.number="moveDelay"
-          type="number"
-          :min="100"
-          :max="5000"
-          :step="100"
-          variant="outlined"
-          density="compact"
-          style="max-width: 150px;"
-        ></v-text-field>
-      </div>
+    <!-- Tabs Navigation -->
+    <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="#1a1a1a">
+      <v-tab value="history">History</v-tab>
+      <v-tab value="settings">Settings</v-tab>
+    </v-tabs>
 
-      <div class="config-row">
-        <v-checkbox
-          v-model="soundEnabled"
-          label="Enable sound"
-          density="compact"
-          hide-details
-        ></v-checkbox>
-      </div>
-    </div>
-
-    <!-- Move History Section -->
-    <div class="move-history-section mt-4">
+    <!-- Tab Content -->
+    <!-- History Tab -->
+    <div v-show="activeTab === 'history'" class="tab-content move-history-section">
       <div class="history-header">
         <div class="history-label">Move History:</div>
         <div class="history-buttons" v-if="parsedMoves.length > 0">
@@ -170,10 +151,29 @@
       </div>
     </div>
 
-    <!-- Status Display -->
-    <div class="status-display mt-4" v-if="parsedMoves.length > 0">
-      <div class="status-info">
-        Total moves: {{ parsedMoves.length }} | Current position: {{ currentMoveIndex }}
+    <!-- Settings Tab -->
+    <div v-show="activeTab === 'settings'" class="tab-content playback-config">
+      <div class="config-row">
+        <label class="config-label">Time between moves (ms):</label>
+        <v-text-field
+          v-model.number="moveDelay"
+          type="number"
+          :min="100"
+          :max="5000"
+          :step="100"
+          variant="outlined"
+          density="compact"
+          style="max-width: 150px;"
+        ></v-text-field>
+      </div>
+
+      <div class="config-row">
+        <v-checkbox
+          v-model="soundEnabled"
+          label="Enable sound"
+          density="compact"
+          hide-details
+        ></v-checkbox>
       </div>
     </div>
   </v-container>
@@ -181,8 +181,11 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { Piece, PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
+import MoveSound from '@/assets/Move.ogg';
+import CaptureSound from '@/assets/Capture.ogg';
 
 const boardConfig = reactive({
   animation: {
@@ -203,8 +206,13 @@ const soundEnabled = ref(false);
 const loadMessage = ref({ text: '', type: 'info' });
 const viewMode = ref(false);
 const copyMessage = ref({ text: '', type: 'info', show: false });
+const activeTab = ref('history');
 let playbackInterval = null;
 let wheelThrottle = false;
+
+// Audio objects
+const moveAudio = new Audio(MoveSound);
+const captureAudio = new Audio(CaptureSound);
 
 function handleBoardCreated(api) {
   boardAPI = api;
@@ -272,7 +280,18 @@ function undoMove() {
   if (boardAPI && currentMoveIndex.value > 0) {
     boardAPI.undoLastMove();
     currentMoveIndex.value--;
-    if (soundEnabled.value) {
+  }
+}
+
+function redoWithSound() {
+  const move = parsedMoves.value[currentMoveIndex.value];
+  const isCapture = boardAPI.getPiece(move.to).type !== PieceType.NO_PIECE;
+  boardAPI.redoLastMove();
+  currentMoveIndex.value++;
+  if (soundEnabled.value) {
+    if (isCapture) {
+      playCaptureSound();
+    } else {
       playMoveSound();
     }
   }
@@ -280,11 +299,7 @@ function undoMove() {
 
 function redoMove() {
   if (boardAPI && currentMoveIndex.value < parsedMoves.value.length) {
-    boardAPI.redoLastMove();
-    currentMoveIndex.value++;
-    if (soundEnabled.value) {
-      playMoveSound();
-    }
+    redoWithSound();
   }
 }
 
@@ -302,16 +317,13 @@ function undoAll() {
 }
 
 function redoAll() {
-  if (!boardAPI) return;
+  if (!boardAPI || currentMoveIndex.value >= parsedMoves.value.length) return;
 
-  while (currentMoveIndex.value < parsedMoves.value.length) {
+  while (currentMoveIndex.value < parsedMoves.value.length - 1) {
     boardAPI.redoLastMove();
     currentMoveIndex.value++;
   }
-
-  if (soundEnabled.value) {
-    playMoveSound();
-  }
+  redoWithSound();
 }
 
 function toggleViewMode() {
@@ -350,28 +362,19 @@ async function copyMoveHistory() {
 
 function jumpToMove(targetIndex) {
   if (!boardAPI || isPlaying.value) return;
+  if (targetIndex === currentMoveIndex.value) return;
 
-  const currentIndex = currentMoveIndex.value;
-
-  // Navigate to the target position
-  if (targetIndex < currentIndex) {
-    // Undo moves to reach target
-    while (currentMoveIndex.value > targetIndex) {
-      boardAPI.undoLastMove();
-      currentMoveIndex.value--;
-    }
-  } else if (targetIndex > currentIndex) {
-    // Redo moves to reach target
-    while (currentMoveIndex.value < targetIndex) {
-      boardAPI.redoLastMove();
-      currentMoveIndex.value++;
-    }
+  // Undo or redo to one before the target
+  while (currentMoveIndex.value > targetIndex - 1) {
+    boardAPI.undoLastMove();
+    currentMoveIndex.value--;
   }
-
-  // Play sound for the action
-  if (soundEnabled.value && currentIndex !== targetIndex) {
-    playMoveSound();
+  while (currentMoveIndex.value < targetIndex - 1) {
+    boardAPI.redoLastMove();
+    currentMoveIndex.value++;
   }
+  // Final move with correct sound
+  redoWithSound();
 }
 
 function togglePlayPause() {
@@ -384,7 +387,7 @@ function togglePlayPause() {
 
 function startPlayback() {
   if (currentMoveIndex.value >= parsedMoves.value.length) {
-    currentMoveIndex.value = 0;
+    undoAll();
   }
 
   isPlaying.value = true;
@@ -406,23 +409,14 @@ function pausePlayback() {
   }
 }
 
+function playCaptureSound() {
+  captureAudio.currentTime = 0;
+  captureAudio.play();
+}
+
 function playMoveSound() {
-  // Simple audio feedback using Web Audio API
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-
-  oscillator.frequency.value = 800;
-  oscillator.type = 'sine';
-
-  gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 0.1);
+  moveAudio.currentTime = 0;
+  moveAudio.play();
 }
 
 function parseMoveHistory(historyText) {
@@ -547,6 +541,18 @@ function loadMoveHistory() {
   cursor: default;
 }
 
+.tabs-no-scroll {
+  scroll-margin: 0;
+}
+
+.tabs-no-scroll :deep(.v-tab) {
+  scroll-margin: 0;
+}
+
+.tabs-no-scroll :deep(.v-btn) {
+  scroll-margin: 0;
+}
+
 .control-buttons {
   display: flex;
   gap: 16px;
@@ -554,11 +560,20 @@ function loadMoveHistory() {
   align-items: center;
 }
 
-.playback-config {
+.tab-content {
   background-color: #1a1a1a;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 0 0 8px 8px;
   border: 1px solid #444;
+  border-top: none;
+  min-height: 400px;
+}
+
+.playback-config {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
 }
 
 .config-row {
@@ -579,10 +594,10 @@ function loadMoveHistory() {
 }
 
 .move-history-section {
-  background-color: #1a1a1a;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #444;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
 }
 
 .history-header {
