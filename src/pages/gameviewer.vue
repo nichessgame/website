@@ -8,61 +8,77 @@
       />
     </div>
 
-    <!-- Control Buttons -->
-    <div class="control-buttons mt-4">
-      <v-btn
-        @click="undoAll"
-        :disabled="isPlaying"
-        variant="outlined"
-      >
-        <v-icon
-          icon="$mdiChevronDoubleLeft"
-          class="ma-auto"
-        />
-      </v-btn>
+    <!-- Control Row -->
+    <div class="control-row mt-2 mt-sm-4">
+      <!-- Left: Empty -->
+      <div class="control-row-left"></div>
 
-      <v-btn
-        @click="undoMove"
-        :disabled="isPlaying"
-        variant="outlined"
-      >
-        <v-icon
-          icon="$mdiChevronLeft"
-          class="ma-auto"
-        />
-      </v-btn>
+      <!-- Center: Control Buttons -->
+      <div class="control-row-center">
+        <v-btn
+          @click="undoAll"
+          :disabled="isPlaying"
+          variant="outlined"
+        >
+          <v-icon
+            icon="$mdiChevronDoubleLeft"
+            class="ma-auto"
+          />
+        </v-btn>
 
-      <v-btn
-        @click="togglePlayPause"
-        variant="outlined"
-      >
-        <v-icon
-          :icon="isPlaying ? '$mdiPause' : '$mdiPlay'"
-          class="ma-auto"
-        />
-      </v-btn>
+        <v-btn
+          @click="undoMove"
+          :disabled="isPlaying"
+          variant="outlined"
+        >
+          <v-icon
+            icon="$mdiChevronLeft"
+            class="ma-auto"
+          />
+        </v-btn>
 
-      <v-btn
-        @click="redoMove"
-        :disabled="isPlaying"
-        variant="outlined"
-      >
-        <v-icon
-          icon="$mdiChevronRight"
-          class="ma-auto"
-        />
-      </v-btn>
+        <v-btn
+          @click="togglePlayPause"
+          variant="outlined"
+        >
+          <v-icon
+            :icon="isPlaying ? '$mdiPause' : '$mdiPlay'"
+            class="ma-auto"
+          />
+        </v-btn>
 
-      <v-btn
-        @click="redoAll"
-        :disabled="isPlaying"
-        variant="outlined"
-      >
-        <v-icon
-          icon="$mdiChevronDoubleRight"
-          class="ma-auto"
-        />
-      </v-btn>
+        <v-btn
+          @click="redoMove"
+          :disabled="isPlaying"
+          variant="outlined"
+        >
+          <v-icon
+            icon="$mdiChevronRight"
+            class="ma-auto"
+          />
+        </v-btn>
+
+        <v-btn
+          @click="redoAll"
+          :disabled="isPlaying"
+          variant="outlined"
+        >
+          <v-icon
+            icon="$mdiChevronDoubleRight"
+            class="ma-auto"
+          />
+        </v-btn>
+      </div>
+
+      <!-- Right: Sound Button -->
+      <div class="control-row-right">
+        <v-btn
+          @click="toggleSound"
+          variant="flat"
+        >
+          <v-icon :icon="soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
+        </v-btn>
+      </div>
     </div>
 
     <!-- Tabs Navigation -->
@@ -73,107 +89,102 @@
 
     <!-- Tab Content -->
     <!-- History Tab -->
-    <div v-show="activeTab === 'history'" class="tab-content move-history-section">
-      <div class="history-header">
-        <div class="history-label">Move History:</div>
-        <div class="history-buttons" v-if="parsedMoves.length > 0">
-          <v-btn
-            v-if="viewMode"
-            @click="copyMoveHistory"
-            variant="outlined"
-            size="small"
-            prepend-icon="$mdiContentCopy"
-          >
-            Copy
-          </v-btn>
-          <v-btn
-            @click="toggleViewMode"
-            variant="outlined"
-            size="small"
-          >
-            {{ viewMode ? 'Edit' : 'View' }}
-          </v-btn>
+    <div v-show="activeTab === 'history'" class="tab-content">
+      <div class="move-history-section">
+        <div class="history-header">
+          <div class="history-label">Move History:</div>
+          <div class="history-buttons" v-if="parsedMoves.length > 0">
+            <v-btn
+              v-if="viewMode"
+              @click="copyMoveHistory"
+              variant="outlined"
+              size="small"
+              prepend-icon="$mdiContentCopy"
+            >
+              Copy
+            </v-btn>
+            <v-btn
+              @click="toggleViewMode"
+              variant="outlined"
+              size="small"
+            >
+              {{ viewMode ? 'Edit' : 'View' }}
+            </v-btn>
+          </div>
         </div>
-      </div>
 
-      <!-- Input Mode -->
-      <div v-if="!viewMode">
-        <v-textarea
-          v-model="moveHistoryText"
-          placeholder="Enter move history, e.g.:
+        <!-- Input Mode -->
+        <div v-if="!viewMode">
+          <v-textarea
+            v-model="moveHistoryText"
+            placeholder="Enter move history, e.g.:
 1.e2 -> e4
 2.d7 -> d6
 3.g1 -> f3
 4.b7 -> b6"
-          rows="8"
-          variant="outlined"
-          class="mt-2"
-        ></v-textarea>
-        <v-btn
-          @click="loadMoveHistory"
-          variant="outlined"
-          prepend-icon="$mdiUpload"
-          class="mt-2"
-        >
-          Load Moves
-        </v-btn>
-
-        <!-- Load Message Display -->
-        <div v-if="loadMessage.text" :class="['load-message', 'mt-3', `message-${loadMessage.type}`]">
-          <v-icon v-if="loadMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-          <v-icon v-else-if="loadMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-          <v-icon v-else icon="$mdiInformation" class="message-icon" />
-          <span>{{ loadMessage.text }}</span>
-        </div>
-      </div>
-
-      <!-- Viewing Mode -->
-      <div v-else class="move-history-view mt-2">
-        <!-- Copy Message Display -->
-        <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
-          <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-          <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-          <span>{{ copyMessage.text }}</span>
-        </div>
-
-        <div v-if="parsedMoves.length === 0" class="no-moves">No moves loaded</div>
-        <div v-else class="move-list">
-          <div
-            v-for="(move, index) in parsedMoves"
-            :key="index"
-            :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
-            @click="jumpToMove(index + 1)"
+            rows="8"
+            variant="outlined"
+            class="mt-2"
+          ></v-textarea>
+          <v-btn
+            @click="loadMoveHistory"
+            variant="outlined"
+            prepend-icon="$mdiUpload"
+            class="mt-2"
           >
-            <span class="move-number">{{ index + 1 }}.</span>
-            <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+            Load Moves
+          </v-btn>
+
+          <!-- Load Message Display -->
+          <div v-if="loadMessage.text" :class="['load-message', 'mt-3', `message-${loadMessage.type}`]">
+            <v-icon v-if="loadMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+            <v-icon v-else-if="loadMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+            <v-icon v-else icon="$mdiInformation" class="message-icon" />
+            <span>{{ loadMessage.text }}</span>
+          </div>
+        </div>
+
+        <!-- Viewing Mode -->
+        <div v-else class="move-history-view mt-2">
+          <!-- Copy Message Display -->
+          <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+            <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+            <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+            <span>{{ copyMessage.text }}</span>
+          </div>
+
+          <div v-if="parsedMoves.length === 0" class="no-moves">No moves loaded</div>
+          <div v-else class="move-list">
+            <div
+              v-for="(move, index) in parsedMoves"
+              :key="index"
+              :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
+              @click="jumpToMove(index + 1)"
+            >
+              <span class="move-number">{{ index + 1 }}.</span>
+              <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Settings Tab -->
-    <div v-show="activeTab === 'settings'" class="tab-content playback-config">
-      <div class="config-row">
-        <label class="config-label">Time between moves (ms):</label>
-        <v-text-field
-          v-model.number="moveDelay"
-          type="number"
-          :min="100"
-          :max="5000"
-          :step="100"
-          variant="outlined"
-          density="compact"
-          style="max-width: 150px;"
-        ></v-text-field>
-      </div>
-
-      <div class="config-row">
-        <v-checkbox
-          v-model="soundEnabled"
-          label="Enable sound"
-          density="compact"
-          hide-details
-        ></v-checkbox>
+    <div v-show="activeTab === 'settings'" class="tab-content">
+      <div class="settings-section">
+        <div class="config-row">
+          <label class="config-label">Time between moves (ms):</label>
+          <v-text-field
+            v-model.number="moveDelay"
+            type="number"
+            :min="100"
+            :max="5000"
+            :step="100"
+            variant="outlined"
+            density="compact"
+            style="max-width: 150px;"
+          ></v-text-field>
+        </div>
       </div>
     </div>
   </v-container>
@@ -410,6 +421,15 @@ function playMoveSound() {
   moveAudio.play();
 }
 
+function toggleSound() {
+  const wasDisabled = !soundEnabled.value;
+  soundEnabled.value = !soundEnabled.value;
+
+  if (wasDisabled && soundEnabled.value) {
+    playMoveSound();
+  }
+}
+
 function parseMoveHistory(historyText) {
   const lines = historyText.split('\n').filter(line => line.trim() !== '');
   const moves = [];
@@ -545,11 +565,67 @@ function loadMoveHistory() {
   scroll-margin: 0;
 }
 
-.control-buttons {
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.control-row-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding-left: 16px;
+}
+
+.control-row-center {
   display: flex;
   gap: 16px;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.control-row-right {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  padding-right: 16px;
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .control-row {
+    gap: 8px;
+    margin-top: 8px !important;
+  }
+
+  .control-row-left {
+    padding-left: 8px;
+  }
+
+  .control-row-center {
+    gap: 8px;
+  }
+
+  .control-row-right {
+    gap: 8px;
+    padding-right: 8px;
+  }
+
+  .control-row :deep(.v-btn) {
+    min-width: 36px !important;
+    width: 36px;
+    height: 36px;
+    padding: 0 8px;
+  }
+
+  .control-row :deep(.v-btn .v-icon) {
+    font-size: 18px;
+  }
 }
 
 .tab-content {
@@ -559,13 +635,6 @@ function loadMoveHistory() {
   border: 1px solid #444;
   border-top: none;
   min-height: 400px;
-}
-
-.playback-config {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  border: none;
 }
 
 .config-row {
@@ -586,10 +655,11 @@ function loadMoveHistory() {
 }
 
 .move-history-section {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  border: none;
+  /* Styling provided by parent .tab-content */
+}
+
+.settings-section {
+  /* Styling provided by parent .tab-content */
 }
 
 .history-header {
