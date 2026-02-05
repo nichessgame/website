@@ -202,7 +202,7 @@ const parsedMoves = ref([]);
 const currentMoveIndex = ref(0);
 const isPlaying = ref(false);
 const moveDelay = ref(1000);
-const soundEnabled = ref(false);
+const soundEnabled = ref(true);
 const loadMessage = ref({ text: '', type: 'info' });
 const viewMode = ref(false);
 const copyMessage = ref({ text: '', type: 'info', show: false });
@@ -210,7 +210,6 @@ const activeTab = ref('history');
 let playbackInterval = null;
 let wheelThrottle = false;
 
-// Audio objects
 const moveAudio = new Audio(MoveSound);
 const captureAudio = new Audio(CaptureSound);
 
@@ -225,7 +224,6 @@ function handleWheel(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  // Don't process moves during playback or if throttled
   if (isPlaying.value || wheelThrottle) return;
 
   // Throttle wheel events to prevent too rapid scrolling
@@ -244,10 +242,8 @@ function handleWheel(event) {
 }
 
 function handleKeyDown(event) {
-  // Don't process during playback
   if (isPlaying.value) return;
 
-  // Check for arrow keys
   if (event.key === 'ArrowLeft') {
     event.preventDefault();
     undoMove();
@@ -259,11 +255,9 @@ function handleKeyDown(event) {
 
 onMounted(() => {
   if (chessboardContainer.value) {
-    // Add wheel event listener with passive: false to allow preventDefault
     chessboardContainer.value.addEventListener('wheel', handleWheel, { passive: false });
   }
 
-  // Add keyboard event listener for arrow keys
   document.addEventListener('keydown', handleKeyDown);
 });
 
@@ -272,7 +266,6 @@ onBeforeUnmount(() => {
     chessboardContainer.value.removeEventListener('wheel', handleWheel);
   }
 
-  // Remove keyboard event listener
   document.removeEventListener('keydown', handleKeyDown);
 });
 
@@ -285,11 +278,10 @@ function undoMove() {
 
 function redoWithSound() {
   const move = parsedMoves.value[currentMoveIndex.value];
-  const isCapture = boardAPI.getPiece(move.to).type !== PieceType.NO_PIECE;
   boardAPI.redoLastMove();
   currentMoveIndex.value++;
   if (soundEnabled.value) {
-    if (isCapture) {
+    if (move.attack) {
       playCaptureSound();
     } else {
       playMoveSound();
@@ -347,7 +339,6 @@ async function copyMoveHistory() {
       show: true
     };
 
-    // Hide message after 3 seconds
     setTimeout(() => {
       copyMessage.value.show = false;
     }, 3000);
@@ -488,7 +479,6 @@ function loadMoveHistory() {
     return;
   }
 
-  // Reset the board to starting position
   boardAPI.resetBoard();
   let tempMoveIndex = 0;
 
@@ -496,7 +486,6 @@ function loadMoveHistory() {
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
 
-    // Check if the move is legal
     if (!boardAPI.isMoveLegal(move)) {
       loadMessage.value = {
         text: `Illegal move at line ${move.lineNum}: ${move.from} -> ${move.to}`,
@@ -512,6 +501,9 @@ function loadMoveHistory() {
       }
       return;
     }
+
+    const isAttack = boardAPI.getPiece(move.to).type !== PieceType.NO_PIECE;
+    move.attack = isAttack;
 
     boardAPI.move(move);
     tempMoveIndex++;
