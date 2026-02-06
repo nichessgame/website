@@ -6,24 +6,21 @@ let aiAgent = new AIAgent();
 
 self.onmessage = async (event: MessageEvent) => {
   try {
-    // Inform the main thread that model download/initialization is starting (or already done).
     if(!aiAgent.initialized) {
       console.log('initializing aiAgent')
-      self.postMessage({ type: 'model-status', status: 'starting', id: event.data?.id ?? '' });
+      self.postMessage({ type: 'model-status', status: 'starting', gameId: event.data?.gameId ?? '' });
       await aiAgent.init()
       console.log('agent initialized')
-      self.postMessage({ type: 'model-status', status: 'ready', id: event.data?.id ?? '' });
+      self.postMessage({ type: 'model-status', status: 'ready', gameId: event.data?.gameId ?? '' });
     } else {
-      // If already initialized, let the UI know immediately.
-      self.postMessage({ type: 'model-status', status: 'ready', id: event.data?.id ?? '' });
+      self.postMessage({ type: 'model-status', status: 'ready', gameId: event.data?.gameId ?? '' });
     }
 
-    // Check if this is an evaluation request (no search, just neural net prediction)
     if (event.data.type === 'evaluate') {
       const evaluation = aiAgent.evaluate(event.data.boardString);
       self.postMessage({
         type: 'evaluation-result',
-        id: event.data.id,
+        gameId: event.data.gameId,
         evaluation: evaluation
       });
       return;
@@ -33,12 +30,13 @@ self.onmessage = async (event: MessageEvent) => {
     let action = searchResult[0];
     let debugStr = searchResult[1];
     self.postMessage({
-      id: event.data.id,
+      gameId: event.data.gameId,
       move: action.srcIdx.toString() + '.' + action.dstIdx.toString(),
-      debug: debugStr
+      debug: debugStr,
+      requestId: event.data.requestId
     });
   } catch (e: any) {
     console.error('worker error', e);
-    self.postMessage({ type: 'model-status', status: 'error', message: String(e?.message ?? e), id: event.data?.id ?? '' });
+    self.postMessage({ type: 'model-status', status: 'error', message: String(e?.message ?? e), gameId: event.data?.gameId ?? '' });
   }
 };
