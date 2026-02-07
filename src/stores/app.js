@@ -84,3 +84,34 @@ function loadColorSetting() {
 function saveColorSetting(color) {
   localStorage.setItem('nichess-selected-color', JSON.stringify(color));
 }
+
+const SAVED_GAMES_KEY = 'nichess-saved-games'
+const MAX_SAVED_GAMES = 10
+
+function loadSavedGames() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_GAMES_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function persistSavedGames(games) {
+  localStorage.setItem(SAVED_GAMES_KEY, JSON.stringify(games))
+}
+
+export function saveGame(gameData) {
+  const games = loadSavedGames()
+  const filtered = games.filter(g => g.gameId !== gameData.gameId)
+  filtered.push({ ...gameData, savedAt: Date.now() })
+  filtered.sort((a, b) => b.savedAt - a.savedAt)
+  persistSavedGames(filtered.slice(0, MAX_SAVED_GAMES))
+}
+
+export function loadGame(gameId) {
+  return loadSavedGames().find(g => g.gameId === gameId) || null
+}
+
+export function getSavedGames() {
+  return loadSavedGames()
+}

@@ -147,7 +147,7 @@ import { useRoute } from 'vue-router'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
 import NewGameDialog from '@/components/NewGameDialog.vue'
-import { useAppStore } from '../stores/app';
+import { useAppStore, saveGame, loadGame } from '../stores/app';
 import { PieceType } from 'nichess';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
@@ -164,7 +164,19 @@ const modelLoading = ref(false)
 const currentMoveIndex = ref(0)
 const copyMessage = ref({ text: '', type: 'info', show: false })
 
-// Get difficulty config from props
+let isRestoring = false
+
+function saveGameToStorage() {
+  if (isRestoring || !props.gameId) return
+  saveGame({
+    gameId: props.gameId,
+    myColor: props.myColor,
+    difficulty: props.difficulty,
+    moveHistory: moveHistory.value.map(m => ({ from: m.from, to: m.to, attack: m.attack })),
+    gameOver: gameOver.value
+  })
+}
+
 const difficultyConfig = computed(() => {
   return AIDifficulty.getConfig(Number(props.difficulty));
 });
@@ -256,24 +268,57 @@ function handleBoardCreated(api) {
   currentAIRequestId.value = null;
   aiComputingFromIndex.value = null;
 
-  if(props.myColor === 'black') {
-    boardAPI.toggleOrientation();
+  // Try to restore a saved game
+  const savedGame = loadGame(props.gameId);
+  if (savedGame && savedGame.moveHistory && savedGame.moveHistory.length > 0) {
+    isRestoring = true;
 
-    // Assign request ID for AI's first move
-    aiRequestCounter++;
-    currentAIRequestId.value = aiRequestCounter;
-    aiComputingFromIndex.value = 0;
+    if (props.myColor === 'black') {
+      boardAPI.toggleOrientation();
+    }
 
-    console.log(`Sending AI request with ID: ${currentAIRequestId.value} (first move)`);
+    // Replay all saved moves
+    for (const move of savedGame.moveHistory) {
+      boardAPI.move({ from: move.from, to: move.to, promotion: undefined });
+    }
 
-    let boardStr = boardAPI.getFen();
-    boardWorker.postMessage({
-      gameId: props.gameId,
-      board: boardStr,
-      difficulty: difficultyConfig.value,
-      history: aiHistory,
-      requestId: currentAIRequestId.value
-    });
+    gameOver.value = savedGame.gameOver || boardAPI.getIsGameOver();
+    isRestoring = false;
+
+    // If it's AI's turn and game isn't over, request AI move
+    if (!gameOver.value && boardAPI.getTurnColor() !== props.myColor) {
+      aiRequestCounter++;
+      currentAIRequestId.value = aiRequestCounter;
+      aiComputingFromIndex.value = currentMoveIndex.value;
+
+      boardWorker.postMessage({
+        gameId: props.gameId,
+        difficulty: difficultyConfig.value,
+        history: aiHistory,
+        requestId: currentAIRequestId.value
+      });
+    }
+  } else {
+    // New game
+    if(props.myColor === 'black') {
+      boardAPI.toggleOrientation();
+
+      // Assign request ID for AI's first move
+      aiRequestCounter++;
+      currentAIRequestId.value = aiRequestCounter;
+      aiComputingFromIndex.value = 0;
+
+      console.log(`Sending AI request with ID: ${currentAIRequestId.value} (first move)`);
+
+      let boardStr = boardAPI.getFen();
+      boardWorker.postMessage({
+        gameId: props.gameId,
+        board: boardStr,
+        difficulty: difficultyConfig.value,
+        history: aiHistory,
+        requestId: currentAIRequestId.value
+      });
+    }
   }
 }
 
@@ -293,6 +338,8 @@ async function handleMove(move) {
 
   gameOver.value = boardAPI.getIsGameOver();
 
+  if (isRestoring) return;
+
   if (appStore.soundEnabled) {
     if (move.attack) {
       playCaptureSound();
@@ -300,6 +347,8 @@ async function handleMove(move) {
       playMoveSound();
     }
   }
+
+  saveGameToStorage();
 
   if(
     (boardAPI.getTurnColor() != props.myColor) &&
@@ -323,11 +372,13 @@ async function handleMove(move) {
 
 function handleCheckmate(isMated) {
   gameOver.value = true;
+  saveGameToStorage();
   console.log(isMated);
 }
 
 function handleDraw() {
   gameOver.value = true;
+  saveGameToStorage();
   console.log('draw');
 }
 
