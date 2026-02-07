@@ -87,7 +87,7 @@
           @click="toggleSound"
           variant="flat"
         >
-          <v-icon :icon="soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
+          <v-icon :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
         </v-btn>
       </div>
     </div>
@@ -162,7 +162,6 @@ const numNodesExplored = ref(0)
 const gameOver = ref(false)
 const modelLoading = ref(false)
 const currentMoveIndex = ref(0)
-const soundEnabled = ref(true)
 const copyMessage = ref({ text: '', type: 'info', show: false })
 
 // Get difficulty config from props
@@ -294,7 +293,7 @@ async function handleMove(move) {
 
   gameOver.value = boardAPI.getIsGameOver();
 
-  if (soundEnabled.value) {
+  if (appStore.soundEnabled) {
     if (move.attack) {
       playCaptureSound();
     } else {
@@ -343,10 +342,10 @@ function playMoveSound() {
 }
 
 function toggleSound() {
-  const wasDisabled = !soundEnabled.value;
-  soundEnabled.value = !soundEnabled.value;
+  const wasDisabled = !appStore.soundEnabled;
+  appStore.toggleSound();
 
-  if (wasDisabled && soundEnabled.value) {
+  if (wasDisabled && appStore.soundEnabled) {
     playMoveSound();
   }
 }
@@ -364,7 +363,7 @@ function redoWithSound() {
   boardAPI.redoLastMove();
   currentMoveIndex.value++;
   aiHistory.push([chessSquares.indexOf(move.from), chessSquares.indexOf(move.to)]);
-  if (soundEnabled.value) {
+  if (appStore.soundEnabled) {
     if (move.attack) {
       playCaptureSound();
     } else {
@@ -388,7 +387,7 @@ function undoAll() {
     aiHistory.pop();
   }
 
-  if (soundEnabled.value) {
+  if (appStore.soundEnabled) {
     playMoveSound();
   }
 }

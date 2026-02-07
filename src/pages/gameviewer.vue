@@ -76,7 +76,7 @@
           @click="toggleSound"
           variant="flat"
         >
-          <v-icon :icon="soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
+          <v-icon :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
         </v-btn>
       </div>
     </div>
@@ -195,8 +195,11 @@ import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { Piece, PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
+import { useAppStore } from '../stores/app';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
+
+const appStore = useAppStore();
 
 const boardConfig = reactive({
   animation: {
@@ -213,7 +216,6 @@ const parsedMoves = ref([]);
 const currentMoveIndex = ref(0);
 const isPlaying = ref(false);
 const moveDelay = ref(1000);
-const soundEnabled = ref(true);
 const loadMessage = ref({ text: '', type: 'info' });
 const viewMode = ref(false);
 const copyMessage = ref({ text: '', type: 'info', show: false });
@@ -291,7 +293,7 @@ function redoWithSound() {
   const move = parsedMoves.value[currentMoveIndex.value];
   boardAPI.redoLastMove();
   currentMoveIndex.value++;
-  if (soundEnabled.value) {
+  if (appStore.soundEnabled) {
     if (move.attack) {
       playCaptureSound();
     } else {
@@ -314,7 +316,7 @@ function undoAll() {
     currentMoveIndex.value--;
   }
 
-  if (soundEnabled.value) {
+  if (appStore.soundEnabled) {
     playMoveSound();
   }
 }
@@ -422,10 +424,10 @@ function playMoveSound() {
 }
 
 function toggleSound() {
-  const wasDisabled = !soundEnabled.value;
-  soundEnabled.value = !soundEnabled.value;
+  const wasDisabled = !appStore.soundEnabled;
+  appStore.toggleSound();
 
-  if (wasDisabled && soundEnabled.value) {
+  if (wasDisabled && appStore.soundEnabled) {
     playMoveSound();
   }
 }

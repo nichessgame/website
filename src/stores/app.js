@@ -7,8 +7,9 @@ export const useAppStore = defineStore('app', {
     boardWorker: null,
     modelReady: false,
     modelLoading: false,
-    selectedDifficulty: AIDifficulty.getConfig(3),
-    selectedColor: 'white'
+    selectedDifficulty: loadDifficultySetting(),
+    selectedColor: loadColorSetting(),
+    soundEnabled: loadSoundSetting()
   }),
   getters: {
     selectedDifficultyLabel: (state) => state.selectedDifficulty.label
@@ -36,12 +37,50 @@ export const useAppStore = defineStore('app', {
     },
     setDifficulty(difficultyConfig) {
       this.selectedDifficulty = difficultyConfig;
+      saveDifficultySetting(difficultyConfig.level);
     },
     setDifficultyByLevel(level) {
       this.selectedDifficulty = AIDifficulty.getConfig(level);
+      saveDifficultySetting(level);
     },
     setColor(color) {
       this.selectedColor = color;
+      saveColorSetting(color);
+    },
+    setSoundEnabled(enabled) {
+      this.soundEnabled = enabled;
+      saveSoundSetting(enabled);
+    },
+    toggleSound() {
+      this.setSoundEnabled(!this.soundEnabled);
     }
   }
 })
+
+function loadSoundSetting() {
+  const stored = localStorage.getItem('nichess-sound-enabled');
+  return stored !== null ? JSON.parse(stored) : true;
+}
+
+function saveSoundSetting(enabled) {
+  localStorage.setItem('nichess-sound-enabled', JSON.stringify(enabled));
+}
+
+function loadDifficultySetting() {
+  const stored = localStorage.getItem('nichess-difficulty-level');
+  const level = stored !== null ? JSON.parse(stored) : 3;
+  return AIDifficulty.getConfig(level);
+}
+
+function saveDifficultySetting(level) {
+  localStorage.setItem('nichess-difficulty-level', JSON.stringify(level));
+}
+
+function loadColorSetting() {
+  const stored = localStorage.getItem('nichess-selected-color');
+  return stored !== null ? JSON.parse(stored) : 'white';
+}
+
+function saveColorSetting(color) {
+  localStorage.setItem('nichess-selected-color', JSON.stringify(color));
+}
