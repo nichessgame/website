@@ -73,7 +73,7 @@
         </v-btn>
       </div>
 
-      <!-- Right: New Game and Sound -->
+      <!-- Right: New Game, Board Flip and Sound -->
       <div class="control-row-right">
         <v-btn
           @click="showNewGameDialog = true"
@@ -81,6 +81,13 @@
           :class="{ 'gold': gameOver }"
         >
           <v-icon icon="$mdiSwordCross" />
+        </v-btn>
+
+        <v-btn
+          @click="flipBoard"
+          variant="flat"
+        >
+          <v-icon icon="$mdiRotate3dVariant" />
         </v-btn>
 
         <v-btn
@@ -92,40 +99,98 @@
       </div>
     </div>
 
-    <!-- Move History Section -->
-    <div class="move-history-section mt-4">
-      <div class="history-header">
-        <div class="history-label">Move History:</div>
-        <div class="history-buttons" v-if="moveHistory.length > 0">
-          <v-btn
-            @click="copyMoveHistory"
-            variant="outlined"
-            size="small"
-            prepend-icon="$mdiContentCopy"
-          >
-            Copy
-          </v-btn>
+    <!-- Tabs Navigation -->
+    <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="#1a1a1a">
+      <v-tab value="moves">Moves</v-tab>
+      <v-tab value="games">Games</v-tab>
+    </v-tabs>
+
+    <!-- Moves Tab -->
+    <div v-show="activeTab === 'moves'" class="tab-content">
+      <div class="move-history-section">
+        <div class="history-header">
+          <div class="history-label">History:</div>
+          <div class="history-buttons" v-if="moveHistory.length > 0">
+            <v-btn
+              @click="copyMoveHistory"
+              variant="outlined"
+              size="small"
+              prepend-icon="$mdiContentCopy"
+            >
+              Copy
+            </v-btn>
+          </div>
+        </div>
+
+        <div class="move-history-view mt-2">
+          <!-- Copy Message Display -->
+          <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+            <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+            <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+            <span>{{ copyMessage.text }}</span>
+          </div>
+
+          <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
+          <div v-else class="move-list">
+            <div
+              v-for="(move, index) in moveHistory"
+              :key="index"
+              :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
+              @click="jumpToMove(index + 1)"
+            >
+              <span class="move-number">{{ index + 1 }}.</span>
+              <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="move-history-view mt-2">
-        <!-- Copy Message Display -->
-        <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
-          <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-          <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-          <span>{{ copyMessage.text }}</span>
-        </div>
-
-        <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
-        <div v-else class="move-list">
-          <div
-            v-for="(move, index) in moveHistory"
-            :key="index"
-            :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
-            @click="jumpToMove(index + 1)"
-          >
-            <span class="move-number">{{ index + 1 }}.</span>
-            <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+    <!-- Games Tab -->
+    <div v-show="activeTab === 'games'" class="tab-content">
+      <div class="games-info-message">Only the last {{ MAX_SAVED_GAMES }} games will be saved</div>
+      <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
+      <div v-else class="saved-games-list">
+        <div
+          v-for="(game, index) in savedGames"
+          :key="game.gameId"
+          :class="['saved-game-item', { 'current-game': game.gameId === props.gameId }]"
+          @click="loadSavedGame(game)"
+        >
+          <div class="saved-game-info">
+            <span class="saved-game-number">{{ index + 1 }}.</span>
+            <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
+            <span v-if="game.gameOver" class="saved-game-over">ended</span>
+          </div>
+          <div class="saved-game-actions">
+            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+            <template v-if="confirmingDeleteId === game.gameId">
+              <v-btn
+                icon
+                size="x-small"
+                variant="text"
+                @click.stop="deleteSavedGame(game)"
+              >
+                <v-icon icon="$mdiCheckCircle" size="small" color="green" />
+              </v-btn>
+              <v-btn
+                icon
+                size="x-small"
+                variant="text"
+                @click.stop="confirmingDeleteId = null"
+              >
+                <v-icon icon="$mdiClose" size="small" color="red" />
+              </v-btn>
+            </template>
+            <v-btn
+              v-else
+              icon
+              size="x-small"
+              variant="text"
+              @click.stop="confirmingDeleteId = game.gameId"
+            >
+              <v-icon icon="$mdiDelete" size="small" />
+            </v-btn>
           </div>
         </div>
       </div>
@@ -142,18 +207,19 @@ const boardConfig = {
   }
 };
 
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
 import NewGameDialog from '@/components/NewGameDialog.vue'
-import { useAppStore, saveGame, loadGame } from '../stores/app';
+import { useAppStore, loadGame, MAX_SAVED_GAMES } from '../stores/app';
 import { PieceType } from 'nichess';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
 import { AIDifficulty } from '../AI/common';
 
 const appStore = useAppStore();
+const router = useRouter();
 const boardWorker = appStore.initBoardWorker();
 const moveHistory = ref([]);
 const aiHistory = [];
@@ -163,12 +229,33 @@ const gameOver = ref(false)
 const modelLoading = ref(false)
 const currentMoveIndex = ref(0)
 const copyMessage = ref({ text: '', type: 'info', show: false })
+const activeTab = ref('history')
+const savedGames = computed(() => appStore.savedGames)
+const confirmingDeleteId = ref(null)
+
+function onStorageChange(e) {
+  if (e.key === 'nichess-saved-games') {
+    appStore.refreshSavedGames()
+    // If the current game was deleted from another tab, start a new default game
+    if (props.gameId && moveHistory.value.length > 0 && !appStore.savedGames.find(g => g.gameId === props.gameId)) {
+      startNewDefaultGame()
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', onStorageChange)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', onStorageChange)
+})
 
 let isRestoring = false
 
 function saveGameToStorage() {
   if (isRestoring || !props.gameId) return
-  saveGame({
+  appStore.saveGame({
     gameId: props.gameId,
     myColor: props.myColor,
     difficulty: props.difficulty,
@@ -392,6 +479,10 @@ function playMoveSound() {
   moveAudio.play();
 }
 
+function flipBoard() {
+  if (boardAPI) boardAPI.toggleOrientation()
+}
+
 function toggleSound() {
   const wasDisabled = !appStore.soundEnabled;
   appStore.toggleSound();
@@ -503,6 +594,47 @@ async function copyMoveHistory() {
   }
 }
 
+function loadSavedGame(game) {
+  if (game.gameId === props.gameId) return
+  router.push({
+    name: 'game',
+    params: {
+      myColor: game.myColor,
+      difficulty: game.difficulty,
+      gameId: game.gameId
+    }
+  })
+}
+
+function deleteSavedGame(game) {
+  confirmingDeleteId.value = null
+  appStore.deleteGame(game.gameId)
+  if (game.gameId === props.gameId) {
+    startNewDefaultGame()
+  }
+}
+
+function startNewDefaultGame() {
+  router.push({
+    name: 'game',
+    params: {
+      myColor: 'white',
+      difficulty: '3',
+      gameId: Date.now().toString()
+    }
+  })
+}
+
+function getDifficultyLabel(difficulty) {
+  return AIDifficulty.getConfig(Number(difficulty)).label
+}
+
+function formatDate(timestamp) {
+  return new Date(timestamp).toLocaleString(undefined, {
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+  })
+}
+
 const props = defineProps({
   myColor: {
     type: String,
@@ -585,23 +717,40 @@ const props = defineProps({
   }
 
   .control-row :deep(.v-btn) {
-    min-width: 36px !important;
-    width: 36px;
-    height: 36px;
-    padding: 0 8px;
+    min-width: 28px !important;
+    width: 28px;
+    height: 28px;
+    padding: 0 4px;
   }
 
   .control-row :deep(.v-btn .v-icon) {
-    font-size: 18px;
+    font-size: 14px;
   }
 }
 
-.move-history-section {
+.tabs-no-scroll {
+  scroll-margin: 0;
+}
+
+.tabs-no-scroll :deep(.v-tab) {
+  scroll-margin: 0;
+}
+
+.tabs-no-scroll :deep(.v-btn) {
+  scroll-margin: 0;
+}
+
+.tab-content {
   background-color: #1a1a1a;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 0 0 8px 8px;
   border: 1px solid #444;
+  border-top: none;
   min-height: 400px;
+}
+
+.move-history-section {
+  /* Styling provided by parent .tab-content */
 }
 
 .history-header {
@@ -705,5 +854,90 @@ const props = defineProps({
 
 .gold {
   color: #ffd700;
+}
+
+.saved-games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.saved-game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background-color: #333;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saved-game-item:hover {
+  background-color: #444;
+  border-color: #666;
+}
+
+.saved-game-item.current-game {
+  background-color: #2a4a2a;
+  border-color: #4CAF50;
+  cursor: default;
+}
+
+.saved-game-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.saved-game-number {
+  color: #999;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 30px;
+}
+
+.saved-game-color {
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.saved-game-detail {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.saved-game-over {
+  color: #ffd700;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.saved-game-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-game-date {
+  color: #888;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.games-info-message {
+  color: #aaa;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: #2a2a2a;
+  border-radius: 4px;
+  border: 1px solid #444;
 }
 </style>

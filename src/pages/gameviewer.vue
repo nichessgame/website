@@ -70,8 +70,15 @@
         </v-btn>
       </div>
 
-      <!-- Right: Sound Button -->
+      <!-- Right: Flip and Sound Buttons -->
       <div class="control-row-right">
+        <v-btn
+          @click="flipBoard"
+          variant="flat"
+        >
+          <v-icon icon="$mdiRotate3dVariant" />
+        </v-btn>
+
         <v-btn
           @click="toggleSound"
           variant="flat"
@@ -83,16 +90,17 @@
 
     <!-- Tabs Navigation -->
     <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="#1a1a1a">
-      <v-tab value="history">History</v-tab>
+      <v-tab value="moves">Moves</v-tab>
+      <v-tab value="games">Games</v-tab>
       <v-tab value="settings">Settings</v-tab>
     </v-tabs>
 
     <!-- Tab Content -->
-    <!-- History Tab -->
-    <div v-show="activeTab === 'history'" class="tab-content">
+    <!-- Moves Tab -->
+    <div v-show="activeTab === 'moves'" class="tab-content">
       <div class="move-history-section">
         <div class="history-header">
-          <div class="history-label">Move History:</div>
+          <div class="history-label">History:</div>
           <div class="history-buttons" v-if="parsedMoves.length > 0">
             <v-btn
               v-if="viewMode"
@@ -169,6 +177,56 @@
       </div>
     </div>
 
+    <!-- Games Tab -->
+    <div v-show="activeTab === 'games'" class="tab-content">
+      <div class="games-info-message">Only the last {{ MAX_SAVED_GAMES }} games will be saved</div>
+      <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
+      <div v-else class="saved-games-list">
+        <div
+          v-for="(game, index) in savedGames"
+          :key="game.gameId"
+          :class="['saved-game-item', { 'current-game': game.gameId === loadedGameId }]"
+          @click="loadSavedGame(game)"
+        >
+          <div class="saved-game-info">
+            <span class="saved-game-number">{{ index + 1 }}.</span>
+            <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
+            <span v-if="game.gameOver" class="saved-game-over">ended</span>
+          </div>
+          <div class="saved-game-actions">
+            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+            <template v-if="confirmingDeleteId === game.gameId">
+              <v-btn
+                icon
+                size="x-small"
+                variant="text"
+                @click.stop="deleteSavedGame(game)"
+              >
+                <v-icon icon="$mdiCheckCircle" size="small" color="green" />
+              </v-btn>
+              <v-btn
+                icon
+                size="x-small"
+                variant="text"
+                @click.stop="confirmingDeleteId = null"
+              >
+                <v-icon icon="$mdiClose" size="small" color="red" />
+              </v-btn>
+            </template>
+            <v-btn
+              v-else
+              icon
+              size="x-small"
+              variant="text"
+              @click.stop="confirmingDeleteId = game.gameId"
+            >
+              <v-icon icon="$mdiDelete" size="small" />
+            </v-btn>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Settings Tab -->
     <div v-show="activeTab === 'settings'" class="tab-content">
       <div class="settings-section">
@@ -191,11 +249,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { Piece, PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
-import { useAppStore } from '../stores/app';
+import { useAppStore, MAX_SAVED_GAMES } from '../stores/app';
+import { AIDifficulty } from '../AI/common';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
 
@@ -220,6 +279,22 @@ const loadMessage = ref({ text: '', type: 'info' });
 const viewMode = ref(false);
 const copyMessage = ref({ text: '', type: 'info', show: false });
 const activeTab = ref('history');
+const savedGames = computed(() => appStore.savedGames)
+const loadedGameId = ref(null)
+const confirmingDeleteId = ref(null)
+
+function onStorageChange(e) {
+  if (e.key === 'nichess-saved-games') {
+    appStore.refreshSavedGames()
+    if (loadedGameId.value) {
+      const game = appStore.savedGames.find(g => g.gameId === loadedGameId.value)
+      if (game && game.moveHistory.length !== parsedMoves.value.length) {
+        reloadCurrentGame(game)
+      }
+    }
+  }
+}
+
 let playbackInterval = null;
 let wheelThrottle = false;
 
@@ -272,6 +347,7 @@ onMounted(() => {
   }
 
   document.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('storage', onStorageChange);
 });
 
 onBeforeUnmount(() => {
@@ -280,6 +356,7 @@ onBeforeUnmount(() => {
   }
 
   document.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('storage', onStorageChange);
 });
 
 function undoMove() {
@@ -423,6 +500,10 @@ function playMoveSound() {
   moveAudio.play();
 }
 
+function flipBoard() {
+  if (boardAPI) boardAPI.toggleOrientation()
+}
+
 function toggleSound() {
   const wasDisabled = !appStore.soundEnabled;
   appStore.toggleSound();
@@ -547,6 +628,59 @@ function loadMoveHistory() {
 
   // Switch to view mode after loading
   viewMode.value = true;
+
+  // Detach from any saved game so live updates don't overwrite edited history
+  loadedGameId.value = null;
+}
+
+function deleteSavedGame(game) {
+  confirmingDeleteId.value = null
+  appStore.deleteGame(game.gameId)
+  if (game.gameId === loadedGameId.value) {
+    loadedGameId.value = null
+  }
+}
+
+function loadSavedGame(game) {
+  boardConfig.orientation = game.myColor === 'black' ? 'black' : 'white'
+  moveHistoryText.value = game.moveHistory
+    .map((m, i) => `${i + 1}.${m.from} -> ${m.to}`)
+    .join('\n')
+  loadMoveHistory()
+  loadedGameId.value = game.gameId // set after loadMoveHistory which clears it
+
+  // Play all moves
+  while (currentMoveIndex.value < parsedMoves.value.length) {
+    boardAPI.redoLastMove()
+    currentMoveIndex.value++
+  }
+}
+
+function reloadCurrentGame(game) {
+  if (!boardAPI) return
+
+  // Reset and replay all moves from scratch to handle any history divergence
+  boardAPI.resetBoard()
+  for (const move of game.moveHistory) {
+    boardAPI.move({ from: move.from, to: move.to })
+  }
+
+  parsedMoves.value = game.moveHistory.map(m => ({
+    from: m.from,
+    to: m.to,
+    attack: m.attack
+  }))
+  currentMoveIndex.value = parsedMoves.value.length
+}
+
+function getDifficultyLabel(difficulty) {
+  return AIDifficulty.getConfig(Number(difficulty)).label
+}
+
+function formatDate(timestamp) {
+  return new Date(timestamp).toLocaleString(undefined, {
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+  })
 }
 </script>
 
@@ -619,14 +753,14 @@ function loadMoveHistory() {
   }
 
   .control-row :deep(.v-btn) {
-    min-width: 36px !important;
-    width: 36px;
-    height: 36px;
-    padding: 0 8px;
+    min-width: 28px !important;
+    width: 28px;
+    height: 28px;
+    padding: 0 4px;
   }
 
   .control-row :deep(.v-btn .v-icon) {
-    font-size: 18px;
+    font-size: 14px;
   }
 }
 
@@ -806,5 +940,89 @@ function loadMoveHistory() {
   background-color: rgba(244, 67, 54, 0.15);
   border: 1px solid rgba(244, 67, 54, 0.3);
   color: #ef5350;
+}
+
+.saved-games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.saved-game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background-color: #333;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saved-game-item:hover {
+  background-color: #444;
+  border-color: #666;
+}
+
+.saved-game-item.current-game {
+  background-color: #2a4a2a;
+  border-color: #4CAF50;
+}
+
+.saved-game-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.saved-game-number {
+  color: #999;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 30px;
+}
+
+.saved-game-color {
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.saved-game-detail {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.saved-game-over {
+  color: #ffd700;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.saved-game-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-game-date {
+  color: #888;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.games-info-message {
+  color: #aaa;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: #2a2a2a;
+  border-radius: 4px;
+  border: 1px solid #444;
 }
 </style>
