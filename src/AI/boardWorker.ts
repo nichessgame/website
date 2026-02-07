@@ -1,5 +1,6 @@
 import { AIAgent } from './ai_agent'
 import { PlayerAction } from 'nichess'
+import { AIDifficulty, DifficultyConfig } from './common'
 
 console.log('creating new worker')
 let aiAgent = new AIAgent();
@@ -26,7 +27,15 @@ self.onmessage = async (event: MessageEvent) => {
       return;
     }
 
-    let searchResult: [PlayerAction, string] = await aiAgent.runSearch(event.data.difficulty, 20, event.data.history);
+    // Convert difficulty config or level to DifficultyConfig object
+    let difficultyConfig: DifficultyConfig;
+    if (typeof event.data.difficulty === 'number') {
+      difficultyConfig = AIDifficulty.getConfig(event.data.difficulty);
+    } else {
+      difficultyConfig = event.data.difficulty;
+    }
+
+    let searchResult: [PlayerAction, string] = await aiAgent.runSearch(difficultyConfig, 20, event.data.history);
     let action = searchResult[0];
     let debugStr = searchResult[1];
     self.postMessage({

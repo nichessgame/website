@@ -13,8 +13,8 @@
         </v-radio-group>
 
         <v-select
-          v-model="difficulty"
-          :items="['1 (3 seconds)', '2 (3 seconds)', '3 (3 seconds)', '4 (3 seconds)', '5 (5 seconds)', '6 (8 seconds)']"
+          v-model="selectedDifficultyLabel"
+          :items="difficultyOptions"
           label="Difficulty"
           class="mt-6"
         ></v-select>
@@ -39,6 +39,7 @@ console.log('script setup')
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app';
+import { AIDifficulty } from '../AI/common';
 
 const props = defineProps({
   modelValue: Boolean
@@ -54,18 +55,40 @@ const dialog = computed({
     emit('update:modelValue', value)
   }
 })
-const myColor = ref('white')
-const difficulty = ref('3 (3 seconds)')
 
 const router = useRouter()
 const appStore = useAppStore()
+
+const difficultyOptions = AIDifficulty.getAllLabels();
+
+// Work with labels in the UI, but store the full config
+const selectedDifficultyLabel = computed({
+  get() {
+    return appStore.selectedDifficulty.label
+  },
+  set(label) {
+    const config = AIDifficulty.getAllConfigs().find(c => c.label === label);
+    if (config) {
+      appStore.setDifficulty(config);
+    }
+  }
+})
+
+const myColor = computed({
+  get() {
+    return appStore.selectedColor
+  },
+  set(value) {
+    appStore.setColor(value)
+  }
+})
 
 const startGame = () => {
   router.push({
     name: 'game',
     params: {
-      myColor: myColor.value,
-      difficulty: difficulty.value[0].toString(),
+      myColor: appStore.selectedColor,
+      difficulty: appStore.selectedDifficulty.level.toString(),
       gameId: Date.now().toString()
     }
   })

@@ -8,7 +8,7 @@ globalThis.Buffer = Buffer;
 import { NichessGS } from './nichess_gs'
 import type { GameState } from './game_state'
 import { MCTS } from './mcts'
-import { NetData } from './common'
+import { NetData, AIDifficulty, DifficultyConfig } from './common'
 import { NUM_MOVES } from './nichess_constants'
 import * as tf from '@tensorflow/tfjs';
 import { loadGraphModel } from '@tensorflow/tfjs-converter';
@@ -105,67 +105,16 @@ export class AIAgent {
     return result;
   }
 
-  async runSearch(difficulty: number, batchSize: number, history): [PlayerAction, string] {
+  async runSearch(difficultyConfig: DifficultyConfig, batchSize: number, history): [PlayerAction, string] {
     let nichessAction: PlayerAction;
     let selectedAction: number;
     let debugStr: string;
-    let timeInSeconds: number;
-    let startTemp: number;
-    let endTemp: number;
-    // make the AI play better when it's losing
-    let losingTemp1: number; // when losing slightly
-    let losingTemp2: number; // when losing bigly
-    switch(difficulty) {
-      case 1:
-        timeInSeconds = 3;
-        startTemp = 2.0;
-        endTemp = 1.7;
-        losingTemp1 = 1.7;
-        losingTemp2 = 1.7;
-        break;
-      case 2:
-        timeInSeconds = 3;
-        startTemp = 1.4;
-        endTemp = 1.0;
-        losingTemp1 = 1.0;
-        losingTemp2 = 0.7;
-        break;
-      case 3:
-        timeInSeconds = 3;
-        startTemp = 1.0;
-        endTemp = 0.6;
-        losingTemp1 = 0.6;
-        losingTemp2 = 0.1;
-        break;
-      case 4:
-        timeInSeconds = 3;
-        startTemp = 0.8;
-        endTemp = 0.3;
-        losingTemp1 = 0.3;
-        losingTemp2 = 0.0;
-        break;
-      case 5:
-        timeInSeconds = 5;
-        startTemp = 0.8;
-        endTemp = 0.3;
-        losingTemp1 = 0.3;
-        losingTemp2 = 0.0;
-        break;
-      case 6:
-        timeInSeconds = 8;
-        startTemp = 0.7;
-        endTemp = 0.2;
-        losingTemp1 = 0.2;
-        losingTemp2 = 0.0;
-        break;
-      default:
-        timeInSeconds = 3;
-        startTemp = 1.0;
-        endTemp = 0.5;
-        losingTemp1 = 0.5;
-        losingTemp2 = 0.2;
-        break;
-    };
+
+    const timeInSeconds = difficultyConfig.timeInSeconds;
+    const startTemp = difficultyConfig.startTemp;
+    const endTemp = difficultyConfig.endTemp;
+    const losingTemp1 = difficultyConfig.losingTemp1;
+    const losingTemp2 = difficultyConfig.losingTemp2;
 
     tf.tidy(() => {
       const startTime = performance.now();
@@ -228,13 +177,13 @@ export class AIAgent {
       // moves and never even considers the bad ones.
       // To combat this we'll add some "fake" visits to the nodes based on their policy.
       let policyMultiplier = 0;
-      if(difficulty <= 2) {
+      if(difficultyConfig.level <= 2) {
         if(numNodes <= 30) {
           policyMultiplier = 5;
         } else if(numNodes <= 200) {
           policyMultiplier = 10;
         }
-      } else if(difficulty == 3) {
+      } else if(difficultyConfig.level == 3) {
         if(numNodes <= 100) {
           policyMultiplier = 2;
         } else if(numNodes <= 200) {

@@ -11,6 +11,102 @@ function shuffle(a: Array<any>): Array<any> {
   return a;
 }
 
+export interface DifficultyConfig {
+  level: number;
+  label: string;
+  timeInSeconds: number;
+  startTemp: number;
+  endTemp: number;
+  losingTemp1: number;
+  losingTemp2: number;
+}
+
+export class AIDifficulty {
+  private static readonly DIFFICULTIES: DifficultyConfig[] = [
+    {
+      level: 1,
+      label: '1 (3 seconds)',
+      timeInSeconds: 3,
+      startTemp: 2.0,
+      endTemp: 1.7,
+      losingTemp1: 1.7,
+      losingTemp2: 1.7
+    },
+    {
+      level: 2,
+      label: '2 (3 seconds)',
+      timeInSeconds: 3,
+      startTemp: 1.4,
+      endTemp: 1.0,
+      losingTemp1: 1.0,
+      losingTemp2: 0.7
+    },
+    {
+      level: 3,
+      label: '3 (3 seconds)',
+      timeInSeconds: 3,
+      startTemp: 1.0,
+      endTemp: 0.6,
+      losingTemp1: 0.6,
+      losingTemp2: 0.1
+    },
+    {
+      level: 4,
+      label: '4 (3 seconds)',
+      timeInSeconds: 3,
+      startTemp: 0.8,
+      endTemp: 0.3,
+      losingTemp1: 0.3,
+      losingTemp2: 0.0
+    },
+    {
+      level: 5,
+      label: '5 (5 seconds)',
+      timeInSeconds: 5,
+      startTemp: 0.8,
+      endTemp: 0.3,
+      losingTemp1: 0.3,
+      losingTemp2: 0.0
+    },
+    {
+      level: 6,
+      label: '6 (8 seconds)',
+      timeInSeconds: 8,
+      startTemp: 0.7,
+      endTemp: 0.2,
+      losingTemp1: 0.2,
+      losingTemp2: 0.0
+    }
+  ];
+
+  private static readonly DEFAULT_CONFIG: DifficultyConfig = {
+    level: 3,
+    label: '3 (3 seconds)',
+    timeInSeconds: 3,
+    startTemp: 1.0,
+    endTemp: 0.6,
+    losingTemp1: 0.6,
+    losingTemp2: 0.1
+  };
+
+  static getConfig(level: number): DifficultyConfig {
+    const config = this.DIFFICULTIES.find(d => d.level === level);
+    return config || this.DEFAULT_CONFIG;
+  }
+
+  static getAllLabels(): string[] {
+    return this.DIFFICULTIES.map(d => d.label);
+  }
+
+  static getDefaultLabel(): string {
+    return this.DIFFICULTIES[2].label; // level 3
+  }
+
+  static getAllConfigs(): DifficultyConfig[] {
+    return [...this.DIFFICULTIES];
+  }
+}
+
 export class Node {
   public q: number = 0
   public d: number = 0

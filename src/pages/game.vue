@@ -151,6 +151,7 @@ import { useAppStore } from '../stores/app';
 import { PieceType } from 'nichess';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
+import { AIDifficulty } from '../AI/common';
 
 const appStore = useAppStore();
 const boardWorker = appStore.initBoardWorker();
@@ -163,6 +164,11 @@ const modelLoading = ref(false)
 const currentMoveIndex = ref(0)
 const soundEnabled = ref(true)
 const copyMessage = ref({ text: '', type: 'info', show: false })
+
+// Get difficulty config from props
+const difficultyConfig = computed(() => {
+  return AIDifficulty.getConfig(Number(props.difficulty));
+});
 
 // AI request tracking to handle stale responses
 let aiRequestCounter = 0
@@ -265,7 +271,7 @@ function handleBoardCreated(api) {
     boardWorker.postMessage({
       gameId: props.gameId,
       board: boardStr,
-      difficulty: Number(props.difficulty),
+      difficulty: difficultyConfig.value,
       history: aiHistory,
       requestId: currentAIRequestId.value
     });
@@ -309,7 +315,7 @@ async function handleMove(move) {
     let boardStr = boardAPI.getFen();
     boardWorker.postMessage({
       gameId: props.gameId,
-      difficulty: Number(props.difficulty),
+      difficulty: difficultyConfig.value,
       history: aiHistory,
       requestId: currentAIRequestId.value
     });
