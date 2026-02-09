@@ -148,7 +148,7 @@
 
     <!-- Games Tab -->
     <div v-show="activeTab === 'games'" class="tab-content">
-      <div class="games-info-message">Only the last {{ MAX_SAVED_GAMES }} games will be saved</div>
+      <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
       <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
       <div v-else class="saved-games-list">
         <div

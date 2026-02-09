@@ -179,7 +179,7 @@
 
     <!-- Games Tab -->
     <div v-show="activeTab === 'games'" class="tab-content">
-      <div class="games-info-message">Only the last {{ MAX_SAVED_GAMES }} games will be saved</div>
+      <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
       <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
       <div v-else class="saved-games-list">
         <div
@@ -195,33 +195,6 @@
           </div>
           <div class="saved-game-actions">
             <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
-            <template v-if="confirmingDeleteId === game.gameId">
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                @click.stop="deleteSavedGame(game)"
-              >
-                <v-icon icon="$mdiCheckCircle" size="small" color="green" />
-              </v-btn>
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                @click.stop="confirmingDeleteId = null"
-              >
-                <v-icon icon="$mdiClose" size="small" color="red" />
-              </v-btn>
-            </template>
-            <v-btn
-              v-else
-              icon
-              size="x-small"
-              variant="text"
-              @click.stop="confirmingDeleteId = game.gameId"
-            >
-              <v-icon icon="$mdiDelete" size="small" />
-            </v-btn>
           </div>
         </div>
       </div>
@@ -281,7 +254,6 @@ const copyMessage = ref({ text: '', type: 'info', show: false });
 const activeTab = ref('history');
 const savedGames = computed(() => appStore.savedGames)
 const loadedGameId = ref(null)
-const confirmingDeleteId = ref(null)
 
 function onStorageChange(e) {
   if (e.key === 'nichess-saved-games') {
@@ -631,14 +603,6 @@ function loadMoveHistory() {
 
   // Detach from any saved game so live updates don't overwrite edited history
   loadedGameId.value = null;
-}
-
-function deleteSavedGame(game) {
-  confirmingDeleteId.value = null
-  appStore.deleteGame(game.gameId)
-  if (game.gameId === loadedGameId.value) {
-    loadedGameId.value = null
-  }
 }
 
 function loadSavedGame(game) {
