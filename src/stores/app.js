@@ -10,7 +10,8 @@ export const useAppStore = defineStore('app', {
     selectedDifficulty: loadDifficultySetting(),
     selectedColor: loadColorSetting(),
     soundEnabled: loadSoundSetting(),
-    savedGames: loadSavedGames()
+    savedGames: loadSavedGames(),
+    analysisData: null
   }),
   getters: {
     selectedDifficultyLabel: (state) => state.selectedDifficulty.label
@@ -68,6 +69,14 @@ export const useAppStore = defineStore('app', {
     },
     refreshSavedGames() {
       this.savedGames = loadSavedGames()
+    },
+    setAnalysisData(data) {
+      this.analysisData = data
+    },
+    consumeAnalysisData() {
+      const data = this.analysisData
+      this.analysisData = null
+      return data
     }
   }
 })

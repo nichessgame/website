@@ -10,8 +10,31 @@
 
     <!-- Control Row -->
     <div class="control-row mt-2 mt-sm-4">
-      <!-- Left: Empty -->
-      <div class="control-row-left"></div>
+      <!-- Left: Analysis -->
+      <div class="control-row-left">
+        <template v-if="confirmingAnalysis">
+          <v-btn
+            @click="confirmOpenAnalysis"
+            variant="flat"
+          >
+            <v-icon icon="$mdiCheckCircle" color="green" />
+          </v-btn>
+          <v-btn
+            @click="confirmingAnalysis = false"
+            variant="flat"
+            class="ml-2"
+          >
+            <v-icon icon="$mdiClose" color="red" />
+          </v-btn>
+        </template>
+        <v-btn
+          v-else
+          @click="confirmingAnalysis = true"
+          variant="flat"
+        >
+          <v-icon icon="$mdiLaptop" />
+        </v-btn>
+      </div>
 
       <!-- Center: Control Buttons -->
       <div class="control-row-center">
@@ -223,6 +246,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { Piece, PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
@@ -232,6 +256,7 @@ import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
 
 const appStore = useAppStore();
+const router = useRouter();
 
 const boardConfig = reactive({
   animation: {
@@ -254,6 +279,7 @@ const copyMessage = ref({ text: '', type: 'info', show: false });
 const activeTab = ref('history');
 const savedGames = computed(() => appStore.savedGames)
 const loadedGameId = ref(null)
+const confirmingAnalysis = ref(false)
 
 function onStorageChange(e) {
   if (e.key === 'nichess-saved-games') {
@@ -470,6 +496,12 @@ function playCaptureSound() {
 function playMoveSound() {
   moveAudio.currentTime = 0;
   moveAudio.play();
+}
+
+function confirmOpenAnalysis() {
+  confirmingAnalysis.value = false
+  appStore.setAnalysisData({ history: parsedMoves.value })
+  router.push('/analysis')
 }
 
 function flipBoard() {

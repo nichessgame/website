@@ -10,7 +10,7 @@ import 'vuetify/styles'
 // Composables
 import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'
-import { mdiSwordCross, mdiRobot, mdiInformation, mdiScriptText, mdiGift, mdiWeb, mdiAccountGroup, mdiGithub, mdiYoutube, mdiClose, mdiTools, mdiChevronLeft, mdiChevronRight, mdiChevronDoubleLeft, mdiChevronDoubleRight, mdiPause, mdiPlay, mdiUpload, mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiVolumeHigh, mdiVolumeOff, mdiRotate3dVariant, mdiDelete } from '@mdi/js'
+import { mdiSwordCross, mdiRobot, mdiInformation, mdiScriptText, mdiGift, mdiWeb, mdiAccountGroup, mdiGithub, mdiYoutube, mdiClose, mdiTools, mdiChevronLeft, mdiChevronRight, mdiChevronDoubleLeft, mdiChevronDoubleRight, mdiPause, mdiPlay, mdiUpload, mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiVolumeHigh, mdiVolumeOff, mdiRotate3dVariant, mdiDelete, mdiLaptop } from '@mdi/js'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -46,6 +46,7 @@ export default createVuetify({
       mdiVolumeOff: mdiVolumeOff,
       mdiRotate3dVariant: mdiRotate3dVariant,
       mdiDelete: mdiDelete,
+      mdiLaptop: mdiLaptop,
     },
     sets: {
       mdi,

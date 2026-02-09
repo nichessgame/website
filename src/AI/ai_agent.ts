@@ -45,6 +45,7 @@ function calcTemp(moveNumber: number, startTemp: number, endTemp: number): numbe
 
 export class AIAgent {
   public initialized = false;
+  private currentAnalysisId = 0;
   constructor() {}
 
   async init(): void {
@@ -245,5 +246,103 @@ export class AIAgent {
       console.log(`runSearch took ${(endTime - startTime).toFixed(3)}ms`);
     });
     return [nichessAction, debugStr];
+  }
+
+  stopAnalysis(): void {
+    this.currentAnalysisId++;
+  }
+
+  async runAnalysis(boardString: string, batchSize: number, maxNodes: number, postUpdate: (data: any) => void): Promise<void> {
+    this.currentAnalysisId++;
+    const myId = this.currentAnalysisId;
+
+    let gs: NichessGS = new NichessGS({encodedBoard: boardString});
+    let mcts = new MCTS(1.25, gs.num_players(), gs.num_moves(), 0, 1.4, 0.25);
+
+    let leafs: Array<GameState | null> = new Array(batchSize);
+    let totalNodes = 0;
+    let iter = 0;
+    let lastUpdateTime = performance.now();
+
+    while (myId === this.currentAnalysisId && totalNodes < maxNodes) {
+      // 1. build batch of leafs
+      let batch: Array<NetData> = new Array(batchSize);
+      let batchIdx = 0;
+      for (let j = 0; j < batchSize; j++) {
+        leafs[j] = mcts.find_leaf(gs);
+        if (leafs[j] != null) {
+          batch[batchIdx] = new NetData(mcts.path_, mcts.current_, leafs[j]);
+          batchIdx += 1;
+        }
+        mcts.path_ = [];
+        mcts.current_ = {};
+      }
+
+      // 2. predict
+      this.nnPredictBatch(batch, batchIdx);
+
+      // 3. backprop
+      for (let j = 0; j < batchIdx; j++) {
+        let nd: NetData = batch[j];
+        mcts.process_result(nd.gs, nd.v, nd.pi, false, nd.current, nd.path);
+      }
+
+      totalNodes += batchIdx;
+      leafs = new Array(batchSize);
+      iter++;
+
+      // Post update every 0.3 seconds
+      const now = performance.now();
+      if (iter >= 2 && now - lastUpdateTime >= 300) {
+        const wld = mcts.root_value();
+        const topMoves = this.getTopMovesWithContinuation(mcts.root_, 4, 4);
+        postUpdate({ wld, topMoves, nodes: totalNodes, currentPlayer: gs.current_player() });
+        lastUpdateTime = now;
+      }
+
+      // Yield to event loop so worker can process incoming messages
+      await new Promise(r => setTimeout(r, 0));
+    }
+
+    // Final update
+    if (iter >= 2 && myId === this.currentAnalysisId) {
+      const wld = mcts.root_value();
+      const topMoves = this.getTopMovesWithContinuation(mcts.root_, 4, 4);
+      postUpdate({ wld, topMoves, nodes: totalNodes, currentPlayer: gs.current_player() });
+    }
+  }
+
+  private getTopMovesWithContinuation(root: any, topN: number, maxDepth: number): Array<{continuation: number[], wld: number[]}> {
+    if (!root.children || root.children.length === 0) return [];
+    const sorted = [...root.children].sort((a: any, b: any) => b.n - a.n);
+    const result: Array<{continuation: number[], wld: number[]}> = [];
+    for (let i = 0; i < Math.min(topN, sorted.length); i++) {
+      if (sorted[i].n === 0) break;
+      const rest = this.getBestContinuation(sorted[i], maxDepth - 1);
+      const q = sorted[i].q;
+      const d = sorted[i].d;
+      const w = q - d / 2;
+      const l = 1 - w - d;
+      result.push({ continuation: [sorted[i].move, ...rest], wld: [w, l, d] });
+    }
+    return result;
+  }
+
+  private getBestContinuation(node: any, maxDepth: number): number[] {
+    const moves: number[] = [];
+    let current = node;
+    for (let i = 0; i < maxDepth; i++) {
+      if (!current.children || current.children.length === 0) break;
+      let bestChild = current.children[0];
+      for (let j = 1; j < current.children.length; j++) {
+        if (current.children[j].n > bestChild.n) {
+          bestChild = current.children[j];
+        }
+      }
+      if (bestChild.n === 0) break;
+      moves.push(bestChild.move);
+      current = bestChild;
+    }
+    return moves;
   }
 }

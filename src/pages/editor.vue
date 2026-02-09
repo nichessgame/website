@@ -54,76 +54,31 @@
       />
     </div>
 
-    <!-- Neural Net Evaluation -->
-    <div class="neural-net-eval mt-4">
-      <!-- Download Warning (only show if model not ready) -->
-      <div v-if="!modelReady" class="download-warning mb-3">
-        <v-icon color="warning" class="mr-2">mdi-alert-circle</v-icon>
-        <span>Note: The 40 MB AI model will be downloaded when you first use eval.</span>
-      </div>
-
-      <div class="eval-controls">
+    <!-- Analyze Button -->
+    <div class="analysis-button-row mt-2">
+      <template v-if="confirmingAnalysis">
         <v-btn
-          @click="evaluatePosition"
+          @click="confirmOpenAnalysis"
           variant="outlined"
-          :loading="evaluating"
-          :disabled="modelLoading || evaluating || autoEvaluate"
-          class="eval-button"
         >
-          Get Neural Net Evaluation
+          <v-icon icon="$mdiCheckCircle" color="green" />
         </v-btn>
-
-        <v-switch
-          v-model="autoEvaluate"
-          label="Auto-evaluate"
-          color="primary"
-          density="compact"
-          hide-details
-        ></v-switch>
-      </div>
-
-      <div v-if="modelLoading" class="model-status mt-2">
-        <v-progress-linear indeterminate color="grey" class="mb-2"></v-progress-linear>
-        <div class="model-status-text">Downloading AI model (40 MB)... This may take a while.</div>
-      </div>
-
-      <div v-if="formattedEvaluation" class="evaluation-result mt-3" :class="{ 'evaluating': evaluating }">
-        <div v-if="evaluating" class="evaluating-indicator">
-          <v-progress-circular indeterminate size="20" width="2" color="grey"></v-progress-circular>
-          <span class="evaluating-text">Updating...</span>
-        </div>
-
-        <div class="evaluation-label">Neural Net Evaluation - Value Head:</div>
-        <div class="evaluation-values">
-          <div class="evaluation-item">
-            <span class="evaluation-key">Player 1 (White) Win:</span>
-            <span class="evaluation-value">{{ formattedEvaluation.player1Win }}%</span>
-          </div>
-          <div class="evaluation-item">
-            <span class="evaluation-key">Player 2 (Black) Win:</span>
-            <span class="evaluation-value">{{ formattedEvaluation.player2Win }}%</span>
-          </div>
-          <div class="evaluation-item">
-            <span class="evaluation-key">Draw:</span>
-            <span class="evaluation-value">{{ formattedEvaluation.draw }}%</span>
-          </div>
-        </div>
-
-        <div class="policy-section mt-3">
-          <div class="evaluation-label">Neural Net Evaluation - Policy Head (Top 8 Moves):</div>
-          <div class="policy-moves">
-            <div
-              v-for="(move, index) in formattedEvaluation.topMoves"
-              :key="index"
-              class="policy-move-item"
-            >
-              <span class="move-rank">{{ index + 1 }}.</span>
-              <span class="move-notation">{{ move.from }} → {{ move.to }}</span>
-              <span class="move-probability">{{ move.probability }}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        <v-btn
+          @click="confirmingAnalysis = false"
+          variant="outlined"
+          class="ml-2"
+        >
+          <v-icon icon="$mdiClose" color="red" />
+        </v-btn>
+      </template>
+      <v-btn
+        v-else
+        @click="confirmingAnalysis = true"
+        variant="outlined"
+        prepend-icon="$mdiLaptop"
+      >
+        Analysis
+      </v-btn>
     </div>
 
     <!-- Move index lookup -->
@@ -189,6 +144,7 @@
 
 <script setup>
 import { ref, reactive, watch, computed, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
 import { PieceType, Player } from 'nichess';
@@ -238,15 +194,11 @@ const sideToMoveOptions = ['Player 1', 'Player 2'];
 
 const currentBoardString = ref('');
 let boardAPI;
+const confirmingAnalysis = ref(false);
 
 // AI evaluation state
 const appStore = useAppStore();
-const boardWorker = appStore.initBoardWorker();
-const modelLoading = computed(() => appStore.modelLoading);
-const modelReady = computed(() => appStore.modelReady);
-const evaluationResult = ref(null);
-const evaluating = ref(false);
-const autoEvaluate = ref(false);
+const router = useRouter();
 
 // Square options for move index lookup (a1 to h8)
 const squareOptions = [];
@@ -401,6 +353,12 @@ function handleSquareSelect(square) {
   updateBoardString();
 }
 
+function confirmOpenAnalysis() {
+  confirmingAnalysis.value = false
+  appStore.setAnalysisData({ position: currentBoardString.value })
+  router.push('/analysis')
+}
+
 function handleBoardCreated(api) {
   boardAPI = api;
   updateBoardString();
@@ -432,128 +390,6 @@ watch(sideToMove, (newValue) => {
   }
 });
 
-// Watch for board state changes and auto-evaluate if enabled
-watch(currentBoardString, (newValue) => {
-  if (autoEvaluate.value && newValue && !evaluating.value) {
-    evaluatePosition();
-  }
-});
-
-// Watch for auto-evaluate toggle - when enabled, evaluate current position immediately
-watch(autoEvaluate, (newValue) => {
-  if (newValue && currentBoardString.value && !evaluating.value) {
-    evaluatePosition();
-  }
-});
-
-// Worker message handler
-boardWorker.onmessage = (event) => {
-  const { type } = event.data;
-
-  if (type === 'model-status') {
-    if (event.data.status === 'starting') {
-      appStore.setModelLoading(true);
-    } else if (event.data.status === 'ready') {
-      appStore.setModelLoading(false);
-      appStore.setModelReady(true);
-      // If we were waiting to evaluate, do it now
-      if (evaluating.value) {
-        const boardString = boardAPI.getFen();
-        boardWorker.postMessage({
-          type: 'evaluate',
-          id: 'editor-eval',
-          boardString: boardString
-        });
-      }
-    } else if (event.data.status === 'error') {
-      appStore.setModelLoading(false);
-      evaluating.value = false;
-      console.error('Model load error:', event.data.message);
-      alert('Error loading AI model: ' + event.data.message);
-    }
-    return;
-  }
-
-  if (type === 'evaluation-result') {
-    evaluating.value = false;
-    evaluationResult.value = event.data.evaluation;
-    console.log('Evaluation result:', evaluationResult.value);
-  }
-};
-
-function evaluatePosition() {
-  if (!boardAPI) return;
-
-  evaluating.value = true;
-  // Don't clear evaluationResult.value here to prevent UI refresh
-  // Just let the new results replace the old ones when ready
-  const boardString = boardAPI.getFen();
-
-  boardWorker.postMessage({
-    type: 'evaluate',
-    id: 'editor-eval',
-    boardString: boardString
-  });
-}
-
-const formattedEvaluation = computed(() => {
-  if (!evaluationResult.value) return null;
-
-  const v = evaluationResult.value.value;
-  const pi = evaluationResult.value.policy;
-
-  // v[0] = player 1 win probability
-  // v[1] = player 2 win probability
-  // v[2] = draw probability
-
-  // Format top moves from policy
-  const topMoves = formatTopMoves(pi, 8);
-
-  return {
-    player1Win: (v[0] * 100).toFixed(1),
-    player2Win: (v[1] * 100).toFixed(1),
-    draw: (v[2] * 100).toFixed(1),
-    topMoves: topMoves
-  };
-});
-
-function formatTopMoves(policy, topN) {
-  // Create array of [moveIndex, probability] pairs
-  const movesWithProbs = policy.map((prob, index) => ({
-    moveIndex: index,
-    probability: prob
-  }));
-
-  // Sort by probability descending
-  movesWithProbs.sort((a, b) => b.probability - a.probability);
-
-  // Take top N moves
-  const topMoves = movesWithProbs.slice(0, topN);
-
-  // Convert move indices to square notation
-  return topMoves.map(move => {
-    const squares = AgentCache.moveIndexToSrcAndDstSquare[move.moveIndex];
-    if (!squares) {
-      return {
-        from: '?',
-        to: '?',
-        probability: (move.probability * 100).toFixed(2)
-      };
-    }
-    const srcSquare = indexToSquare(squares[0]);
-    const dstSquare = indexToSquare(squares[1]);
-    return {
-      from: srcSquare,
-      to: dstSquare,
-      probability: (move.probability * 100).toFixed(2)
-    };
-  });
-}
-
-onBeforeUnmount(() => {
-  // Clean up worker message handler
-  boardWorker.onmessage = null;
-});
 </script>
 
 <style scoped>

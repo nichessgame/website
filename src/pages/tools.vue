@@ -11,7 +11,10 @@
           title="Game Viewer"
           to="/gameviewer"
         />
-
+        <v-list-item
+          title="Analysis"
+          to="/analysis"
+        />
       </v-list>
     </v-card>
   </v-container>

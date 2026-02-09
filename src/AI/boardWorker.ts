@@ -7,6 +7,12 @@ let aiAgent = new AIAgent();
 
 self.onmessage = async (event: MessageEvent) => {
   try {
+    // stop-analysis doesn't need model init
+    if (event.data.type === 'stop-analysis') {
+      aiAgent.stopAnalysis();
+      return;
+    }
+
     if(!aiAgent.initialized) {
       console.log('initializing aiAgent')
       self.postMessage({ type: 'model-status', status: 'starting', gameId: event.data?.gameId ?? '' });
@@ -15,6 +21,15 @@ self.onmessage = async (event: MessageEvent) => {
       self.postMessage({ type: 'model-status', status: 'ready', gameId: event.data?.gameId ?? '' });
     } else {
       self.postMessage({ type: 'model-status', status: 'ready', gameId: event.data?.gameId ?? '' });
+    }
+
+    if (event.data.type === 'analyze') {
+      // Fire-and-forget so the message loop stays responsive
+      const maxNodes = event.data.maxNodes || 10000;
+      aiAgent.runAnalysis(event.data.boardString, 20, maxNodes, (data) => {
+        self.postMessage({ type: 'analysis-update', ...data });
+      });
+      return;
     }
 
     if (event.data.type === 'evaluate') {
