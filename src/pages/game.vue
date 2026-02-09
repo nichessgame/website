@@ -19,9 +19,35 @@
 
     <!-- Combined Control Row -->
     <div class="control-row mt-2 mt-sm-4">
-      <!-- Left: Number of nodes -->
+      <!-- Left: Number of nodes or Analysis button -->
       <div class="control-row-left">
-        <div class="nodes-count">
+        <template v-if="gameOver">
+          <template v-if="confirmingAnalysis">
+            <v-btn
+              @click="confirmOpenAnalysis"
+              variant="outlined"
+              class="gold"
+            >
+              <v-icon icon="$mdiCheckCircle" color="green" />
+            </v-btn>
+            <v-btn
+              @click="confirmingAnalysis = false"
+              variant="outlined"
+              class="ml-2 gold"
+            >
+              <v-icon icon="$mdiClose" color="red" />
+            </v-btn>
+          </template>
+          <v-btn
+            v-else
+            @click="confirmingAnalysis = true"
+            variant="outlined"
+            class="gold"
+          >
+            <v-icon icon="$mdiLaptop" />
+          </v-btn>
+        </template>
+        <div v-else class="nodes-count">
           {{ numNodesExplored }}
         </div>
       </div>
@@ -232,6 +258,7 @@ const copyMessage = ref({ text: '', type: 'info', show: false })
 const activeTab = ref('history')
 const savedGames = computed(() => appStore.savedGames)
 const confirmingDeleteId = ref(null)
+const confirmingAnalysis = ref(false)
 
 function onStorageChange(e) {
   if (e.key === 'nichess-saved-games') {
@@ -490,6 +517,11 @@ function toggleSound() {
   if (wasDisabled && appStore.soundEnabled) {
     playMoveSound();
   }
+}
+
+function confirmOpenAnalysis() {
+  appStore.setAnalysisData({ history: moveHistory.value })
+  router.push('/analysis')
 }
 
 function undoMove() {
