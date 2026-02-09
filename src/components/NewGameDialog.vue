@@ -1,12 +1,12 @@
 <template>
   <v-dialog v-model="dialog" max-width="600">
-    <v-card>
-      <v-card-title class="d-flex justify-space-between align-center">
+    <v-card class="new-game-dialog">
+      <v-card-title class="dialog-title d-flex justify-space-between align-center">
         Create a new game
         <v-btn icon="$mdiClose" variant="text" @click="dialog = false"></v-btn>
       </v-card-title>
-      
-      <v-card-text>
+
+      <v-card-text class="dialog-text">
         <v-radio-group v-model="myColor" label="Choose your color:" inline>
           <v-radio label="White" value="white"></v-radio>
           <v-radio label="Black" value="black"></v-radio>
@@ -19,14 +19,14 @@
           class="mt-6"
         ></v-select>
 
-        <v-alert v-if="!appStore.boardWorker" type="info" class="mt-4" color="gray">
+        <v-alert v-if="!modelReady" type="info" class="mt-4 model-alert">
           The 40 MB AI model will be downloaded when you start the game. This might take a while if
           your internet is slow.
         </v-alert>
       </v-card-text>
 
-      <v-card-actions>
-        <v-btn color="white" size="large" block @click="startGame">
+      <v-card-actions class="dialog-actions">
+        <v-btn variant="outlined" size="large" block @click="startGame">
           Play
         </v-btn>
       </v-card-actions>
@@ -58,6 +58,8 @@ const dialog = computed({
 
 const router = useRouter()
 const appStore = useAppStore()
+
+const modelReady = computed(() => appStore.modelReady)
 
 const difficultyOptions = AIDifficulty.getAllLabels();
 
@@ -95,6 +97,47 @@ const startGame = () => {
   dialog.value = false
 }
 </script>
+
+<style scoped>
+.new-game-dialog {
+  background-color: #1a1a1a !important;
+  border: 1px solid #444;
+}
+
+.dialog-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 20px 24px 16px 24px;
+  background-color: #1a1a1a;
+}
+
+.dialog-text {
+  padding: 16px 24px;
+  background-color: #1a1a1a;
+}
+
+.dialog-text :deep(.v-label) {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.dialog-text :deep(.v-radio .v-label) {
+  color: #ccc !important;
+  font-weight: 400;
+}
+
+.dialog-actions {
+  padding: 16px 24px 24px 24px;
+  background-color: #1a1a1a;
+}
+
+.model-alert {
+  background-color: rgba(255, 193, 7, 0.15) !important;
+  border: 1px solid rgba(255, 193, 7, 0.3) !important;
+  color: #ffb74d !important;
+}
+</style>
 
 <style>
 .v-overlay__scrim {
