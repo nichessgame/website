@@ -265,9 +265,6 @@ const modelReady = computed(() => appStore.modelReady);
 
 let wheelThrottle = false;
 
-const moveAudio = new Audio(MoveSound);
-const captureAudio = new Audio(CaptureSound);
-
 // Worker setup
 const boardWorker = appStore.initBoardWorker();
 
@@ -585,13 +582,11 @@ function loadSavedGame(game) {
 }
 
 function playCaptureSound() {
-  captureAudio.currentTime = 0;
-  captureAudio.play();
+  new Audio(CaptureSound).play().catch(() => {});
 }
 
 function playMoveSound() {
-  moveAudio.currentTime = 0;
-  moveAudio.play();
+  new Audio(MoveSound).play().catch(() => {});
 }
 
 function flipBoard() {

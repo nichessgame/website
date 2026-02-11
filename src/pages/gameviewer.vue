@@ -296,9 +296,6 @@ function onStorageChange(e) {
 let playbackInterval = null;
 let wheelThrottle = false;
 
-const moveAudio = new Audio(MoveSound);
-const captureAudio = new Audio(CaptureSound);
-
 function handleBoardCreated(api) {
   boardAPI = api;
   currentMoveIndex.value = 0;
@@ -489,13 +486,11 @@ function pausePlayback() {
 }
 
 function playCaptureSound() {
-  captureAudio.currentTime = 0;
-  captureAudio.play();
+  new Audio(CaptureSound).play().catch(() => {});
 }
 
 function playMoveSound() {
-  moveAudio.currentTime = 0;
-  moveAudio.play();
+  new Audio(MoveSound).play().catch(() => {});
 }
 
 function confirmOpenAnalysis() {

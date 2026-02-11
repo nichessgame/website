@@ -300,8 +300,6 @@ let aiRequestCounter = 0
 const currentAIRequestId = ref(null)
 const aiComputingFromIndex = ref(null)
 
-const moveAudio = new Audio(MoveSound);
-const captureAudio = new Audio(CaptureSound);
 
 const chessSquares = [
     'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1',
@@ -497,13 +495,11 @@ function handleDraw() {
 }
 
 function playCaptureSound() {
-  captureAudio.currentTime = 0;
-  captureAudio.play();
+  new Audio(CaptureSound).play().catch(() => {});
 }
 
 function playMoveSound() {
-  moveAudio.currentTime = 0;
-  moveAudio.play();
+  new Audio(MoveSound).play().catch(() => {});
 }
 
 function flipBoard() {
