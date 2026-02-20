@@ -13,8 +13,13 @@ import App from './App.vue'
 // Composables
 import { createApp } from 'vue'
 
+// PWA
+import { registerSW } from 'virtual:pwa-register'
+
 // Styles
 import 'unfonts.css'
+
+registerSW({ immediate: true })
 
 const app = createApp(App)
 
