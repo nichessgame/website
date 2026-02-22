@@ -79,7 +79,7 @@ export class AIDifficulty {
     }
   ];
 
-  private static readonly DEFAULT_CONFIG: DifficultyConfig = {
+  private static readonly FALLBACK_CONFIG: DifficultyConfig = {
     level: 3,
     label: '3 (3 seconds)',
     timeInSeconds: 3,
@@ -89,9 +89,15 @@ export class AIDifficulty {
     losingTemp2: 0.2
   };
 
+  static readonly DEFAULT_LEVEL = 1;
+
   static getConfig(level: number): DifficultyConfig {
     const config = this.DIFFICULTIES.find(d => d.level === level);
-    return config || this.DEFAULT_CONFIG;
+    return config || this.FALLBACK_CONFIG;
+  }
+
+  static getDefaultConfig(): DifficultyConfig {
+    return this.getConfig(this.DEFAULT_LEVEL);
   }
 
   static getAllLabels(): string[] {
@@ -99,7 +105,7 @@ export class AIDifficulty {
   }
 
   static getDefaultLabel(): string {
-    return this.DIFFICULTIES[2].label; // level 3
+    return this.getDefaultConfig().label;
   }
 
   static getAllConfigs(): DifficultyConfig[] {

@@ -92,7 +92,7 @@ function saveSoundSetting(enabled) {
 
 function loadDifficultySetting() {
   const stored = localStorage.getItem('nichess-difficulty-level');
-  const level = stored !== null ? JSON.parse(stored) : 3;
+  const level = stored !== null ? JSON.parse(stored) : AIDifficulty.DEFAULT_LEVEL;
   return AIDifficulty.getConfig(level);
 }
 
