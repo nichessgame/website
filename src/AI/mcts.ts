@@ -147,6 +147,31 @@ export class MCTS {
     }
   }
 
+  find_leaf_weak(gs: GameState, target_q: number): GameState | null {
+    this.current_ = this.root_
+    let leaf: GameState = gs.copy()
+    while(this.current_.n > 0 && this.current_.scores == undefined) {
+      this.current_.virtual_loss += VIRTUAL_LOSS
+      this.path_.push(this.current_)
+      if(this.current_ == this.root_) {
+        this.current_ = this.current_.best_child_weak(this.cpuct_, this.fpu_reduction_, target_q)
+      } else {
+        this.current_ = this.current_.best_child(this.cpuct_, this.fpu_reduction_)
+      }
+      leaf.play_move(this.current_.move)
+    }
+    if(this.current_.n == 0) {
+      if(this.current_.virtual_loss != 0) {
+        return null;
+      }
+      this.current_.player = leaf.current_player()
+      this.current_.scores = leaf.scores()
+      this.current_.add_children(leaf.valid_moves())
+    }
+    this.current_.virtual_loss += VIRTUAL_LOSS
+    return leaf
+  }
+
   find_leaf(gs: GameState): GameState | null {
     this.current_ = this.root_
     let leaf: GameState = gs.copy()

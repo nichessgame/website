@@ -86,7 +86,7 @@ export class AIDifficulty {
     startTemp: 1.0,
     endTemp: 0.6,
     losingTemp1: 0.6,
-    losingTemp2: 0.1
+    losingTemp2: 0.2
   };
 
   static getConfig(level: number): DifficultyConfig {
@@ -148,6 +148,39 @@ export class Node {
     } else {
       return this.q + cpuct * this.policy * sqrt_parent_n / (this.n + 1 + this.virtual_loss)
     }
+  }
+
+  uct_weak(sqrt_parent_n: number, cpuct: number, fpu_value: number, target_q: number): number {
+    let exploitation: number
+    if(this.n == 0) {
+      exploitation = fpu_value
+    } else {
+      exploitation = 1 - Math.abs(this.q - target_q)
+    }
+    return exploitation + cpuct * this.policy * sqrt_parent_n / (this.n + 1 + this.virtual_loss)
+  }
+
+  best_child_weak(cpuct: number, fpu_reduction: number, target_q: number): Node {
+    let seen_policy: number = 0
+    let c: Node
+    for(let i = 0; i < this.children.length; i++) {
+      c = this.children[i]
+      if(c.n > 0) {
+        seen_policy += c.policy
+      }
+    }
+    let fpu_value = (1 - Math.abs(this.v - target_q)) - fpu_reduction * Math.sqrt(seen_policy)
+    let sqrt_n = Math.sqrt(this.n)
+    let best_i = 0
+    let best_uct = this.children[0].uct_weak(sqrt_n, cpuct, fpu_value, target_q)
+    for(let i = 1; i < this.children.length; i++) {
+      let uct = this.children[i].uct_weak(sqrt_n, cpuct, fpu_value, target_q)
+      if(uct > best_uct) {
+        best_uct = uct
+        best_i = i
+      }
+    }
+    return this.children[best_i]
   }
 
   best_child(cpuct: number, fpu_reduction: number): Node {
