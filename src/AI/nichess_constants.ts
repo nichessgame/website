@@ -14,4 +14,5 @@ export const VIRTUAL_LOSS = 1;
 export const NUM_SQUARES = WIDTH * HEIGHT;
 // Under the current rules, living pieces can only have 10, 20, 30, 40, 50 or 60 HP.
 export const NUM_DISTINCT_HP_VALUES = 6;
+export const NOISE_ALPHA_RATIO = 10.83;
 

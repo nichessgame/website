@@ -1,6 +1,35 @@
 import type { GameState } from './game_state'
 import { Node } from './common'
-import { VIRTUAL_LOSS } from './nichess_constants'
+import { VIRTUAL_LOSS, NOISE_ALPHA_RATIO } from './nichess_constants'
+
+// Sample from a standard normal distribution using Box-Muller transform
+function sample_normal(): number {
+  const u1 = Math.random()
+  const u2 = Math.random()
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+}
+
+// Sample from Gamma(alpha, 1) using Marsaglia and Tsang's method
+function sample_gamma(alpha: number): number {
+  if (alpha < 1) {
+    // For alpha < 1, use the relation: Gamma(alpha) = Gamma(alpha+1) * U^(1/alpha)
+    return sample_gamma(alpha + 1) * Math.pow(Math.random(), 1 / alpha)
+  }
+  const d = alpha - 1 / 3
+  const c = 1 / Math.sqrt(9 * d)
+  while (true) {
+    let x: number
+    let v: number
+    do {
+      x = sample_normal()
+      v = 1 + c * x
+    } while (v <= 0)
+    v = v * v * v
+    const u = Math.random()
+    if (u < 1 - 0.0331 * (x * x) * (x * x)) return d * v
+    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v
+  }
+}
 
 export class MCTS {
   private cpuct_: number
@@ -103,8 +132,19 @@ export class MCTS {
   }
 
   add_root_noise(): void {
-    // TODO: not used now, maybe add later
-    return
+    const legal_move_count = this.root_.children.length
+    const alpha = NOISE_ALPHA_RATIO / legal_move_count
+    const noise = new Float32Array(this.num_moves_)
+    let sum = 0
+    for (let i = 0; i < this.root_.children.length; i++) {
+      const c = this.root_.children[i]
+      noise[c.move] = sample_gamma(alpha)
+      sum += noise[c.move]
+    }
+    for (let i = 0; i < this.root_.children.length; i++) {
+      const c = this.root_.children[i]
+      c.policy = c.policy * (1 - this.epsilon) + this.epsilon * noise[c.move] / sum
+    }
   }
 
   find_leaf(gs: GameState): GameState | null {
