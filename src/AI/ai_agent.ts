@@ -257,7 +257,7 @@ export class AIAgent {
         }
         let filteredMoves: Array<{move: number, score: number, n: number}> | null = null;
         for(const [lo, hi] of ranges) {
-          const candidates = childScores.filter(c => c.score > lo && c.score < hi);
+          const candidates = childScores.filter(c => c.score >= lo && c.score <= hi);
           if(candidates.length > 0) {
             filteredMoves = candidates;
             console.log(`Weak AI: found ${candidates.length} moves in (${lo}, ${hi}) range`);
