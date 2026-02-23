@@ -138,6 +138,14 @@ export class AIAgent {
       
       let leafs: Array<GameState | null> = new Array(batchSize);
       const useWeakSearch = difficultyConfig.level <= 3;
+      let targetQ = 1.0;
+      if(difficultyConfig.level == 3) {
+        targetQ = 0.45;
+      } else if(difficultyConfig.level == 2) {
+        targetQ = 0.4;
+      } else if(difficultyConfig.level == 1) {
+        targetQ = 0.35;
+      }
       const t0 = performance.now();
       let t1 = performance.now();
       let iter = 0;
@@ -146,7 +154,7 @@ export class AIAgent {
         let batch: Array<NetData> = new Array(batchSize);
         let batchIdx = 0;
         for(let j = 0; j < batchSize; j++) {
-          leafs[j] = useWeakSearch ? mcts.find_leaf_weak(gs, 0.45) : mcts.find_leaf(gs)
+          leafs[j] = useWeakSearch ? mcts.find_leaf_weak(gs, targetQ) : mcts.find_leaf(gs)
           if(leafs[j] != null) {
             batch[batchIdx] = new NetData(mcts.path_, mcts.current_, leafs[j])
             batchIdx += 1
@@ -249,11 +257,11 @@ export class AIAgent {
         // Otherwise, try to pick the least winning move.
         let ranges: Array<[number, number]>;
         if(difficultyConfig.level == 3) {
-          ranges = [[0.5, 1.0],[-0.1, 0], [-0.2, 0], [0, 0.1], [0.1, 0.3], [0.3, 0.5]];
+          ranges = [[0.5, 1.0]];
         } else if(difficultyConfig.level == 2) {
           ranges = [[0.5, 1.0],[-0.15, 0], [-0.3, 0], [0, 0.1], [0.1, 0.2], [0.2, 0.3], [0.3, 0.5]];
         } else {
-          ranges = [[0.65, 1.0],[-0.3, -0.15], [-0.3, 0], [0, 0.1], [0.1, 0.2], [0.2, 0.3], [0.3, 0.65]];
+          ranges = [[0.65, 1.0],[-0.4, -0.2], [-0.2, 0], [0, 0.1], [0.1, 0.2], [0.2, 0.3], [0.3, 0.65]];
         }
         let filteredMoves: Array<{move: number, score: number, n: number}> | null = null;
         for(const [lo, hi] of ranges) {
