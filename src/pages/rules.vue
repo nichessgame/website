@@ -14,6 +14,27 @@
 
       <v-col cols="12" md="9">
         <v-card
+          id="attacking"
+          class="mb-6"
+        >
+          <v-card-title> Attacking </v-card-title>
+          <v-card-text>
+            <v-row align="center">
+              <v-col cols="12" md="8">
+                <p class="mb-2">The number next to each piece shows its health points.</p>
+                <p class="mb-2">When you perform a standard attack, one of two things happens:</p>
+                <p class="mb-2"><b>1.</b> If your piece has enough ability points to destroy the enemy
+                  piece, it moves to its position.</p>
+                <p class="mb-2"><b>2.</b> Otherwise, it moves toward the enemy piece and stops one square
+                  away. The attacked piece then loses health points equal to the attacker's ability
+                points.</p>
+
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+
+        <v-card
           id="king"
           class="mb-6"
         >
@@ -202,6 +223,10 @@
 
 <script setup>
 const rules = [
+  {
+    id: 'attacking',
+    name: 'Attacking',
+  },
   {
     id: 'king',
     name: 'King',
