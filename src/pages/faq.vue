@@ -75,8 +75,18 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 const router = useRouter()
 
+useHead({
+  title: 'Frequently Asked Questions',
+  meta: [
+    { name: 'description', content: 'Frequently asked questions about Nichess.' },
+    { property: 'og:title', content: 'Frequently Asked Questions' },
+    { property: 'og:description', content: 'Frequently asked questions about Nichess.' },
+    { property: 'og:url', content: 'https://www.nichess.org/faq' },
+  ],
+})
 </script>
 
 <style scoped>

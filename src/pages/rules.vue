@@ -222,6 +222,18 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Rules',
+  meta: [
+    { name: 'description', content: 'Learn the rules of Nichess: how pieces attack, health points, ability points, and special abilities for each piece.' },
+    { property: 'og:title', content: 'Rules' },
+    { property: 'og:description', content: 'Learn the rules of Nichess: how pieces attack, health points, ability points, and special abilities for each piece.' },
+    { property: 'og:url', content: 'https://www.nichess.org/rules' },
+  ],
+})
+
 const rules = [
   {
     id: 'attacking',

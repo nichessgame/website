@@ -226,6 +226,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Nichess',
+  meta: [
+    { name: 'description', content: 'Play Nichess against AI.' },
+    { property: 'og:title', content: 'Nichess' },
+    { property: 'og:url', content: 'https://www.nichess.org/' },
+  ],
+})
+
 const boardConfig = {
   animation: {
     enabled: true,

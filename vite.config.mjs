@@ -8,10 +8,16 @@ import VueRouter from 'unplugin-vue-router/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
+import Prerender from '@prerenderer/rollup-plugin'
+import PuppeteerRenderer from '@prerenderer/renderer-puppeteer'
+import Sitemap from 'vite-plugin-sitemap'
 
 // Utilities
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
+import path from 'node:path'
+
+const staticRoutes = ['/', '/rules', '/faq', '/donate', '/tools', '/urbit', '/editor', '/analysis', '/gameviewer']
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -50,6 +56,16 @@ export default defineConfig({
       },
       vueTemplate: true,
     }),
+    Prerender({
+      routes: staticRoutes,
+      renderer: new PuppeteerRenderer({
+        renderAfterTime: 5000,
+      }),
+    }),
+    Sitemap({
+      hostname: 'https://www.nichess.org',
+      exclude: ['/game/:myColor/:difficulty/:gameId'],
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -72,7 +88,7 @@ export default defineConfig({
       manifest: {
         name: 'Nichess',
         short_name: 'Nichess',
-        description: 'A chess variant game with AI',
+        description: 'A game like chess where pieces have special abilities and health points.',
         theme_color: '#1a1a2e',
         background_color: '#1a1a2e',
         display: 'standalone',
@@ -134,5 +150,5 @@ export default defineConfig({
       },
     },
   },
-  base: './',
+  base: '/',
 })

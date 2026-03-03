@@ -65,7 +65,17 @@
 </template>
 
 <script setup>
-  //
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Donate - Nichess',
+  meta: [
+    { name: 'description', content: 'Support Nichess development. Donate via Patreon, Bitcoin, Ethereum, or Monero.' },
+    { property: 'og:title', content: 'Donate' },
+    { property: 'og:description', content: 'Support Nichess development. Donate via Patreon, Bitcoin, Ethereum, or Monero.' },
+    { property: 'og:url', content: 'https://www.nichess.org/donate' },
+  ],
+})
 </script>
 
 <style scoped>

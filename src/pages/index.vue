@@ -82,8 +82,19 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
 import NewGameDialog from '@/components/NewGameDialog.vue'
 const showNewGameDialog = ref(false)
+
+useHead({
+  title: 'Nichess',
+  meta: [
+    { name: 'description', content: 'Play Nichess, a game like chess where pieces have special abilities and health points.' },
+    { property: 'og:title', content: 'Nichess' },
+    { property: 'og:description', content: 'Play Nichess - Chess where pieces have special abilities and health points.' },
+    { property: 'og:url', content: 'https://www.nichess.org/' },
+  ],
+})
 </script>
 
 <style scoped>

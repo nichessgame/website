@@ -143,7 +143,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
 import { ref, reactive, watch, computed, onBeforeUnmount } from 'vue'
+
+useHead({
+  title: 'Board Editor',
+  meta: [
+    { name: 'description', content: 'Nichess board editor: Set up custom positions.' },
+    { property: 'og:title', content: 'Board Editor' },
+    { property: 'og:url', content: 'https://www.nichess.org/editor' },
+  ],
+})
 import { useRouter } from 'vue-router'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';

@@ -245,7 +245,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+
+useHead({
+  title: 'Game Viewer',
+  meta: [
+    { name: 'description', content: 'View and replay Nichess games move by move.' },
+    { property: 'og:title', content: 'Game Viewer' },
+    { property: 'og:url', content: 'https://www.nichess.org/gameviewer' },
+  ],
+})
 import { useRouter } from 'vue-router'
 import { Piece, PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';

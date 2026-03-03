@@ -21,6 +21,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Tools',
+  meta: [
+    { name: 'description', content: 'Nichess tools: board editor, game viewer, and position analysis.' },
+    { property: 'og:title', content: 'Tools' },
+    { property: 'og:description', content: 'Nichess tools: board editor, game viewer, and position analysis.' },
+    { property: 'og:url', content: 'https://www.nichess.org/tools' },
+  ],
+})
 </script>
 
 <style scoped>

@@ -228,7 +228,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@unhead/vue'
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+
+useHead({
+  title: 'Analysis',
+  meta: [
+    { name: 'description', content: 'Analyze Nichess positions with AI.' },
+    { property: 'og:title', content: 'Analysis' },
+    { property: 'og:url', content: 'https://www.nichess.org/analysis' },
+  ],
+})
 import { PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
