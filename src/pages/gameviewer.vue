@@ -289,6 +289,7 @@ const activeTab = ref('history');
 const savedGames = computed(() => appStore.savedGames)
 const loadedGameId = ref(null)
 const confirmingAnalysis = ref(false)
+const currentOrientation = ref('white')
 
 function onStorageChange(e) {
   if (e.key === 'nichess-saved-games') {
@@ -508,12 +509,15 @@ function playMoveSound() {
 
 function confirmOpenAnalysis() {
   confirmingAnalysis.value = false
-  appStore.setAnalysisData({ history: parsedMoves.value })
+  appStore.setAnalysisData({ history: parsedMoves.value, moveIndex: currentMoveIndex.value, orientation: currentOrientation.value })
   router.push('/analysis')
 }
 
 function flipBoard() {
-  if (boardAPI) boardAPI.toggleOrientation()
+  if (boardAPI) {
+    boardAPI.toggleOrientation()
+    currentOrientation.value = currentOrientation.value === 'white' ? 'black' : 'white'
+  }
 }
 
 function toggleSound() {
@@ -648,7 +652,8 @@ function loadMoveHistory() {
 }
 
 function loadSavedGame(game) {
-  boardConfig.orientation = game.myColor === 'black' ? 'black' : 'white'
+  currentOrientation.value = game.myColor === 'black' ? 'black' : 'white'
+  boardConfig.orientation = currentOrientation.value
   moveHistoryText.value = game.moveHistory
     .map((m, i) => `${i + 1}.${m.from} -> ${m.to}`)
     .join('\n')

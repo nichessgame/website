@@ -385,7 +385,7 @@ function handleBoardCreated(api) {
 
   if (data && data.history && Array.isArray(data.history)) {
     // From gameviewer: replay move history
-    boardConfig.orientation = data.myColor === 'black' ? 'black' : 'white';
+    boardConfig.orientation = data.orientation === 'black' ? 'black' : 'white';
     boardAPI.resetBoard();
     suppressSound = true;
     for (const move of data.history) {
@@ -396,8 +396,13 @@ function handleBoardCreated(api) {
     }
     suppressSound = false;
     currentMoveIndex.value = moveHistory.value.length;
-    if (appStore.soundEnabled && moveHistory.value.length > 0) {
-      const lastMove = moveHistory.value[moveHistory.value.length - 1];
+    const targetIndex = data.moveIndex !== undefined ? data.moveIndex : moveHistory.value.length;
+    while (currentMoveIndex.value > targetIndex) {
+      boardAPI.undoLastMove();
+      currentMoveIndex.value--;
+    }
+    if (appStore.soundEnabled && currentMoveIndex.value > 0) {
+      const lastMove = moveHistory.value[currentMoveIndex.value - 1];
       lastMove.attack ? playCaptureSound() : playMoveSound();
     }
   } else if (data && data.position && typeof data.position === 'string') {
