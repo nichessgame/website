@@ -527,7 +527,7 @@ function toggleSound() {
 }
 
 function confirmOpenAnalysis() {
-  appStore.setAnalysisData({ history: moveHistory.value })
+  appStore.setAnalysisData({ history: moveHistory.value, myColor: props.myColor })
   router.push('/analysis')
 }
 

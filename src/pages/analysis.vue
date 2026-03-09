@@ -385,6 +385,7 @@ function handleBoardCreated(api) {
 
   if (data && data.history && Array.isArray(data.history)) {
     // From gameviewer: replay move history
+    boardConfig.orientation = data.myColor === 'black' ? 'black' : 'white';
     boardAPI.resetBoard();
     suppressSound = true;
     for (const move of data.history) {
@@ -580,6 +581,7 @@ function loadSavedGame(game) {
   const freshGame = appStore.savedGames.find(g => g.gameId === game.gameId);
   if (!freshGame) return;
 
+  boardConfig.orientation = freshGame.myColor === 'black' ? 'black' : 'white';
   boardAPI.resetBoard();
   moveHistory.value = [];
   currentMoveIndex.value = 0;
