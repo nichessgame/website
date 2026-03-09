@@ -273,7 +273,6 @@ const boardConfig = reactive({
     enabled: true,
     duration: 200
   },
-  viewOnly: true,
 });
 
 let boardAPI = null;
@@ -310,6 +309,7 @@ function handleBoardCreated(api) {
   boardAPI = api;
   currentMoveIndex.value = 0;
   parsedMoves.value = [];
+  boardAPI.forbidMoves();
 }
 
 function handleWheel(event) {
@@ -368,6 +368,7 @@ function undoMove() {
   if (boardAPI && currentMoveIndex.value > 0) {
     boardAPI.undoLastMove();
     currentMoveIndex.value--;
+    boardAPI.forbidMoves();
   }
 }
 
@@ -375,6 +376,7 @@ function redoWithSound() {
   const move = parsedMoves.value[currentMoveIndex.value];
   boardAPI.redoLastMove();
   currentMoveIndex.value++;
+  boardAPI.forbidMoves();
   if (appStore.soundEnabled) {
     if (move.attack) {
       playCaptureSound();
@@ -398,6 +400,7 @@ function undoAll() {
     currentMoveIndex.value--;
   }
 
+  boardAPI.forbidMoves();
   if (appStore.soundEnabled) {
     playMoveSound();
   }
@@ -611,6 +614,7 @@ function loadMoveHistory() {
           boardAPI.move(previousMoves[j]);
         }
       }
+      boardAPI.forbidMoves();
       return;
     }
 
@@ -640,6 +644,7 @@ function loadMoveHistory() {
 
   // Detach from any saved game so live updates don't overwrite edited history
   loadedGameId.value = null;
+  boardAPI.forbidMoves();
 }
 
 function loadSavedGame(game) {
@@ -654,6 +659,11 @@ function loadSavedGame(game) {
   while (currentMoveIndex.value < parsedMoves.value.length) {
     boardAPI.redoLastMove()
     currentMoveIndex.value++
+  }
+  boardAPI.forbidMoves();
+  if (appStore.soundEnabled && parsedMoves.value.length > 0) {
+    const lastMove = parsedMoves.value[parsedMoves.value.length - 1];
+    lastMove.attack ? playCaptureSound() : playMoveSound();
   }
 }
 
@@ -672,6 +682,7 @@ function reloadCurrentGame(game) {
     attack: m.attack
   }))
   currentMoveIndex.value = parsedMoves.value.length
+  boardAPI.forbidMoves()
 }
 
 function getDifficultyLabel(difficulty) {
