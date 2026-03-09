@@ -423,10 +423,10 @@ export class AIAgent {
     }
   }
 
-  private getTopMovesWithContinuation(root: any, topN: number, maxDepth: number): Array<{continuation: number[], wld: number[]}> {
+  private getTopMovesWithContinuation(root: any, topN: number, maxDepth: number): Array<{continuation: number[], wld: number[], visits: number}> {
     if (!root.children || root.children.length === 0) return [];
     const sorted = [...root.children].sort((a: any, b: any) => b.n - a.n);
-    const result: Array<{continuation: number[], wld: number[]}> = [];
+    const result: Array<{continuation: number[], wld: number[], visits: number}> = [];
     for (let i = 0; i < Math.min(topN, sorted.length); i++) {
       if (sorted[i].n === 0) break;
       const rest = this.getBestContinuation(sorted[i], maxDepth - 1);
@@ -434,7 +434,7 @@ export class AIAgent {
       const d = sorted[i].d;
       const w = q - d / 2;
       const l = 1 - w - d;
-      result.push({ continuation: [sorted[i].move, ...rest], wld: [w, l, d] });
+      result.push({ continuation: [sorted[i].move, ...rest], wld: [w, l, d], visits: sorted[i].n });
     }
     return result;
   }

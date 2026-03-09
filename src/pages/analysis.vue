@@ -154,7 +154,7 @@
                   class="continuation-move"
                 >{{ move.from }} → {{ move.to }}<span v-if="mIdx < entry.moves.length - 1" class="continuation-separator">,&nbsp;</span></span>
               </span>
-              <span class="move-wld">{{ entry.wld.whiteWin }}% {{ entry.wld.blackWin }}% {{ entry.wld.draw }}%</span>
+              <span class="move-wld">{{ entry.visits }} visits</span>
             </div>
           </div>
         </div>
@@ -336,19 +336,10 @@ const formattedWLD = computed(() => {
 
 const formattedTopMoves = computed(() => {
   if (!analysisResult.value || !analysisResult.value.topMoves) return [];
-  const cp = analysisResult.value.currentPlayer;
   return analysisResult.value.topMoves.map(entry => {
-    const wld = entry.wld;
-    const whiteWin = cp === 0 ? wld[0] : wld[1];
-    const blackWin = cp === 0 ? wld[1] : wld[0];
-    const draw = wld[2];
     return {
       moves: entry.continuation.map(moveIndexToSquares),
-      wld: {
-        whiteWin: (whiteWin * 100).toFixed(1),
-        blackWin: (blackWin * 100).toFixed(1),
-        draw: (draw * 100).toFixed(1)
-      }
+      visits: entry.visits
     };
   });
 });
@@ -373,6 +364,13 @@ watch(analysisEnabled, (enabled) => {
 watch(currentBoardString, (newVal) => {
   if (analysisEnabled.value && newVal) {
     boardWorker.postMessage({ type: 'analyze', boardString: newVal, maxNodes: maxNodes.value });
+  }
+});
+
+watch(maxNodes, (newVal) => {
+  if (analysisEnabled.value && currentBoardString.value) {
+    boardWorker.postMessage({ type: 'stop-analysis' });
+    boardWorker.postMessage({ type: 'analyze', boardString: currentBoardString.value, maxNodes: newVal });
   }
 });
 
