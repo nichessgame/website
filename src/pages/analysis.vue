@@ -274,6 +274,7 @@ const modelLoading = computed(() => appStore.modelLoading);
 const modelReady = computed(() => appStore.modelReady);
 
 let wheelThrottle = false;
+let suppressSound = false;
 
 // Worker setup
 const boardWorker = appStore.initBoardWorker();
@@ -385,13 +386,19 @@ function handleBoardCreated(api) {
   if (data && data.history && Array.isArray(data.history)) {
     // From gameviewer: replay move history
     boardAPI.resetBoard();
+    suppressSound = true;
     for (const move of data.history) {
       if (!boardAPI.isMoveLegal(move)) break;
       const isAttack = boardAPI.getPiece(move.to).type !== PieceType.NO_PIECE;
       boardAPI.move({ from: move.from, to: move.to });
       moveHistory.value.push({ from: move.from, to: move.to, attack: move.attack !== undefined ? move.attack : isAttack });
     }
+    suppressSound = false;
     currentMoveIndex.value = moveHistory.value.length;
+    if (appStore.soundEnabled && moveHistory.value.length > 0) {
+      const lastMove = moveHistory.value[moveHistory.value.length - 1];
+      lastMove.attack ? playCaptureSound() : playMoveSound();
+    }
   } else if (data && data.position && typeof data.position === 'string') {
     // From editor: set custom position
     boardAPI.setPosition(data.position);
@@ -411,7 +418,7 @@ function handleMove(move) {
   currentMoveIndex.value = moveHistory.value.length;
   selectedGameId.value = null;
 
-  if (appStore.soundEnabled) {
+  if (!suppressSound && appStore.soundEnabled) {
     if (move.attack) {
       playCaptureSound();
     } else {
@@ -577,14 +584,20 @@ function loadSavedGame(game) {
   moveHistory.value = [];
   currentMoveIndex.value = 0;
 
+  suppressSound = true;
   for (const move of freshGame.moveHistory) {
     if (!boardAPI.isMoveLegal(move)) break;
     const isAttack = boardAPI.getPiece(move.to).type !== PieceType.NO_PIECE;
     boardAPI.move({ from: move.from, to: move.to });
     moveHistory.value.push({ from: move.from, to: move.to, attack: move.attack !== undefined ? move.attack : isAttack });
   }
+  suppressSound = false;
   currentMoveIndex.value = moveHistory.value.length;
   selectedGameId.value = freshGame.gameId;
+  if (appStore.soundEnabled && moveHistory.value.length > 0) {
+    const lastMove = moveHistory.value[moveHistory.value.length - 1];
+    lastMove.attack ? playCaptureSound() : playMoveSound();
+  }
 
   updateBoardString();
 }
