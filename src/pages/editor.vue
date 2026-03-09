@@ -144,7 +144,7 @@
 
 <script setup>
 import { useHead } from '@unhead/vue'
-import { ref, reactive, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, reactive, watch, computed, onBeforeUnmount, nextTick } from 'vue'
 
 useHead({
   title: 'Board Editor',
@@ -336,6 +336,16 @@ function selectPiece(pieceType) {
 }
 
 function handleMove(move) {
+  const player = sideToMove.value === 'Player 1' ? Player.PLAYER_1 : Player.PLAYER_2;
+  boardAPI.setCurrentPlayer(player);
+  // TODO: This is a hack to let us keep moving pieces even if the game ends.
+  // While you're moving pieces on the board editor, you might make a threefold repetition.
+  // If that happens, boardAPI.move() method will detect the game is over and prevent you from
+  // making new moves. This solves that problem.
+  // Maybe change vue3-nichessboard BoardAPI to not need this?
+  nextTick(() => {
+    boardAPI.setConfig({ movable: { color: 'both' } }, false);
+  });
   updateBoardString();
 }
 
@@ -382,12 +392,16 @@ function updateBoardString() {
 
 function setStartingPosition() {
   boardAPI.setPosition("0|0-warrior-60,0-knight-60,0-assassin-10,0-mage-10,0-king-10,0-assassin-10,0-knight-60,0-warrior-60,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,0-pawn-30,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-pawn-30,1-warrior-60,1-knight-60,1-assassin-10,1-mage-10,1-king-10,1-assassin-10,1-knight-60,1-warrior-60,")
+  const player = sideToMove.value === 'Player 1' ? Player.PLAYER_1 : Player.PLAYER_2;
+  boardAPI.setCurrentPlayer(player);
   updateBoardString();
   selectedPiece.value = 'HAND'
 }
 
 function clearPosition() {
   boardAPI.setPosition("0|empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,empty,")
+  const player = sideToMove.value === 'Player 1' ? Player.PLAYER_1 : Player.PLAYER_2;
+  boardAPI.setCurrentPlayer(player);
   updateBoardString();
   selectedPiece.value = 'HAND'
 }
