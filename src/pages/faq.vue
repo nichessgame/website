@@ -80,11 +80,19 @@ const router = useRouter()
 
 useHead({
   title: 'Frequently Asked Questions',
+  link: [
+    { rel: 'canonical', href: 'https://www.nichess.org/faq' },
+  ],
   meta: [
     { name: 'description', content: 'Frequently asked questions about Nichess.' },
     { property: 'og:title', content: 'Frequently Asked Questions' },
     { property: 'og:description', content: 'Frequently asked questions about Nichess.' },
     { property: 'og:url', content: 'https://www.nichess.org/faq' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'FAQ' },
+    { name: 'twitter:description', content: 'Frequently asked questions about Nichess.' },
   ],
 })
 </script>

@@ -68,12 +68,20 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: 'Donate - Nichess',
+  title: 'Donate',
+  link: [
+    { rel: 'canonical', href: 'https://www.nichess.org/donate' },
+  ],
   meta: [
     { name: 'description', content: 'Support Nichess development. Donate via Patreon, Bitcoin, Ethereum, or Monero.' },
     { property: 'og:title', content: 'Donate' },
     { property: 'og:description', content: 'Support Nichess development. Donate via Patreon, Bitcoin, Ethereum, or Monero.' },
     { property: 'og:url', content: 'https://www.nichess.org/donate' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'Donate - Nichess' },
+    { name: 'twitter:description', content: 'Support Nichess development. Donate via Patreon, Bitcoin, Ethereum, or Monero.' },
   ],
 })
 </script>

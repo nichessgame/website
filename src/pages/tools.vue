@@ -25,11 +25,19 @@ import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Tools',
+  link: [
+    { rel: 'canonical', href: 'https://www.nichess.org/tools' },
+  ],
   meta: [
     { name: 'description', content: 'Nichess tools: board editor, game viewer, and position analysis.' },
     { property: 'og:title', content: 'Tools' },
     { property: 'og:description', content: 'Nichess tools: board editor, game viewer, and position analysis.' },
     { property: 'og:url', content: 'https://www.nichess.org/tools' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'Tools' },
+    { name: 'twitter:description', content: 'Nichess tools: board editor, game viewer, and position analysis.' },
   ],
 })
 </script>

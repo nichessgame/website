@@ -78,11 +78,19 @@ import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Urbit Guide',
+  link: [
+    { rel: 'canonical', href: 'https://www.nichess.org/urbit' },
+  ],
   meta: [
     { name: 'description', content: 'How to play Nichess on Urbit: get a ship, install the app, and play games against other players.' },
     { property: 'og:title', content: 'Urbit Guide' },
     { property: 'og:description', content: 'How to play Nichess on Urbit: get a ship, install the app, and play games against other players.' },
     { property: 'og:url', content: 'https://www.nichess.org/urbit' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'Urbit Guide' },
+    { name: 'twitter:description', content: 'How to play Nichess on Urbit: get a ship, install the app, and play games against other players.' },
   ],
 })
 </script>

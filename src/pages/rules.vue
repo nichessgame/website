@@ -226,11 +226,19 @@ import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Rules',
+  link: [
+    { rel: 'canonical', href: 'https://www.nichess.org/rules' },
+  ],
   meta: [
     { name: 'description', content: 'Learn the rules of Nichess: how pieces attack, health points, ability points, and special abilities for each piece.' },
     { property: 'og:title', content: 'Rules' },
     { property: 'og:description', content: 'Learn the rules of Nichess: how pieces attack, health points, ability points, and special abilities for each piece.' },
     { property: 'og:url', content: 'https://www.nichess.org/rules' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'Rules' },
+    { name: 'twitter:description', content: 'Learn the rules of Nichess: how pieces attack, health points, ability points, and special abilities for each piece.' },
   ],
 })
 

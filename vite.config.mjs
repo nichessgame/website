@@ -10,7 +10,6 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
 import Prerender from '@prerenderer/rollup-plugin'
 import PuppeteerRenderer from '@prerenderer/renderer-puppeteer'
-import Sitemap from 'vite-plugin-sitemap'
 
 // Utilities
 import { defineConfig } from 'vite'
@@ -61,10 +60,18 @@ export default defineConfig({
       renderer: new PuppeteerRenderer({
         renderAfterTime: 5000,
       }),
-    }),
-    Sitemap({
-      hostname: 'https://www.nichess.org',
-      exclude: ['/game/:myColor/:difficulty/:gameId'],
+      postProcess(route) {
+        if (route.route !== '/') {
+          route.outputPath = route.route.slice(1) + '.html'
+        }
+        // Rewrite internal links to use .html so crawlers can follow them directly
+        for (const r of staticRoutes) {
+          if (r === '/') continue
+          route.html = route.html
+            .replaceAll(`href="${r}"`, `href="${r}.html"`)
+            .replaceAll(`href="${r}/"`, `href="${r}.html"`)
+        }
+      },
     }),
     VitePWA({
       registerType: 'autoUpdate',

@@ -88,11 +88,36 @@ const showNewGameDialog = ref(false)
 
 useHead({
   title: 'Nichess',
+  link: [
+    { rel: 'canonical', href: 'https://www.nichess.org/' },
+  ],
   meta: [
-    { name: 'description', content: 'Play Nichess, a game like chess where pieces have special abilities and health points.' },
+    { name: 'description', content: 'Play Nichess, a free and open source game like chess where pieces have special abilities and health points.' },
     { property: 'og:title', content: 'Nichess' },
-    { property: 'og:description', content: 'Play Nichess - Chess where pieces have special abilities and health points.' },
+    { property: 'og:description', content: 'Play Nichess, a free and open source game like chess where pieces have special abilities and health points.' },
     { property: 'og:url', content: 'https://www.nichess.org/' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: 'Nichess' },
+    { name: 'twitter:description', content: 'Play Nichess, a free and open source game like chess where pieces have special abilities and health points.' },
+    { name: 'twitter:image', content: 'https://www.nichess.org/pwa-512x512.png' },
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Nichess',
+        url: 'https://www.nichess.org/',
+        description: 'A free and open source game like chess where pieces have special abilities and health points.',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://www.nichess.org/',
+        },
+      }),
+    },
   ],
 })
 </script>

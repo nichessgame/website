@@ -9,17 +9,26 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 
+// Add .html aliases so prerendered pages work at both /rules and /rules.html
+const layoutRoutes = setupLayouts([
+  ...routes,
+  {
+    path: '/game/:myColor/:difficulty/:gameId',
+    name: 'game',
+    component: () => import('../pages/game.vue'),
+    props: true
+  }
+])
+
+for (const route of layoutRoutes) {
+  if (route.path && route.path !== '/' && !route.path.includes(':')) {
+    route.alias = route.path + '.html'
+  }
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts([
-    ...routes,
-    {
-      path: '/game/:myColor/:difficulty/:gameId',
-      name: 'game',
-      component: () => import('../pages/game.vue'),
-      props: true
-    }
-  ]),
+  routes: layoutRoutes,
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
