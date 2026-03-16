@@ -11,7 +11,8 @@ export const useAppStore = defineStore('app', {
     selectedColor: loadColorSetting(),
     soundEnabled: loadSoundSetting(),
     savedGames: loadSavedGames(),
-    analysisData: null
+    analysisData: null,
+    savedNostrGames: loadSavedNostrGames()
   }),
   getters: {
     selectedDifficultyLabel: (state) => state.selectedDifficulty.label
@@ -70,6 +71,20 @@ export const useAppStore = defineStore('app', {
     refreshSavedGames() {
       this.savedGames = loadSavedGames()
     },
+    saveNostrGame(gameData) {
+      const filtered = this.savedNostrGames.filter(g => g.gameId !== gameData.gameId)
+      filtered.push({ ...gameData, savedAt: Date.now() })
+      filtered.sort((a, b) => b.savedAt - a.savedAt)
+      this.savedNostrGames = filtered.slice(0, MAX_SAVED_NOSTR_GAMES)
+      persistSavedNostrGames(this.savedNostrGames)
+    },
+    deleteNostrGame(gameId) {
+      this.savedNostrGames = this.savedNostrGames.filter(g => g.gameId !== gameId)
+      persistSavedNostrGames(this.savedNostrGames)
+    },
+    refreshSavedNostrGames() {
+      this.savedNostrGames = loadSavedNostrGames()
+    },
     setAnalysisData(data) {
       this.analysisData = data
     },
@@ -126,4 +141,19 @@ function persistSavedGames(games) {
 
 export function loadGame(gameId) {
   return loadSavedGames().find(g => g.gameId === gameId) || null
+}
+
+const SAVED_NOSTR_GAMES_KEY = 'nichess-saved-nostr-games'
+export const MAX_SAVED_NOSTR_GAMES = 30
+
+function loadSavedNostrGames() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_NOSTR_GAMES_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function persistSavedNostrGames(games) {
+  localStorage.setItem(SAVED_NOSTR_GAMES_KEY, JSON.stringify(games))
 }

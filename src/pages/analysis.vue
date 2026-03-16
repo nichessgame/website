@@ -84,6 +84,7 @@
       <v-tab value="analysis">Analysis</v-tab>
       <v-tab value="moves">Moves</v-tab>
       <v-tab value="games">Games</v-tab>
+      <v-tab value="nostr">Nostr</v-tab>
     </v-tabs>
 
     <!-- Analysis Tab -->
@@ -224,6 +225,29 @@
         </div>
       </div>
     </div>
+    <!-- Nostr Tab -->
+    <div v-show="activeTab === 'nostr'" class="tab-content">
+      <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} Nostr games will be saved here.</div>
+      <div v-if="savedNostrGames.length === 0" class="no-moves">No saved Nostr games</div>
+      <div v-else class="saved-games-list">
+        <div
+          v-for="(game, index) in savedNostrGames"
+          :key="game.gameId"
+          :class="['saved-game-item', { 'current-game': game.gameId === selectedGameId }]"
+          @click="loadNostrSavedGame(game)"
+        >
+          <div class="saved-game-info">
+            <span class="saved-game-number">{{ index + 1 }}.</span>
+            <span class="saved-game-color">{{ game.gameId }}</span>
+            <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
+            <span v-if="game.gameOver" class="saved-game-over">ended</span>
+          </div>
+          <div class="saved-game-actions">
+            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </v-container>
 </template>
 
@@ -242,7 +266,7 @@ useHead({
 import { PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
-import { useAppStore, MAX_SAVED_GAMES } from '../stores/app';
+import { useAppStore, MAX_SAVED_GAMES, MAX_SAVED_NOSTR_GAMES } from '../stores/app';
 import { AgentCache } from '@/AI/agent_cache';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
@@ -263,6 +287,7 @@ const currentMoveIndex = ref(0);
 const copyMessage = ref({ text: '', type: 'info', show: false });
 const activeTab = ref('analysis');
 const savedGames = computed(() => appStore.savedGames);
+const savedNostrGames = computed(() => appStore.savedNostrGames);
 const selectedGameId = ref(null);
 
 // Analysis state
@@ -609,6 +634,31 @@ function loadSavedGame(game) {
   updateBoardString();
 }
 
+function loadNostrSavedGame(game) {
+  if (!boardAPI || !game.moveHistory || game.moveHistory.length === 0) return
+
+  boardAPI.resetBoard();
+  moveHistory.value = [];
+  currentMoveIndex.value = 0;
+
+  suppressSound = true;
+  for (const move of game.moveHistory) {
+    if (!boardAPI.isMoveLegal(move)) break;
+    const isAttack = boardAPI.getPiece(move.to).type !== PieceType.NO_PIECE;
+    boardAPI.move({ from: move.from, to: move.to });
+    moveHistory.value.push({ from: move.from, to: move.to, attack: move.attack !== undefined ? move.attack : isAttack });
+  }
+  suppressSound = false;
+  currentMoveIndex.value = moveHistory.value.length;
+  selectedGameId.value = game.gameId;
+  if (appStore.soundEnabled && moveHistory.value.length > 0) {
+    const lastMove = moveHistory.value[moveHistory.value.length - 1];
+    lastMove.attack ? playCaptureSound() : playMoveSound();
+  }
+
+  updateBoardString();
+}
+
 function playCaptureSound() {
   new Audio(CaptureSound).play().catch(() => {});
 }
@@ -900,6 +950,11 @@ function formatDate(timestamp) {
   font-weight: bold;
   font-size: 14px;
   text-transform: capitalize;
+}
+
+.saved-game-moves {
+  color: #aaa;
+  font-size: 13px;
 }
 
 .saved-game-over {

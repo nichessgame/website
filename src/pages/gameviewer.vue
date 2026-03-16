@@ -115,6 +115,7 @@
     <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="#1a1a1a">
       <v-tab value="moves">Moves</v-tab>
       <v-tab value="games">Games</v-tab>
+      <v-tab value="nostr">Nostr</v-tab>
       <v-tab value="settings">Settings</v-tab>
     </v-tabs>
 
@@ -223,6 +224,30 @@
       </div>
     </div>
 
+    <!-- Nostr Tab -->
+    <div v-show="activeTab === 'nostr'" class="tab-content">
+      <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} Nostr games will be saved here.</div>
+      <div v-if="savedNostrGames.length === 0" class="no-moves">No saved Nostr games</div>
+      <div v-else class="saved-games-list">
+        <div
+          v-for="(game, index) in savedNostrGames"
+          :key="game.gameId"
+          :class="['saved-game-item', { 'current-game': game.gameId === loadedGameId }]"
+          @click="loadNostrSavedGame(game)"
+        >
+          <div class="saved-game-info">
+            <span class="saved-game-number">{{ index + 1 }}.</span>
+            <span class="saved-game-color">{{ game.gameId }}</span>
+            <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
+            <span v-if="game.gameOver" class="saved-game-over">ended</span>
+          </div>
+          <div class="saved-game-actions">
+            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Settings Tab -->
     <div v-show="activeTab === 'settings'" class="tab-content">
       <div class="settings-section">
@@ -260,7 +285,7 @@ import { useRouter } from 'vue-router'
 import { Piece, PieceType } from 'nichess'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
-import { useAppStore, MAX_SAVED_GAMES } from '../stores/app';
+import { useAppStore, MAX_SAVED_GAMES, MAX_SAVED_NOSTR_GAMES } from '../stores/app';
 import { AIDifficulty } from '../AI/common';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
@@ -287,6 +312,7 @@ const viewMode = ref(false);
 const copyMessage = ref({ text: '', type: 'info', show: false });
 const activeTab = ref('history');
 const savedGames = computed(() => appStore.savedGames)
+const savedNostrGames = computed(() => appStore.savedNostrGames)
 const loadedGameId = ref(null)
 const confirmingAnalysis = ref(false)
 const currentOrientation = ref('white')
@@ -672,6 +698,26 @@ function loadSavedGame(game) {
   }
 }
 
+function loadNostrSavedGame(game) {
+  if (!game.moveHistory || game.moveHistory.length === 0) return
+  moveHistoryText.value = game.moveHistory
+    .map((m, i) => `${i + 1}.${m.from} -> ${m.to}`)
+    .join('\n')
+  loadMoveHistory()
+  loadedGameId.value = game.gameId
+
+  // Play all moves
+  while (currentMoveIndex.value < parsedMoves.value.length) {
+    boardAPI.redoLastMove()
+    currentMoveIndex.value++
+  }
+  boardAPI.forbidMoves();
+  if (appStore.soundEnabled && parsedMoves.value.length > 0) {
+    const lastMove = parsedMoves.value[parsedMoves.value.length - 1];
+    lastMove.attack ? playCaptureSound() : playMoveSound();
+  }
+}
+
 function reloadCurrentGame(game) {
   if (!boardAPI) return
 
@@ -1011,6 +1057,11 @@ function formatDate(timestamp) {
 }
 
 .saved-game-detail {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.saved-game-moves {
   color: #aaa;
   font-size: 13px;
 }

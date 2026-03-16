@@ -16,7 +16,7 @@ import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 import path from 'node:path'
 
-const staticRoutes = ['/', '/rules', '/faq', '/donate', '/tools', '/urbit', '/editor', '/analysis', '/gameviewer']
+const staticRoutes = ['/', '/rules', '/faq', '/donate', '/tools', '/urbit', '/editor', '/analysis', '/gameviewer', '/nostr']
 
 // https://vitejs.dev/config/
 export default defineConfig({

@@ -38,10 +38,13 @@
             <v-list-item
               prepend-icon="$mdiWeb"
             >
-              <v-list-item-title class="custom-title mb-2">Play on Urbit</v-list-item-title>
+              <v-list-item-title class="custom-title mb-2">Play on Urbit / Nostr</v-list-item-title>
                 Urbit is a peer-to-peer network that allows you to play against other people and 
-                test new Nichess variants.
-                <br>See <router-link to="/urbit" class="custom-link">this</router-link> guide for more.
+                test new Nichess variants. See <router-link to="/urbit" class="custom-link">this</router-link> guide for more.
+                <br>You can also play via <router-link to="/nostr"
+                  class="custom-link">Nostr</router-link>.
+                <br>In either case, you'll need to invite
+                someone.
 
             </v-list-item>
 
