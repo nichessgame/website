@@ -19,15 +19,6 @@ import {
 
 let model;
 
-// TODO: don't do this in javascript, add it to the model in pytorch
-function expArr(arr: Float32Array) {
-    const result = new Float32Array(arr.length);
-    for (let i = 0; i < arr.length; i++) {
-        result[i] = Math.exp(arr[i]);
-    }
-    return result;
-}
-
 function calcTemp(moveNumber: number, startTemp: number, endTemp: number): number {
   const ln2 = 0.693;
   const TEMP_DECAY_HALF_LIFE = 10;
@@ -70,7 +61,8 @@ export class AIAgent {
       for(let i = 0; i < size; i++) {
         inpArr.push(batch[i].gs.canonicalized())
       }
-      const inp = tf.tensor(inpArr)
+      // need to transpose because tensorflow expects different dimensions than torch
+      const inp = tf.tensor(inpArr).transpose([0, 2, 3, 1])
       const out = model.execute(inp)
       const pis = out[0].dataSync();
       const vs = out[1].dataSync();
