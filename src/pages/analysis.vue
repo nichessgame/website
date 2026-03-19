@@ -384,11 +384,24 @@ watch(analysisEnabled, (enabled) => {
     }
   } else {
     boardWorker.postMessage({ type: 'stop-analysis' });
+    analysisResult.value = null;
+    if (boardAPI) boardAPI.hideMoves();
+  }
+});
+
+watch(formattedTopMoves, (moves) => {
+  if (!boardAPI || !analysisEnabled.value) return;
+  if (moves.length > 0 && moves[0].moves.length > 0) {
+    const top = moves[0].moves[0];
+    boardAPI.drawMove(top.from, top.to, 'paleBlue');
+  } else {
+    boardAPI.hideMoves();
   }
 });
 
 watch(currentBoardString, (newVal) => {
   if (analysisEnabled.value && newVal) {
+    analysisResult.value = null;
     boardWorker.postMessage({ type: 'analyze', boardString: newVal, maxNodes: maxNodes.value });
   }
 });
