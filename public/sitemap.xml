@@ -6,42 +6,47 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/rules.html</loc>
+    <loc>https://www.nichess.org/rules</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/faq.html</loc>
+    <loc>https://www.nichess.org/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/donate.html</loc>
+    <loc>https://www.nichess.org/donate</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/tools.html</loc>
+    <loc>https://www.nichess.org/tools</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/urbit.html</loc>
+    <loc>https://www.nichess.org/urbit</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/editor.html</loc>
+    <loc>https://www.nichess.org/editor</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/analysis.html</loc>
+    <loc>https://www.nichess.org/analysis</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.nichess.org/gameviewer.html</loc>
+    <loc>https://www.nichess.org/gameviewer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.nichess.org/nostr</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

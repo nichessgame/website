@@ -64,19 +64,14 @@ export default defineConfig({
         if (route.route !== '/') {
           route.outputPath = route.route.slice(1) + '.html'
         }
-        // Rewrite internal links to use .html so crawlers can follow them directly
-        for (const r of staticRoutes) {
-          if (r === '/') continue
-          route.html = route.html
-            .replaceAll(`href="${r}"`, `href="${r}.html"`)
-            .replaceAll(`href="${r}/"`, `href="${r}.html"`)
-        }
       },
     }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/sitemap\.xml$/, /^\/robots\.txt$/],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         runtimeCaching: [
           {
