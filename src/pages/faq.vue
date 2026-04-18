@@ -4,14 +4,6 @@
       <h1 class="text-h4 mb-6">Frequently Asked Questions</h1>
       <v-expansion-panels variant="accordion">
         <v-expansion-panel
-            title="How can I play against a friend?"
-        >
-          <v-expansion-panel-text>
-            For now the only way to do so is via <router-link to="/urbit" class="custom-link">Urbit</router-link>. Someday, we'll have centralized servers like Lichess and Chess.com.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-
-        <v-expansion-panel
             title="What is the point of this? Chess is better."
         >
           <v-expansion-panel-text>
