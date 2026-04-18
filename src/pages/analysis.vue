@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="1000px" class="pa-0">
+  <v-container max-width="1080px" class="pa-0">
     <div ref="chessboardContainer" class="chessboard-container">
       <TheChessboard
         @board-created="handleBoardCreated"
