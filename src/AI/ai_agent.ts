@@ -136,7 +136,7 @@ export class AIAgent {
       } else if(difficultyConfig.level == 2) {
         targetQ = 0.4;
       } else if(difficultyConfig.level == 1) {
-        targetQ = 0.35;
+        targetQ = 0.3;
       }
       const t0 = performance.now();
       let t1 = performance.now();
@@ -251,7 +251,7 @@ export class AIAgent {
         if(difficultyConfig.level == 3) {
           ranges = [[0.5, 1.0]];
         } else if(difficultyConfig.level == 2) {
-          ranges = [[0.5, 1.0],[-0.15, 0], [-0.3, 0], [0, 0.1], [0.1, 0.2], [0.2, 0.3], [0.3, 0.5]];
+          ranges = [[0.6, 1.0],[-0.15, 0], [-0.3, 0], [0, 0.1], [0.1, 0.2], [0.2, 0.3], [0.3, 0.6]];
         } else {
           ranges = [[0.65, 1.0],[-0.4, -0.2], [-0.2, 0], [0, 0.1], [0.1, 0.2], [0.2, 0.3], [0.3, 0.65]];
         }
