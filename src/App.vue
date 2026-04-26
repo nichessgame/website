@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
 /* Center content on larger screens */
 @media (min-width: 600px) {
   .v-container {
-    max-width: 1200px;
+    max-width: clamp(1200px, 46vw, 2400px);
     margin: 0 auto;
   }
 }

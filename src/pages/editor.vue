@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="900px" class="pa-0">
+  <v-container max-width="clamp(900px, 47vw, 1440px)" class="pa-0">
     <!-- Piece selector section -->
     <div class="piece-selector">
       <div class="selector-layout">

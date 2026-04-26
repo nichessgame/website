@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="1080px" class="pa-0">
+  <v-container max-width="clamp(864px, 80vh, 1920px)" class="pa-0">
     <TheChessboard
       @board-created="handleBoardCreated"
       @move="handleMove"
@@ -683,7 +683,6 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   flex: 1;
-  padding-left: 16px;
 }
 
 .control-row-center {
@@ -700,7 +699,6 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: flex-end;
   flex: 1;
-  padding-right: 16px;
 }
 
 @media (max-width: 600px) {

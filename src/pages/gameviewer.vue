@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="1080px" class="pa-0">
+  <v-container max-width="clamp(864px, 80vh, 1920px)" class="pa-0">
     <div ref="chessboardContainer" class="chessboard-container">
       <TheChessboard
         @board-created="handleBoardCreated"
@@ -792,7 +792,6 @@ if (typeof window !== 'undefined') {
   display: flex;
   align-items: center;
   flex: 1;
-  padding-left: 16px;
 }
 
 .control-row-center {
@@ -809,7 +808,6 @@ if (typeof window !== 'undefined') {
   align-items: center;
   justify-content: flex-end;
   flex: 1;
-  padding-right: 16px;
 }
 
 /* Mobile styles */

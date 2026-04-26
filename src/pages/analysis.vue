@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="1080px" class="pa-0">
+  <v-container max-width="clamp(864px, 80vh, 1920px)" class="pa-0">
     <div ref="chessboardContainer" class="chessboard-container">
       <TheChessboard
         @board-created="handleBoardCreated"
@@ -728,7 +728,6 @@ function formatDate(timestamp) {
   display: flex;
   align-items: center;
   flex: 1;
-  padding-left: 16px;
 }
 
 .control-row-center {
@@ -745,7 +744,6 @@ function formatDate(timestamp) {
   align-items: center;
   justify-content: flex-end;
   flex: 1;
-  padding-right: 16px;
 }
 
 /* Mobile styles */
@@ -1047,8 +1045,8 @@ function formatDate(timestamp) {
 
 .evaluation-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
   padding: 8px;
   background-color: #333;
   border-radius: 4px;
@@ -1119,7 +1117,6 @@ function formatDate(timestamp) {
   color: #ffd700;
   font-family: monospace;
   font-size: 13px;
-  margin-left: auto;
   white-space: nowrap;
 }
 

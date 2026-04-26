@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="900px" class="mt-2">
+  <v-container max-width="clamp(900px, 35vw, 1440px)" class="mt-2">
     <v-card class="pa-6" elevation="4">
       <div class="text-h4 mb-6">Tools</div>
       <v-list>
