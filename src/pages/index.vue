@@ -1,86 +1,63 @@
 <template>
-  <v-container class="mt-md-10 mt-2" max-width="900px">
+  <main class="home-page">
     <NewGameDialog v-model="showNewGameDialog" />
-    <v-row class="text-center" justify="center">
-      <v-col cols="12">
-        <div class="d-sm-block d-md-none">
-          <h1 class="text-h5 mb-4">Welcome to Nichess</h1>
-          <p class="mb-4 ml-2 mr-2">
-            Chess where pieces have special abilities and health points.
-          </p>
-        </div>
-        <div class="d-none d-md-block">
-          <v-img
-            src="@/assets/logo.png"
-            max-height="150"
-            contain
-            class="mb-6"
-          ></v-img>
 
-          <h1 class="text-h4 mb-4">Welcome to Nichess</h1>
-          <p class="text-h6 mb-4">
-            Chess where pieces have special abilities and health points.
-          </p>
-        </div>
+    <section class="hero" aria-labelledby="home-title">
+      <h1 id="home-title">Nichess</h1>
+      <p>Chess where pieces have special abilities and health points.</p>
+      <div class="hero-actions">
+        <button class="primary-action" type="button" @click="showNewGameDialog = true">
+          Play against AI
+        </button>
+        <router-link class="secondary-action" to="/rules">
+          Rules
+        </router-link>
+      </div>
+    </section>
 
-      </v-col>
+    <section class="info-grid" aria-label="Nichess links and information">
+      <article class="info-panel">
+        <h2>Peer-to-peer</h2>
+        <p>
+          Play against someone via <router-link to="/nostr" class="custom-link">Nostr</router-link>
+          or <router-link to="/urbit" class="custom-link">Urbit</router-link>.
+        </p>
+      </article>
 
-      <v-col cols="12" md="8">
-        <v-card class="pa-2" elevation="4">
-          <v-list lines="two">
-            <v-list-item
-              prepend-icon="$mdiRobot"
-            >
-              <v-list-item-title class="custom-title mb-2">Play against AI</v-list-item-title>
-              Read the <router-link to="/rules" class="custom-link">rules</router-link> or start a <a @click="showNewGameDialog=true" class="custom-link">new game</a> against the computer.
-            </v-list-item>
+      <article class="info-panel">
+        <h2>Social</h2>
+        <p>
+          Follow us on <a class="custom-link" href="https://www.x.com/nichessgame">X</a>
+          and <a class="custom-link" href="https://www.youtube.com/@nichessgame">YouTube</a>.
+        </p>
+        <p>
+          Email: contact@nichess.org
+        </p>
+      </article>
 
-            <v-list-item
-              prepend-icon="$mdiWeb"
-            >
-              <v-list-item-title class="custom-title mb-2">Play on Urbit / Nostr</v-list-item-title>
-                Urbit is a peer-to-peer network that allows you to play against other people and 
-                test new Nichess variants. See <router-link to="/urbit" class="custom-link">this</router-link> guide for more.
-                <br>You can also play via <router-link to="/nostr"
-                  class="custom-link">Nostr</router-link>.
-                <br>In either case, you'll need to invite
-                someone.
+      <article class="info-panel">
+        <h2>Free and Open Source</h2>
+        <p>
+          All the code and AI models are available on our
+          <a class="custom-link" href="https://github.com/nichessgame">GitHub page</a>
+          under FOSS licenses.
+        </p>
+      </article>
 
-            </v-list-item>
+      <article class="info-panel">
+        <h2>AI Games</h2>
+        <p>
+          <a class="custom-link" href="https://youtube.com/playlist?list=PLN0TnHkszmgQSnFrvF_ANIzX8GmDD5GFR">Watch</a>
+          our AI play against itself.
+        </p>
+        <p>
+          This is currently the best way to see what the game is like if both sides play well.
+        </p>
 
-            <v-list-item
-              prepend-icon="$mdiAccountGroup"
-            >
-              <v-list-item-title class="custom-title mb-2">Social</v-list-item-title>
-              <a class="custom-link" href="https://www.x.com/nichessgame">X account</a>
-              <br><a class="custom-link" href="https://x.com/i/communities/1993398352315400235">X community</a>
-              <br><a class="custom-link" href="https://x.com/i/chat/group_join/g1993403016347635959/C17DNh73Gx">X group chat</a>
-              <br><a class="custom-link" href="https://www.youtube.com/@nichessgame">YouTube channel</a>
-              <br>Email: contact@nichess.org
-            </v-list-item>
+      </article>
 
-            <v-list-item
-              prepend-icon="$mdiGithub"
-            >
-              <v-list-item-title class="custom-title mb-2">Free and Open Source</v-list-item-title>
-              All the code and AI models are available on our 
-              <a class="custom-link" href="https://github.com/nichessgame">GitHub page</a>
-              under FOSS licenses.
-            </v-list-item>
-
-            <v-list-item
-              prepend-icon="$mdiYoutube"
-            >
-              <v-list-item-title class="custom-title mb-2">AI Games</v-list-item-title>
-              <a class="custom-link" href="https://youtube.com/playlist?list=PLN0TnHkszmgQSnFrvF_ANIzX8GmDD5GFR">Watch</a> our AI play against itself.
-              <br>This is currently the best way to see what the game is like if both sides play
-              well.
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+    </section>
+  </main>
   <AppFooter />
 </template>
 
@@ -126,24 +103,166 @@ useHead({
 </script>
 
 <style scoped>
+.home-page {
+  width: min(100% - 32px, 940px);
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 48px) 0 clamp(32px, 5vw, 56px);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(12px, 2vw, 18px);
+  padding: clamp(22px, 5vw, 56px) 0 clamp(28px, 5vw, 52px);
+}
+
+.hero h1 {
+  color: #f4f4f5;
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1;
+  margin: 0;
+}
+
+.hero p {
+  color: #d4d7dd;
+  font-size: clamp(1rem, 1.6vw, 1.22rem);
+  line-height: 1.45;
+  margin: 0;
+  max-width: 620px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.primary-action,
+.secondary-action {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  min-width: min(100%, 148px);
+  padding: 0 18px;
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 680;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.primary-action {
+  background: #e2e8f0;
+  color: #101318;
+}
+
+.primary-action:hover {
+  background: #ffffff;
+}
+
+.secondary-action {
+  background: transparent;
+  border-color: #6f7787;
+  color: #f4f4f5;
+}
+
+.secondary-action:hover {
+  border-color: #b8bfcc;
+  color: #ffffff;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 20px);
+}
+
+.info-panel {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  min-height: 156px;
+  padding: clamp(16px, 2.3vw, 22px);
+}
+
+.info-panel h2 {
+  color: #f1f3f6;
+  font-size: clamp(1.05rem, 1.55vw, 1.22rem);
+  font-weight: 680;
+  line-height: 1.2;
+  margin: 0 0 10px;
+}
+
+.info-panel p,
+.info-panel span {
+  color: #d0d4dc;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.info-panel p + p {
+  margin-top: 9px;
+}
+
 .custom-link {
-  color: #6393ea;
+  color: #8bb5ff;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .custom-link:hover {
   cursor:pointer;
 }
 
-.v-list-item {
-  text-align: left;
-  margin-bottom: 12px;
-}
-.v-list-item__title {
-  font-weight: 600;
+@media (max-width: 680px) {
+  .home-page {
+    width: min(100% - 24px, 940px);
+    padding-top: 16px;
+  }
+
+  .hero {
+    align-items: stretch;
+    text-align: left;
+    padding-top: 20px;
+  }
+
+  .hero-actions {
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .primary-action,
+  .secondary-action {
+    flex: 0 0 auto;
+    min-width: auto;
+    padding: 0 16px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-panel {
+    min-height: auto;
+  }
 }
 
-.custom-title {
-  font-weight: 600;
-  color: lightgrey;
+@media (max-width: 320px) {
+  .primary-action,
+  .secondary-action {
+    flex: 1 1 100%;
+  }
 }
 </style>
