@@ -1,67 +1,43 @@
 <template>
-  <v-container class="mt-2" max-width="clamp(900px, 35vw, 1440px)">
-    <v-card class="pa-6" elevation="4">
-      <div class="text-h4"> Donate </div>
-      <div class="mt-2">
-      If you'd like to see a multiplayer server, consider donating.
-      </div>
-      <div class="text-h6 mt-md-4 mt-2"> Patreon </div>
-      <div class="mt-2">
-        <a class="custom-link"
-          href="https://www.patreon.com/join/nichessgame">https://www.patreon.com/join/nichessgame</a>
-      </div>
-      <div class="text-h6 mt-md-4 mt-2"> BTC </div>
-      <v-row class="mt-2">
-        <v-col>
-          <div class="d-flex justify-start">
-            <v-img
-              src="@/assets/btc_qr.png"
-              max-width="155"
-              max-height="155"
-              contain
-            ></v-img>
-          </div>
-        </v-col>
-      </v-row>
-      <div class="mt-2">
+  <main class="page-shell">
+    <header class="page-header">
+      <h1 class="page-title">Donate</h1>
+      <p class="page-subtitle">If you'd like to see a multiplayer server, consider donating.</p>
+    </header>
+
+    <section class="panel-grid" aria-label="Donation methods">
+      <article class="site-panel">
+        <h2>Patreon</h2>
+        <p>
+          <a class="site-link" href="https://www.patreon.com/join/nichessgame">https://www.patreon.com/join/nichessgame</a>
+        </p>
+      </article>
+
+      <article class="site-panel donation-panel">
+        <h2>BTC</h2>
+        <img src="@/assets/btc_qr.png" alt="Bitcoin donation QR code" class="qr-code small" />
+        <p class="address-text">
         bc1qj77tuw0x7llvehwjq5yw3luzeefpu8dmtlgy4r
-      </div>
+        </p>
+      </article>
 
-      <div class="text-h6 mt-md-4 mt-2"> ETH </div>
-      <v-row class="mt-2">
-        <v-col>
-          <div class="d-flex justify-start">
-            <v-img
-              src="@/assets/eth_qr.png"
-              max-width="132"
-              max-height="132"
-              contain
-            ></v-img>
-          </div>
-        </v-col>
-      </v-row>
-      <div class="mt-2">
+      <article class="site-panel donation-panel">
+        <h2>ETH</h2>
+        <img src="@/assets/eth_qr.png" alt="Ethereum donation QR code" class="qr-code small" />
+        <p class="address-text">
         0x952838143173312f1F9B9416226A21105604D135
-      </div>
-      <div class="text-h6 mt-md-4 mt-2"> XMR </div>
-      <v-row class="mt-2">
-        <v-col>
-          <div class="d-flex justify-start">
-            <v-img
-              src="@/assets/monero_qr.png"
-              max-width="240"
-              max-height="240"
-              contain
-            ></v-img>
-          </div>
-        </v-col>
-      </v-row>
-      <div class="mt-2">
-        43HhtcAuDyL5i8ozADfar64yA4NF5XARrMvJeEJWQhEb47JzrEHkDf3fb1mS3Krp3KJwktbvfNtjtf4DM5w963wT6Z1pGnQ
-      </div>
-    </v-card>
-  </v-container>
+        </p>
+      </article>
 
+      <article class="site-panel donation-panel">
+        <h2>XMR</h2>
+        <img src="@/assets/monero_qr.png" alt="Monero donation QR code" class="qr-code large" />
+        <p class="address-text">
+        43HhtcAuDyL5i8ozADfar64yA4NF5XARrMvJeEJWQhEb47JzrEHkDf3fb1mS3Krp3KJwktbvfNtjtf4DM5w963wT6Z1pGnQ
+        </p>
+      </article>
+    </section>
+  </main>
 </template>
 
 <script setup>
@@ -87,18 +63,25 @@ useHead({
 </script>
 
 <style scoped>
-.custom-link {
-  color: #6393ea;
-  text-decoration: underline;
-}
-.custom-link:hover {
-  cursor:pointer;
+.donation-panel {
+  display: grid;
+  gap: 12px;
 }
 
-.v-card {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+.qr-code {
+  background: #ffffff;
+  border-radius: 4px;
+  display: block;
+  padding: 6px;
+}
+
+.qr-code.small {
+  height: 144px;
+  width: 144px;
+}
+
+.qr-code.large {
+  height: 190px;
+  width: 190px;
 }
 </style>
-

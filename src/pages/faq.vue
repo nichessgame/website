@@ -1,74 +1,64 @@
 <template>
-  <v-container class="mt-2" max-width="clamp(900px, 35vw, 1440px)">
-    <v-card class="pa-6" elevation="4">
-      <h1 class="text-h4 mb-6">Frequently Asked Questions</h1>
-      <v-expansion-panels variant="accordion">
-        <v-expansion-panel
-            title="What is the point of this? Chess is better."
-        >
-          <v-expansion-panel-text>
+  <main class="page-shell">
+    <header class="page-header">
+      <h1 class="page-title">Frequently Asked Questions</h1>
+    </header>
+
+    <section class="content-stack" aria-label="Frequently asked questions">
+      <details class="faq-item">
+        <summary>What is the point of this? Chess is better.</summary>
+        <p>
             Nichess is a superset of chess—it has everything chess has and more. It's only a matter of time before a Nichess variant is made that's better than chess.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
+        </p>
+      </details>
 
-        <v-expansion-panel
-            title="I don't like X. You should add Y."
-        >
-          <v-expansion-panel-text>
+      <details class="faq-item">
+        <summary>I don't like X. You should add Y.</summary>
+        <p>
             Unfortunately, even a small change requires retraining the AI from scratch. We appreciate the suggestions, but don't expect frequent changes once a variant is released. As more people get involved, we'll be able to make changes more frequently.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
+        </p>
+      </details>
 
-        <v-expansion-panel
-            title="I made a Nichess variant / I have ideas how to improve Nichess."
-        >
-          <v-expansion-panel-text>
+      <details class="faq-item">
+        <summary>I made a Nichess variant / I have ideas how to improve Nichess.</summary>
+        <p>
             Great. Send your ideas to contact@nichess.org.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
+        </p>
+      </details>
 
-        <v-expansion-panel
-            title="How can I help?"
-        >
-          <v-expansion-panel-text>
+      <details class="faq-item">
+        <summary>How can I help?</summary>
+        <p>
             Pick something and make it better.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
+        </p>
+      </details>
 
-        <v-expansion-panel
-            title="Why is the AI playing better/worse on my desktop PC than on my smartphone?"
-        >
-          <v-expansion-panel-text>
+      <details class="faq-item">
+        <summary>Why is the AI playing better/worse on my desktop PC than on my smartphone?</summary>
+        <p>
             The AI is running locally, on your device. Its skill level depends on your hardware and software. If the performance is poor, try a different browser or a device. Chromium-based browsers (Chrome, Brave, Edge etc.) tend to perform a bit better than Firefox.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
+        </p>
+      </details>
 
-        <v-expansion-panel
-            title="I started a game and nothing is happening."
-        >
-          <v-expansion-panel-text>
+      <details class="faq-item">
+        <summary>I started a game and nothing is happening.</summary>
+        <p>
             Sometimes it can take a while to download the AI model. Make sure you have a good internet connection.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
+        </p>
+      </details>
 
-        <v-expansion-panel
-            title="How do I report a bug?"
-        >
-          <v-expansion-panel-text>
+      <details class="faq-item">
+        <summary>How do I report a bug?</summary>
+        <p>
             Send an email to contact@nichess.org.
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-
-
-      </v-expansion-panels>
-    </v-card>
-  </v-container>
+        </p>
+      </details>
+    </section>
+  </main>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
-const router = useRouter()
 
 useHead({
   title: 'Frequently Asked Questions',
@@ -90,14 +80,32 @@ useHead({
 </script>
 
 <style scoped>
-.custom-link {
-  color: #6393ea;
-  text-decoration: underline;
+.faq-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  padding: 12px 0;
 }
 
-.v-card {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+.faq-item:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+summary {
+  color: #f1f3f6;
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 650;
+  line-height: 1.35;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+details p {
+  color: #d0d4dc;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin-top: 10px;
 }
 </style>

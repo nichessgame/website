@@ -9,13 +9,13 @@
         <v-toolbar-title class="mr-sm-4"><v-btn to="/" :active="false" class="nav-button">Nichess</v-btn></v-toolbar-title>
         
         <div class="d-none d-sm-flex ml-auto">
-          <v-btn prepend-icon="$mdiSwordCross" @click="showNewGameDialog = true" class="nav-button">Play</v-btn>
+          <v-btn @click="showNewGameDialog = true" class="nav-button">Play</v-btn>
           <NewGameDialog v-model="showNewGameDialog" />
-          <v-btn to="/faq" prepend-icon="$mdiInformation" :active="false" class="nav-button">FAQ</v-btn>
-          <v-btn to="/rules" prepend-icon="$mdiScriptText" :active="false" class="nav-button">Rules</v-btn>
-          <v-btn to="/tools" prepend-icon="$mdiTools" :active="false" class="nav-button">Tools</v-btn>
-          <v-btn to="/nostr" prepend-icon="$mdiWeb" :active="false" class="nav-button">Nostr</v-btn>
-          <v-btn to="/donate" prepend-icon="$mdiGift" :active="false" class="donate">Donate</v-btn>
+          <v-btn to="/faq" :active="false" class="nav-button">FAQ</v-btn>
+          <v-btn to="/rules" :active="false" class="nav-button">Rules</v-btn>
+          <v-btn to="/tools" :active="false" class="nav-button">Tools</v-btn>
+          <v-btn to="/nostr" :active="false" class="nav-button">Nostr</v-btn>
+          <v-btn to="/donate" :active="false" class="donate">Donate</v-btn>
         </div>
       </v-container>
     </v-app-bar>
@@ -27,27 +27,23 @@
     >
       <v-list>
         <v-list-item
-          prepend-icon="$mdiSwordCross"
           title="Play"
           @click="showNewGameDialog = true"
           class="nav-button"
         />
         <v-list-item
-          prepend-icon="$mdiInformation"
           title="FAQ"
           to="/faq"
           :active="false"
           class="nav-button"
         />
         <v-list-item
-          prepend-icon="$mdiScriptText"
           title="Rules"
           to="/rules"
           :active="false"
           class="nav-button"
         />
         <v-list-item
-          prepend-icon="$mdiTools"
           title="Tools"
           to="/tools"
           :active="false"
@@ -55,7 +51,6 @@
         />
 
         <v-list-item
-          prepend-icon="$mdiWeb"
           title="Nostr"
           to="/nostr"
           :active="false"
@@ -63,7 +58,6 @@
         />
 
         <v-list-item
-          prepend-icon="$mdiGift"
           title="Donate"
           to="/donate"
           :active="false"

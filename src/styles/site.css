@@ -1,0 +1,243 @@
+.page-shell {
+  width: min(100% - 32px, 940px);
+  margin: 0 auto;
+  padding: clamp(22px, 4vw, 42px) 0 clamp(32px, 5vw, 56px);
+}
+
+.page-shell-wide {
+  width: min(100% - 32px, 1120px);
+}
+
+.page-header {
+  margin-bottom: clamp(16px, 3vw, 26px);
+}
+
+.page-title {
+  color: #f4f4f5;
+  font-size: clamp(1.55rem, 3vw, 2.2rem);
+  font-weight: 720;
+  letter-spacing: 0;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #d4d7dd;
+  font-size: clamp(0.95rem, 1.35vw, 1.05rem);
+  line-height: 1.5;
+  margin: 8px 0 0;
+  max-width: 680px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 20px);
+}
+
+.site-panel {
+  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: clamp(14px, 2vw, 18px);
+}
+
+.site-panel h2,
+.site-panel h3,
+.site-panel h4 {
+  color: #f1f3f6;
+  letter-spacing: 0;
+  line-height: 1.25;
+  margin: 0 0 10px;
+}
+
+.site-panel h2 {
+  font-size: clamp(1rem, 1.45vw, 1.16rem);
+  font-weight: 680;
+}
+
+.site-panel h2:not(:first-child) {
+  margin-top: 22px;
+}
+
+.site-panel h3 {
+  font-size: 0.98rem;
+  font-weight: 680;
+  margin-top: 16px;
+}
+
+.site-panel h4 {
+  font-size: 0.98rem;
+  font-weight: 680;
+  margin-top: 16px;
+}
+
+.site-panel p,
+.site-panel li {
+  color: #d0d4dc;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.site-panel p {
+  margin: 0;
+}
+
+.site-panel p + p {
+  margin-top: 10px;
+}
+
+.site-link {
+  color: #8bb5ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-link:hover {
+  cursor: pointer;
+}
+
+.content-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.compact-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.compact-list li {
+  list-style: none;
+}
+
+.code-line {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #eceff4;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 10px 0 0;
+  overflow-x: auto;
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+
+.code-line + p {
+  margin-top: 12px;
+}
+
+.address-text {
+  color: #d0d4dc;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.tool-link {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  color: #f1f3f6;
+  display: flex;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0 16px;
+  text-decoration: none;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.tool-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.rules-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+}
+
+.rules-nav {
+  align-self: start;
+  position: sticky;
+  top: 72px;
+}
+
+.rules-nav a {
+  border-radius: 6px;
+  color: #d0d4dc;
+  display: block;
+  font-size: 0.9rem;
+  padding: 7px 9px;
+  text-decoration: none;
+}
+
+.rules-nav a:hover {
+  background: rgba(255, 255, 255, 0.055);
+  color: #ffffff;
+}
+
+.rule-card {
+  scroll-margin-top: 80px;
+}
+
+.rule-content {
+  align-items: center;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 150px);
+}
+
+.rule-piece {
+  display: block;
+  margin: 0 auto;
+  max-height: 150px;
+  max-width: 150px;
+  object-fit: contain;
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .page-shell,
+  .page-shell-wide {
+    width: min(100% - 24px, 940px);
+    padding-top: 18px;
+  }
+
+  .panel-grid,
+  .rules-layout,
+  .rule-content {
+    grid-template-columns: 1fr;
+  }
+
+  .rules-nav {
+    position: static;
+  }
+
+  .rules-nav .site-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px;
+  }
+
+  .rules-nav a {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 9px;
+  }
+
+  .rule-piece {
+    justify-self: start;
+    max-height: 112px;
+    max-width: 112px;
+  }
+}

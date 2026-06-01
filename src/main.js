@@ -21,6 +21,7 @@ import { registerSW } from 'virtual:pwa-register'
 
 // Styles
 import 'unfonts.css'
+import '@/styles/site.css'
 
 registerSW({ immediate: true })
 

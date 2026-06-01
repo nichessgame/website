@@ -1,23 +1,16 @@
 <template>
-  <v-container max-width="clamp(900px, 35vw, 1440px)" class="mt-2">
-    <v-card class="pa-6" elevation="4">
-      <div class="text-h4 mb-6">Tools</div>
-      <v-list>
-        <v-list-item
-          title="Board Editor"
-          to="/editor"
-        />
-        <v-list-item
-          title="Game Viewer"
-          to="/gameviewer"
-        />
-        <v-list-item
-          title="Analysis"
-          to="/analysis"
-        />
-      </v-list>
-    </v-card>
-  </v-container>
+  <main class="page-shell">
+    <header class="page-header">
+      <h1 class="page-title">Tools</h1>
+      <p class="page-subtitle">Utilities for setting up positions, replaying games, and evaluating play.</p>
+    </header>
+
+    <nav class="content-stack" aria-label="Nichess tools">
+      <router-link class="tool-link" to="/editor">Board Editor</router-link>
+      <router-link class="tool-link" to="/gameviewer">Game Viewer</router-link>
+      <router-link class="tool-link" to="/analysis">Analysis</router-link>
+    </nav>
+  </main>
 </template>
 
 <script setup>
@@ -41,6 +34,3 @@ useHead({
   ],
 })
 </script>
-
-<style scoped>
-</style>

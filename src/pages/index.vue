@@ -19,16 +19,16 @@
       <article class="info-panel">
         <h2>Peer-to-peer</h2>
         <p>
-          Play against someone via <router-link to="/nostr" class="custom-link">Nostr</router-link>
-          or <router-link to="/urbit" class="custom-link">Urbit</router-link>.
+          Play against someone via <router-link to="/nostr" class="site-link">Nostr</router-link>
+          or <router-link to="/urbit" class="site-link">Urbit</router-link>.
         </p>
       </article>
 
       <article class="info-panel">
         <h2>Social</h2>
         <p>
-          Follow us on <a class="custom-link" href="https://www.x.com/nichessgame">X</a>
-          and <a class="custom-link" href="https://www.youtube.com/@nichessgame">YouTube</a>.
+          Follow us on <a class="site-link" href="https://www.x.com/nichessgame">X</a>
+          and <a class="site-link" href="https://www.youtube.com/@nichessgame">YouTube</a>.
         </p>
         <p>
           Email: contact@nichess.org
@@ -39,7 +39,7 @@
         <h2>Free and Open Source</h2>
         <p>
           All the code and AI models are available on our
-          <a class="custom-link" href="https://github.com/nichessgame">GitHub page</a>
+          <a class="site-link" href="https://github.com/nichessgame">GitHub page</a>
           under FOSS licenses.
         </p>
       </article>
@@ -47,7 +47,7 @@
       <article class="info-panel">
         <h2>AI Games</h2>
         <p>
-          <a class="custom-link" href="https://youtube.com/playlist?list=PLN0TnHkszmgQSnFrvF_ANIzX8GmDD5GFR">Watch</a>
+          <a class="site-link" href="https://youtube.com/playlist?list=PLN0TnHkszmgQSnFrvF_ANIzX8GmDD5GFR">Watch</a>
           our AI play against itself.
         </p>
         <p>
@@ -215,15 +215,6 @@ useHead({
 
 .info-panel p + p {
   margin-top: 9px;
-}
-
-.custom-link {
-  color: #8bb5ff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.custom-link:hover {
-  cursor:pointer;
 }
 
 @media (max-width: 680px) {
