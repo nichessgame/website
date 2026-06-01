@@ -1,21 +1,31 @@
 <template>
   <v-app>
-    <!--<v-app-bar app scroll-behavior="fully-hide" scroll-threshold="1" elevation="0"
-      color="transparent">-->
-    <v-app-bar app scroll-behavior="collapse" scroll-threshold="1" elevation="0" color="transparent">
+    <v-app-bar
+      app
+      class="site-app-bar"
+      color="transparent"
+      elevation="0"
+      scroll-behavior="collapse"
+      scroll-threshold="1"
+    >
 
-      <v-container class="d-flex align-center px-0">
-        <v-app-bar-nav-icon @click="drawer = !drawer" class="d-sm-none" />
-        <v-toolbar-title class="mr-sm-4"><v-btn to="/" :active="false" class="nav-button">Nichess</v-btn></v-toolbar-title>
+      <v-container class="nav-container d-flex align-center">
+        <v-app-bar-nav-icon
+          aria-label="Open navigation"
+          class="mobile-menu-button d-sm-none"
+          @click="drawer = !drawer"
+        />
+
+        <router-link class="brand-link" to="/">Nichess</router-link>
         
-        <div class="d-none d-sm-flex ml-auto">
-          <v-btn @click="showNewGameDialog = true" class="nav-button">Play</v-btn>
+        <div class="desktop-nav d-none d-sm-flex ml-auto">
+          <v-btn class="nav-link" variant="text" @click="showNewGameDialog = true">Play</v-btn>
           <NewGameDialog v-model="showNewGameDialog" />
-          <v-btn to="/faq" :active="false" class="nav-button">FAQ</v-btn>
-          <v-btn to="/rules" :active="false" class="nav-button">Rules</v-btn>
-          <v-btn to="/tools" :active="false" class="nav-button">Tools</v-btn>
-          <v-btn to="/nostr" :active="false" class="nav-button">Nostr</v-btn>
-          <v-btn to="/donate" :active="false" class="donate">Donate</v-btn>
+          <v-btn to="/faq" :active="false" class="nav-link" variant="text">FAQ</v-btn>
+          <v-btn to="/rules" :active="false" class="nav-link" variant="text">Rules</v-btn>
+          <v-btn to="/tools" :active="false" class="nav-link" variant="text">Tools</v-btn>
+          <v-btn to="/nostr" :active="false" class="nav-link" variant="text">Nostr</v-btn>
+          <v-btn to="/donate" :active="false" class="nav-link donate-link" variant="text">Donate</v-btn>
         </div>
       </v-container>
     </v-app-bar>
@@ -23,45 +33,45 @@
     <v-navigation-drawer
       v-model="drawer"
       temporary
-      class="d-sm-none"
+      class="mobile-drawer d-sm-none"
     >
-      <v-list>
+      <v-list class="mobile-nav-list">
         <v-list-item
           title="Play"
-          @click="showNewGameDialog = true"
-          class="nav-button"
+          class="mobile-play-item"
+          @click="showNewGameDialog = true; drawer = false"
         />
         <v-list-item
           title="FAQ"
           to="/faq"
           :active="false"
-          class="nav-button"
+          class="mobile-nav-item"
         />
         <v-list-item
           title="Rules"
           to="/rules"
           :active="false"
-          class="nav-button"
+          class="mobile-nav-item"
         />
         <v-list-item
           title="Tools"
           to="/tools"
           :active="false"
-          class="nav-button"
+          class="mobile-nav-item"
         />
 
         <v-list-item
           title="Nostr"
           to="/nostr"
           :active="false"
-          class="nav-button"
+          class="mobile-nav-item"
         />
 
         <v-list-item
           title="Donate"
           to="/donate"
           :active="false"
-          class="donate"
+          class="mobile-nav-item mobile-donate-item"
         />
       </v-list>
     </v-navigation-drawer>
@@ -84,23 +94,106 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.v-btn {
-  margin-left: 8px;
+.site-app-bar {
+  background: transparent !important;
 }
 
-.donate {
-  color: #ffd700; /* gold */
+.nav-container {
+  max-width: min(100% - 32px, 1120px);
+  padding: 0;
 }
 
-.nav-button {
-  color: gainsboro;
+.brand-link {
+  color: #b9bec8;
+  font-size: 0.92rem;
+  font-weight: 620;
+  letter-spacing: 0;
+  line-height: 1;
+  margin-right: 30px;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
-/* Center content on larger screens */
-@media (min-width: 600px) {
-  .v-container {
-    max-width: clamp(1200px, 46vw, 2400px);
-    margin: 0 auto;
+.brand-link:hover {
+  color: #e7eaf0;
+}
+
+.desktop-nav {
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  color: #aeb4bf;
+  font-size: 0.9rem;
+  font-weight: 560;
+  letter-spacing: 0;
+  min-height: 40px;
+  min-width: auto;
+  padding: 0 14px;
+  text-transform: uppercase;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.035);
+  color: #f0f2f6;
+}
+
+.donate-link {
+  color: #c7b46b;
+}
+
+.donate-link:hover {
+  background: rgba(199, 180, 107, 0.055);
+  color: #dccb86;
+}
+
+.mobile-menu-button {
+  color: #f1f3f6;
+  margin-right: 8px;
+}
+
+.mobile-drawer {
+  background: #15181d;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobile-nav-list {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.mobile-play-item,
+.mobile-nav-item {
+  border-radius: 6px;
+  color: #b9bec8;
+  font-size: 0.92rem;
+  font-weight: 560;
+  min-height: 48px;
+  text-transform: uppercase;
+}
+
+.mobile-play-item {
+  color: #b9bec8;
+}
+
+.mobile-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.mobile-donate-item {
+  color: #c7b46b;
+}
+
+@media (max-width: 599px) {
+  .nav-container {
+    max-width: min(100% - 24px, 1120px);
+  }
+
+  .brand-link {
+    margin-right: 0;
   }
 }
 </style>
