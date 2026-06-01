@@ -114,14 +114,14 @@ useHead({
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: clamp(12px, 2vw, 18px);
-  padding: clamp(22px, 5vw, 56px) 0 clamp(28px, 5vw, 52px);
+  gap: clamp(16px, 2.4vw, 24px);
+  padding: clamp(22px, 5vw, 56px) 0 clamp(38px, 6vw, 70px);
 }
 
 .hero h1 {
   color: #f4f4f5;
   font-size: clamp(2.75rem, 7vw, 5.25rem);
-  font-weight: 760;
+  font-weight: 620;
   letter-spacing: 0;
   line-height: 1;
   margin: 0;
@@ -140,6 +140,7 @@ useHead({
   flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
+  margin-top: clamp(2px, 0.8vw, 8px);
   width: 100%;
 }
 
@@ -186,7 +187,7 @@ useHead({
 .info-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 20px);
+  gap: clamp(16px, 2.6vw, 26px);
 }
 
 .info-panel {
@@ -225,8 +226,9 @@ useHead({
 
   .hero {
     align-items: stretch;
+    gap: 14px;
     text-align: left;
-    padding-top: 20px;
+    padding: 20px 0 34px;
   }
 
   .hero-actions {
