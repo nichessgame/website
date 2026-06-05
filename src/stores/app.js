@@ -5,6 +5,7 @@ import { AIDifficulty } from '../AI/common'
 export const POINTS_TEXT_THEMES = [
   { value: 'standard', title: 'Standard', description: 'Bright labels with a warm outline.' },
   { value: 'strong', title: 'Strong', description: 'Darker labels with a stronger outline.' },
+  { value: 'simple', title: 'Simple', description: 'Plain labels with no text effects.' },
 ]
 
 export const useAppStore = defineStore('app', {
