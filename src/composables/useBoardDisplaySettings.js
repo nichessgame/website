@@ -5,12 +5,13 @@ export function useBoardDisplaySettings(boardConfig) {
   const appStore = useAppStore()
 
   watch(
-    () => appStore.selectedHealthTextTheme,
-    theme => {
-      boardConfig.healthText = {
-        ...(boardConfig.healthText || {}),
-        visible: true,
+    () => [appStore.selectedPointsTextTheme, appStore.abilityPointsVisible],
+    ([theme, abilityPointsVisible]) => {
+      boardConfig.healthAndAbilityPointsText = {
+        ...(boardConfig.healthAndAbilityPointsText || {}),
+        healthPointsVisible: true,
         theme,
+        abilityPointsVisible,
       }
     },
     { immediate: true }

@@ -25,18 +25,34 @@
 
       <v-card-text class="board-settings-content">
         <v-select
-          v-model="selectedHealthTextTheme"
-          :items="HEALTH_TEXT_THEMES"
+          v-model="selectedPointsTextTheme"
+          :items="POINTS_TEXT_THEMES"
           item-title="title"
           item-value="value"
-          label="Health text"
+          label="Text style"
           variant="outlined"
           density="compact"
           hide-details
         />
 
+        <div class="settings-row toggle-row">
+          <div class="toggle-label">
+            <v-icon icon="$mdiLightningBolt" size="20" />
+            <span>Ability points</span>
+          </div>
+
+          <v-switch
+            :model-value="appStore.abilityPointsVisible"
+            color="primary"
+            density="compact"
+            hide-details
+            inset
+            @update:model-value="appStore.setAbilityPointsVisible"
+          />
+        </div>
+
         <div class="settings-row sound-row">
-          <div class="sound-label">
+          <div class="toggle-label">
             <v-icon
               :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'"
               size="20"
@@ -69,16 +85,16 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { HEALTH_TEXT_THEMES, useAppStore } from '@/stores/app'
+import { POINTS_TEXT_THEMES, useAppStore } from '@/stores/app'
 import MoveSound from '@/assets/Move.ogg'
 
 const emit = defineEmits(['flip-board'])
 const appStore = useAppStore()
 const dialogOpen = ref(false)
 
-const selectedHealthTextTheme = computed({
-  get: () => appStore.selectedHealthTextTheme,
-  set: theme => appStore.setHealthTextTheme(theme),
+const selectedPointsTextTheme = computed({
+  get: () => appStore.selectedPointsTextTheme,
+  set: theme => appStore.setPointsTextTheme(theme),
 })
 
 function toggleSound(enabled) {
@@ -139,11 +155,12 @@ function toggleSound(enabled) {
   padding: 6px 10px 6px 12px;
 }
 
+.toggle-row,
 .sound-row {
   justify-content: space-between;
 }
 
-.sound-label {
+.toggle-label {
   align-items: center;
   color: #d7dbe3;
   display: flex;

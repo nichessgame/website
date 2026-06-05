@@ -2,9 +2,9 @@
 import { defineStore } from 'pinia'
 import { AIDifficulty } from '../AI/common'
 
-export const HEALTH_TEXT_THEMES = [
-  { value: 'strong', title: 'Strong', description: 'Brighter labels with a stronger warm outline.' },
-  { value: 'gold', title: 'Gold', description: 'Bright gold labels with a subtle warm edge.' },
+export const POINTS_TEXT_THEMES = [
+  { value: 'standard', title: 'Standard', description: 'Bright labels with a warm outline.' },
+  { value: 'strong', title: 'Strong', description: 'Darker labels with a stronger outline.' },
 ]
 
 export const useAppStore = defineStore('app', {
@@ -14,7 +14,8 @@ export const useAppStore = defineStore('app', {
     modelLoading: false,
     selectedDifficulty: loadDifficultySetting(),
     selectedColor: loadColorSetting(),
-    selectedHealthTextTheme: loadHealthTextThemeSetting(),
+    selectedPointsTextTheme: loadPointsTextThemeSetting(),
+    abilityPointsVisible: loadAbilityPointsVisibleSetting(),
     soundEnabled: loadSoundSetting(),
     savedGames: loadSavedGames(),
     analysisData: null,
@@ -56,10 +57,14 @@ export const useAppStore = defineStore('app', {
       this.selectedColor = color;
       saveColorSetting(color);
     },
-    setHealthTextTheme(theme) {
-      const nextTheme = HEALTH_TEXT_THEMES.some(option => option.value === theme) ? theme : 'strong';
-      this.selectedHealthTextTheme = nextTheme;
-      saveHealthTextThemeSetting(nextTheme);
+    setPointsTextTheme(theme) {
+      const nextTheme = POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'standard';
+      this.selectedPointsTextTheme = nextTheme;
+      savePointsTextThemeSetting(nextTheme);
+    },
+    setAbilityPointsVisible(visible) {
+      this.abilityPointsVisible = visible;
+      saveAbilityPointsVisibleSetting(visible);
     },
     setSoundEnabled(enabled) {
       this.soundEnabled = enabled;
@@ -135,18 +140,32 @@ function saveColorSetting(color) {
   localStorage.setItem('nichess-selected-color', JSON.stringify(color));
 }
 
-function loadHealthTextThemeSetting() {
+function loadPointsTextThemeSetting() {
   try {
-    const stored = localStorage.getItem('nichess-health-text-theme');
-    const theme = stored !== null ? JSON.parse(stored) : 'strong';
-    return HEALTH_TEXT_THEMES.some(option => option.value === theme) ? theme : 'strong';
+    const stored = localStorage.getItem('nichess-points-text-theme') ?? localStorage.getItem('nichess-health-text-theme');
+    const theme = stored !== null ? JSON.parse(stored) : 'standard';
+    if (theme === 'gold') return 'standard';
+    return POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'standard';
   } catch {
-    return 'strong';
+    return 'standard';
   }
 }
 
-function saveHealthTextThemeSetting(theme) {
-  localStorage.setItem('nichess-health-text-theme', JSON.stringify(theme));
+function savePointsTextThemeSetting(theme) {
+  localStorage.setItem('nichess-points-text-theme', JSON.stringify(theme));
+}
+
+function loadAbilityPointsVisibleSetting() {
+  try {
+    const stored = localStorage.getItem('nichess-ability-points-visible');
+    return stored !== null ? JSON.parse(stored) : false;
+  } catch {
+    return false;
+  }
+}
+
+function saveAbilityPointsVisibleSetting(visible) {
+  localStorage.setItem('nichess-ability-points-visible', JSON.stringify(visible));
 }
 
 const SAVED_GAMES_KEY = 'nichess-saved-games'
