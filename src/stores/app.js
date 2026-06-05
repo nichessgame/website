@@ -2,6 +2,11 @@
 import { defineStore } from 'pinia'
 import { AIDifficulty } from '../AI/common'
 
+export const HEALTH_TEXT_THEMES = [
+  { value: 'strong', title: 'Strong', description: 'Brighter labels with a stronger warm outline.' },
+  { value: 'gold', title: 'Gold', description: 'Bright gold labels with a subtle warm edge.' },
+]
+
 export const useAppStore = defineStore('app', {
   state: () => ({
     boardWorker: null,
@@ -9,6 +14,7 @@ export const useAppStore = defineStore('app', {
     modelLoading: false,
     selectedDifficulty: loadDifficultySetting(),
     selectedColor: loadColorSetting(),
+    selectedHealthTextTheme: loadHealthTextThemeSetting(),
     soundEnabled: loadSoundSetting(),
     savedGames: loadSavedGames(),
     analysisData: null,
@@ -49,6 +55,11 @@ export const useAppStore = defineStore('app', {
     setColor(color) {
       this.selectedColor = color;
       saveColorSetting(color);
+    },
+    setHealthTextTheme(theme) {
+      const nextTheme = HEALTH_TEXT_THEMES.some(option => option.value === theme) ? theme : 'strong';
+      this.selectedHealthTextTheme = nextTheme;
+      saveHealthTextThemeSetting(nextTheme);
     },
     setSoundEnabled(enabled) {
       this.soundEnabled = enabled;
@@ -122,6 +133,20 @@ function loadColorSetting() {
 
 function saveColorSetting(color) {
   localStorage.setItem('nichess-selected-color', JSON.stringify(color));
+}
+
+function loadHealthTextThemeSetting() {
+  try {
+    const stored = localStorage.getItem('nichess-health-text-theme');
+    const theme = stored !== null ? JSON.parse(stored) : 'strong';
+    return HEALTH_TEXT_THEMES.some(option => option.value === theme) ? theme : 'strong';
+  } catch {
+    return 'strong';
+  }
+}
+
+function saveHealthTextThemeSetting(theme) {
+  localStorage.setItem('nichess-health-text-theme', JSON.stringify(theme));
 }
 
 const SAVED_GAMES_KEY = 'nichess-saved-games'

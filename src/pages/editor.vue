@@ -50,8 +50,13 @@
       <TheChessboard
         @board-created="handleBoardCreated"
         :board-config="boardConfig"
+        :reactive-config="true"
         @move="handleMove"
       />
+    </div>
+
+    <div class="board-settings-row mt-2">
+      <BoardSettingsButton @flip-board="flipBoard" />
     </div>
 
     <!-- Analyze Button -->
@@ -160,6 +165,8 @@ import 'vue3-nichessboard/style.css';
 import { PieceType, Player } from 'nichess';
 import { AgentCache } from '@/AI/agent_cache';
 import { useAppStore } from '../stores/app';
+import { useBoardDisplaySettings } from '@/composables/useBoardDisplaySettings';
+import BoardSettingsButton from '@/components/BoardSettingsButton.vue';
 
 // Import piece icons
 import openHand from '@/assets/open-hand.svg';
@@ -304,6 +311,7 @@ const boardConfig = reactive({
     select: handleSquareSelect
   }
 });
+useBoardDisplaySettings(boardConfig);
 
 function selectPiece(pieceType) {
   selectedPiece.value = pieceType;
@@ -388,6 +396,10 @@ function updateBoardString() {
   if (boardAPI) {
     currentBoardString.value = boardAPI.getFen();
   }
+}
+
+function flipBoard() {
+  if (boardAPI) boardAPI.toggleOrientation();
 }
 
 function setStartingPosition() {
@@ -549,6 +561,14 @@ watch(sideToMove, (newValue) => {
   width: 100% !important;
   height: 100% !important;
   aspect-ratio: 1 !important;
+}
+
+.board-settings-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 832px;
 }
 
 @media (min-width: 900px) {

@@ -8,6 +8,7 @@
       @draw="handleDraw"
       :player-color="props.myColor"
       :board-config="boardConfig"
+      :reactive-config="true"
       :key="props.gameId"
       class="mt-10"
     />
@@ -99,7 +100,7 @@
         </v-btn>
       </div>
 
-      <!-- Right: New Game, Board Flip and Sound -->
+      <!-- Right: New Game and Board Settings -->
       <div class="control-row-right">
         <v-btn
           @click="showNewGameDialog = true"
@@ -109,19 +110,7 @@
           <v-icon icon="$mdiSwordCross" />
         </v-btn>
 
-        <v-btn
-          @click="flipBoard"
-          variant="flat"
-        >
-          <v-icon icon="$mdiRotate3dVariant" />
-        </v-btn>
-
-        <v-btn
-          @click="toggleSound"
-          variant="flat"
-        >
-          <v-icon :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
-        </v-btn>
+        <BoardSettingsButton @flip-board="flipBoard" />
       </div>
     </div>
 
@@ -237,14 +226,14 @@ useHead({
   ],
 })
 
-const boardConfig = {
+const boardConfig = reactive({
   animation: {
     enabled: true,
     duration: 200
   }
-};
+});
 
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { TheChessboard } from 'vue3-nichessboard';
 import 'vue3-nichessboard/style.css';
@@ -254,8 +243,11 @@ import { PieceType } from 'nichess';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
 import { AIDifficulty } from '../AI/common';
+import { useBoardDisplaySettings } from '@/composables/useBoardDisplaySettings';
+import BoardSettingsButton from '@/components/BoardSettingsButton.vue';
 
 const appStore = useAppStore();
+useBoardDisplaySettings(boardConfig);
 const router = useRouter();
 const boardWorker = appStore.initBoardWorker();
 const moveHistory = ref([]);
@@ -515,15 +507,6 @@ function playMoveSound() {
 
 function flipBoard() {
   if (boardAPI) boardAPI.toggleOrientation()
-}
-
-function toggleSound() {
-  const wasDisabled = !appStore.soundEnabled;
-  appStore.toggleSound();
-
-  if (wasDisabled && appStore.soundEnabled) {
-    playMoveSound();
-  }
 }
 
 function confirmOpenAnalysis() {

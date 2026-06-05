@@ -5,6 +5,7 @@
         @board-created="handleBoardCreated"
         @move="handleMove"
         :board-config="boardConfig"
+        :reactive-config="true"
         class="mt-10"
       />
     </div>
@@ -61,21 +62,9 @@
         </v-btn>
       </div>
 
-      <!-- Right: Flip and Sound Buttons -->
+      <!-- Right: Board Settings -->
       <div class="control-row-right">
-        <v-btn
-          @click="flipBoard"
-          variant="flat"
-        >
-          <v-icon icon="$mdiRotate3dVariant" />
-        </v-btn>
-
-        <v-btn
-          @click="toggleSound"
-          variant="flat"
-        >
-          <v-icon :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
-        </v-btn>
+        <BoardSettingsButton @flip-board="flipBoard" />
       </div>
     </div>
 
@@ -270,6 +259,8 @@ import { useAppStore, MAX_SAVED_GAMES, MAX_SAVED_NOSTR_GAMES } from '../stores/a
 import { AgentCache } from '@/AI/agent_cache';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
+import { useBoardDisplaySettings } from '@/composables/useBoardDisplaySettings';
+import BoardSettingsButton from '@/components/BoardSettingsButton.vue';
 
 const appStore = useAppStore();
 
@@ -279,6 +270,7 @@ const boardConfig = reactive({
     duration: 200
   },
 });
+useBoardDisplaySettings(boardConfig);
 
 let boardAPI = null;
 const chessboardContainer = ref(null);
@@ -682,15 +674,6 @@ function playMoveSound() {
 
 function flipBoard() {
   if (boardAPI) boardAPI.toggleOrientation()
-}
-
-function toggleSound() {
-  const wasDisabled = !appStore.soundEnabled;
-  appStore.toggleSound();
-
-  if (wasDisabled && appStore.soundEnabled) {
-    playMoveSound();
-  }
 }
 
 function formatDate(timestamp) {

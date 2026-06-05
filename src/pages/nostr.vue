@@ -7,6 +7,7 @@
       @draw="handleDraw"
       player-color="both"
       :board-config="boardConfig"
+      :reactive-config="true"
       :key="currentGameId"
       class="mt-10"
     />
@@ -35,12 +36,7 @@
       </div>
 
       <div class="control-row-right">
-        <v-btn @click="flipBoard" variant="flat">
-          <v-icon icon="$mdiRotate3dVariant" />
-        </v-btn>
-        <v-btn @click="toggleSound" variant="flat">
-          <v-icon :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'" />
-        </v-btn>
+        <BoardSettingsButton @flip-board="flipBoard" />
       </div>
     </div>
 
@@ -180,7 +176,7 @@
 
 <script setup>
 import { useHead } from '@unhead/vue'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { TheChessboard } from 'vue3-nichessboard'
 import 'vue3-nichessboard/style.css'
@@ -192,6 +188,8 @@ import * as secp256k1 from '@noble/secp256k1'
 import { HDKey } from '@scure/bip32'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
+import { useBoardDisplaySettings } from '@/composables/useBoardDisplaySettings'
+import BoardSettingsButton from '@/components/BoardSettingsButton.vue'
 
 useHead({
   title: 'Nostr',
@@ -202,9 +200,10 @@ useHead({
   ],
 })
 
-const boardConfig = {
+const boardConfig = reactive({
   animation: { enabled: true, duration: 200 },
-}
+})
+useBoardDisplaySettings(boardConfig)
 
 const appStore = useAppStore()
 const route = useRoute()
@@ -471,14 +470,6 @@ function handleDraw() {
 
 function flipBoard() {
   if (boardAPI) boardAPI.toggleOrientation()
-}
-
-function toggleSound() {
-  const wasDisabled = !appStore.soundEnabled
-  appStore.toggleSound()
-  if (wasDisabled && appStore.soundEnabled) {
-    new Audio(MoveSound).play().catch(() => {})
-  }
 }
 
 function undoMove() {
