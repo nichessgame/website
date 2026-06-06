@@ -3,9 +3,10 @@ import { defineStore } from 'pinia'
 import { AIDifficulty } from '../AI/common'
 
 export const POINTS_TEXT_THEMES = [
-  { value: 'standard', title: 'Standard', description: 'Bright labels with a warm outline.' },
-  { value: 'strong', title: 'Strong', description: 'Darker labels with a stronger outline.' },
-  { value: 'simple', title: 'Simple', description: 'Plain labels with no text effects.' },
+  { value: 'light-gold-1', title: 'Light Gold 1', description: 'Bright gold labels with a warm outline.' },
+  { value: 'light-gold-2', title: 'Light Gold 2', description: 'Bright gold labels with a darker outline.' },
+  { value: 'dark-gold-1', title: 'Dark Gold 1', description: 'Darker gold labels with a warm outline.' },
+  { value: 'dark-gold-2', title: 'Dark Gold 2', description: 'Darker gold labels with a darker outline.' },
 ]
 
 export const useAppStore = defineStore('app', {
@@ -59,7 +60,7 @@ export const useAppStore = defineStore('app', {
       saveColorSetting(color);
     },
     setPointsTextTheme(theme) {
-      const nextTheme = POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'standard';
+      const nextTheme = normalizePointsTextTheme(theme);
       this.selectedPointsTextTheme = nextTheme;
       savePointsTextThemeSetting(nextTheme);
     },
@@ -144,16 +145,22 @@ function saveColorSetting(color) {
 function loadPointsTextThemeSetting() {
   try {
     const stored = localStorage.getItem('nichess-points-text-theme') ?? localStorage.getItem('nichess-health-text-theme');
-    const theme = stored !== null ? JSON.parse(stored) : 'standard';
-    if (theme === 'gold') return 'standard';
-    return POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'standard';
+    const theme = stored !== null ? JSON.parse(stored) : 'light-gold-2';
+    return normalizePointsTextTheme(theme);
   } catch {
-    return 'standard';
+    return 'light-gold-2';
   }
 }
 
 function savePointsTextThemeSetting(theme) {
   localStorage.setItem('nichess-points-text-theme', JSON.stringify(theme));
+}
+
+function normalizePointsTextTheme(theme) {
+  if (theme === 'standard') return 'light-gold-1';
+  if (theme === 'strong') return 'dark-gold-2';
+  if (theme === 'gold') return 'light-gold-2';
+  return POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'light-gold-2';
 }
 
 function loadAbilityPointsVisibleSetting() {

@@ -38,7 +38,7 @@ Use the rendering benchmark to compare board point-label performance across
 themes and visibility modes:
 
 ```bash
-node scripts/benchmark-rendering.mjs --iterations=80 --samples=5 --warmups=1 --themes=standard,strong,simple --modes=health,health+ability
+node scripts/benchmark-rendering.mjs --iterations=80 --samples=5 --warmups=1 --themes=light-gold-1,light-gold-2,dark-gold-1,dark-gold-2 --modes=health,health+ability
 ```
 
 Before running or committing changes to the benchmark script, you can check that
@@ -54,9 +54,9 @@ syntax error will be printed and the command will exit with a non-zero status.
 ## Board display settings
 
 User-facing board display settings live in `src/stores/app.js` and are persisted in
-local storage. The health point text theme is stored under
-`nichess-health-text-theme` and can be changed from the board settings button shown
-next to each chessboard.
+local storage. The point text theme is stored under `nichess-points-text-theme`
+and can be changed from the board settings button shown next to each chessboard.
+The default point text theme is `light-gold-2`.
 
 Board pages should keep their own board-specific config, make it reactive, and
 apply shared display settings with `useBoardDisplaySettings`:

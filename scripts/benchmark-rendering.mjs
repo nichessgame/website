@@ -7,7 +7,7 @@ import process from 'node:process';
 import puppeteer from 'puppeteer';
 import { createServer } from 'vite';
 
-const defaultThemes = ['standard', 'strong', 'simple'];
+const defaultThemes = ['light-gold-1', 'light-gold-2', 'dark-gold-1', 'dark-gold-2'];
 const defaultModes = [
   { name: 'health', healthPointsVisible: true, abilityPointsVisible: false },
   { name: 'health+ability', healthPointsVisible: true, abilityPointsVisible: true },
@@ -287,7 +287,7 @@ const state = reactive({
     healthAndAbilityPointsText: {
       healthPointsVisible: true,
       abilityPointsVisible: true,
-      theme: 'standard',
+      theme: 'light-gold-2',
     },
     drawable: { enabled: false, visible: false },
     movable: { showDests: false },
