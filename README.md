@@ -32,6 +32,25 @@ npm run build
 npm run dev
 ```
 
+## Rendering benchmarks
+
+Use the rendering benchmark to compare board point-label performance across
+themes and visibility modes:
+
+```bash
+node scripts/benchmark-rendering.mjs --iterations=80 --samples=5 --warmups=1 --themes=standard,strong,simple --modes=health,health+ability
+```
+
+Before running or committing changes to the benchmark script, you can check that
+Node can parse it:
+
+```bash
+node --check scripts/benchmark-rendering.mjs
+```
+
+This is a syntax check only. No output means the script parsed successfully; a
+syntax error will be printed and the command will exit with a non-zero status.
+
 ## Board display settings
 
 User-facing board display settings live in `src/stores/app.js` and are persisted in
