@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      class="site-app-bar"
+      :class="['site-app-bar', { 'mobile-scrolled': !isAtTop }]"
       color="transparent"
       elevation="0"
       scroll-behavior="collapse"
@@ -80,15 +80,27 @@
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount } from 'vue'
+import { ref, onBeforeUnmount, onMounted } from 'vue'
 import { useAppStore } from './stores/app'
 import NewGameDialog from '@/components/NewGameDialog.vue'
 
 const drawer = ref(false)
 const showNewGameDialog = ref(false)
+const isAtTop = ref(true)
 const appStore = useAppStore()
 
+function updateScrollState() {
+  isAtTop.value = window.scrollY <= 0
+  if (!isAtTop.value) drawer.value = false
+}
+
+onMounted(() => {
+  updateScrollState()
+  window.addEventListener('scroll', updateScrollState, { passive: true })
+})
+
 onBeforeUnmount(() => {
+  window.removeEventListener('scroll', updateScrollState)
   appStore.cleanupBoardWorker()
 })
 </script>
@@ -96,6 +108,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .site-app-bar {
   background: transparent !important;
+  transition: transform 180ms ease, opacity 180ms ease;
 }
 
 .nav-container {
@@ -188,6 +201,12 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 599px) {
+  .site-app-bar.mobile-scrolled {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-100%);
+  }
+
   .nav-container {
     max-width: min(100% - 24px, 1120px);
   }

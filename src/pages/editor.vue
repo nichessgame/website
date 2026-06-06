@@ -34,10 +34,20 @@
 
 
           <div class="button-group mt-2">
-            <v-btn @click="setStartingPosition" variant="outlined" block class="mb-2">
+            <v-btn
+              block
+              class="site-button-secondary mb-2"
+              variant="flat"
+              @click="setStartingPosition"
+            >
               Starting position
             </v-btn>
-            <v-btn @click="clearPosition" variant="outlined" block>
+            <v-btn
+              block
+              class="site-button-secondary"
+              variant="flat"
+              @click="clearPosition"
+            >
               Clear position
             </v-btn>
           </div>
@@ -55,36 +65,41 @@
       />
     </div>
 
-    <div class="board-settings-row mt-2">
-      <BoardSettingsButton @flip-board="flipBoard" />
-    </div>
-
-    <!-- Analyze Button -->
-    <div class="analysis-button-row mt-2">
-      <template v-if="confirmingAnalysis">
+    <BoardControlRow class="mt-2">
+      <template #left>
+        <template v-if="confirmingAnalysis">
+          <v-btn
+            aria-label="Open analysis"
+            class="board-action-button"
+            variant="flat"
+            @click="confirmOpenAnalysis"
+          >
+            <v-icon icon="$mdiCheckCircle" color="green" />
+          </v-btn>
+          <v-btn
+            aria-label="Cancel analysis"
+            class="board-action-button"
+            variant="flat"
+            @click="confirmingAnalysis = false"
+          >
+            <v-icon icon="$mdiClose" color="red" />
+          </v-btn>
+        </template>
         <v-btn
-          @click="confirmOpenAnalysis"
-          variant="outlined"
+          v-else
+          aria-label="Analyze position"
+          class="board-action-button"
+          variant="flat"
+          @click="confirmingAnalysis = true"
         >
-          <v-icon icon="$mdiCheckCircle" color="green" />
-        </v-btn>
-        <v-btn
-          @click="confirmingAnalysis = false"
-          variant="outlined"
-          class="ml-2"
-        >
-          <v-icon icon="$mdiClose" color="red" />
+          <v-icon icon="$mdiLaptop" />
         </v-btn>
       </template>
-      <v-btn
-        v-else
-        @click="confirmingAnalysis = true"
-        variant="outlined"
-        prepend-icon="$mdiLaptop"
-      >
-        Analysis
-      </v-btn>
-    </div>
+
+      <template #right>
+        <BoardSettingsButton @flip-board="flipBoard" />
+      </template>
+    </BoardControlRow>
 
     <!-- Move index lookup -->
     <div class="move-index-lookup mt-4">
@@ -166,6 +181,7 @@ import { PieceType, Player } from 'nichess';
 import { AgentCache } from '@/AI/agent_cache';
 import { useAppStore } from '../stores/app';
 import { useBoardDisplaySettings } from '@/composables/useBoardDisplaySettings';
+import BoardControlRow from '@/components/BoardControlRow.vue';
 import BoardSettingsButton from '@/components/BoardSettingsButton.vue';
 
 // Import piece icons
@@ -561,14 +577,6 @@ watch(sideToMove, (newValue) => {
   width: 100% !important;
   height: 100% !important;
   aspect-ratio: 1 !important;
-}
-
-.board-settings-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 832px;
 }
 
 @media (min-width: 900px) {

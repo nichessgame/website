@@ -16,14 +16,15 @@
         <template v-if="confirmingAnalysis">
           <v-btn
             @click="confirmOpenAnalysis"
+            class="board-action-button"
             variant="flat"
           >
             <v-icon icon="$mdiCheckCircle" color="green" />
           </v-btn>
           <v-btn
             @click="confirmingAnalysis = false"
+            class="board-action-button"
             variant="flat"
-            class="ml-2"
           >
             <v-icon icon="$mdiClose" color="red" />
           </v-btn>
@@ -31,6 +32,7 @@
         <v-btn
           v-else
           @click="confirmingAnalysis = true"
+          class="board-action-button"
           variant="flat"
         >
           <v-icon icon="$mdiLaptop" />
@@ -40,9 +42,9 @@
       <!-- Center: Control Buttons -->
       <div class="control-row-center">
         <v-btn
-          @click="undoAll"
-          :disabled="isPlaying"
-          variant="outlined"
+          @click="!isPlaying && undoAll()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronDoubleLeft"
@@ -51,9 +53,9 @@
         </v-btn>
 
         <v-btn
-          @click="undoMove"
-          :disabled="isPlaying"
-          variant="outlined"
+          @click="!isPlaying && undoMove()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronLeft"
@@ -63,7 +65,8 @@
 
         <v-btn
           @click="togglePlayPause"
-          variant="outlined"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             :icon="isPlaying ? '$mdiPause' : '$mdiPlay'"
@@ -72,9 +75,9 @@
         </v-btn>
 
         <v-btn
-          @click="redoMove"
-          :disabled="isPlaying"
-          variant="outlined"
+          @click="!isPlaying && redoMove()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronRight"
@@ -83,9 +86,9 @@
         </v-btn>
 
         <v-btn
-          @click="redoAll"
-          :disabled="isPlaying"
-          variant="outlined"
+          @click="!isPlaying && redoAll()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronDoubleRight"
@@ -118,7 +121,8 @@
             <v-btn
               v-if="viewMode"
               @click="copyMoveHistory"
-              variant="outlined"
+              class="site-button-secondary"
+              variant="flat"
               size="small"
               prepend-icon="$mdiContentCopy"
             >
@@ -126,7 +130,8 @@
             </v-btn>
             <v-btn
               @click="toggleViewMode"
-              variant="outlined"
+              class="site-button-secondary"
+              variant="flat"
               size="small"
             >
               {{ viewMode ? 'Edit' : 'View' }}
@@ -149,9 +154,9 @@
           ></v-textarea>
           <v-btn
             @click="loadMoveHistory"
-            variant="outlined"
+            class="site-button-secondary mt-2"
+            variant="flat"
             prepend-icon="$mdiUpload"
-            class="mt-2"
           >
             Load Moves
           </v-btn>
@@ -813,16 +818,6 @@ if (typeof window !== 'undefined') {
     padding-right: 8px;
   }
 
-  .control-row :deep(.v-btn) {
-    min-width: 28px !important;
-    width: 28px;
-    height: 28px;
-    padding: 0 4px;
-  }
-
-  .control-row :deep(.v-btn .v-icon) {
-    font-size: 14px;
-  }
 }
 
 .tab-content {

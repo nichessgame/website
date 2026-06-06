@@ -97,6 +97,58 @@
   cursor: pointer;
 }
 
+.board-action-button.v-btn {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  color: #f1f3f6;
+  height: 34px;
+  min-width: 48px;
+  padding: 0;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  width: 48px;
+}
+
+.board-action-button.v-btn:hover {
+  background: rgba(255, 255, 255, 0.085);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.board-action-button.v-btn .v-icon {
+  font-size: 18px;
+}
+
+.site-button-secondary.v-btn {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  color: #f1f3f6;
+  font-weight: 620;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.site-button-secondary.v-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.site-button-primary.v-btn {
+  background: #e2e8f0;
+  border-radius: 6px;
+  color: #101318;
+  font-weight: 680;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.site-button-primary.v-btn:hover {
+  background: #ffffff;
+}
+
 .content-stack {
   display: grid;
   gap: 12px;
@@ -239,5 +291,15 @@
     justify-self: start;
     max-height: 112px;
     max-width: 112px;
+  }
+
+  .board-action-button.v-btn {
+    height: 28px;
+    min-width: 36px;
+    width: 36px;
+  }
+
+  .board-action-button.v-btn .v-icon {
+    font-size: 14px;
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <v-btn
     aria-label="Board settings"
+    class="board-action-button"
     variant="flat"
     @click="dialogOpen = true"
   >
@@ -72,8 +73,9 @@
 
         <v-btn
           block
+          class="site-button-secondary"
           prepend-icon="$mdiRotate3dVariant"
-          variant="outlined"
+          variant="flat"
           @click="emit('flip-board')"
         >
           Flip board

@@ -60,7 +60,7 @@ export const useAppStore = defineStore('app', {
       saveColorSetting(color);
     },
     setPointsTextTheme(theme) {
-      const nextTheme = POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'light-gold-2';
+      const nextTheme = POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'dark-gold-2';
       this.selectedPointsTextTheme = nextTheme;
       savePointsTextThemeSetting(nextTheme);
     },
@@ -145,10 +145,10 @@ function saveColorSetting(color) {
 function loadPointsTextThemeSetting() {
   try {
     const stored = localStorage.getItem('nichess-points-text-theme') ?? localStorage.getItem('nichess-health-text-theme');
-    const theme = stored !== null ? JSON.parse(stored) : 'light-gold-2';
-    return POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'light-gold-2';
+    const theme = stored !== null ? JSON.parse(stored) : 'dark-gold-2';
+    return POINTS_TEXT_THEMES.some(option => option.value === theme) ? theme : 'dark-gold-2';
   } catch {
-    return 'light-gold-2';
+    return 'dark-gold-2';
   }
 }
 

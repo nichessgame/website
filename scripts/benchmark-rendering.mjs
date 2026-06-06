@@ -287,7 +287,7 @@ const state = reactive({
     healthAndAbilityPointsText: {
       healthPointsVisible: true,
       abilityPointsVisible: true,
-      theme: 'light-gold-2',
+      theme: 'dark-gold-2',
     },
     drawable: { enabled: false, visible: false },
     movable: { showDests: false },

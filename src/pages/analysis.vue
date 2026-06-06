@@ -18,9 +18,9 @@
       <!-- Center: Control Buttons -->
       <div class="control-row-center">
         <v-btn
-          @click="undoAll"
-          :disabled="currentMoveIndex === 0"
-          variant="outlined"
+          @click="currentMoveIndex > 0 && undoAll()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronDoubleLeft"
@@ -29,9 +29,9 @@
         </v-btn>
 
         <v-btn
-          @click="undoMove"
-          :disabled="currentMoveIndex === 0"
-          variant="outlined"
+          @click="currentMoveIndex > 0 && undoMove()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronLeft"
@@ -40,9 +40,9 @@
         </v-btn>
 
         <v-btn
-          @click="redoMove"
-          :disabled="currentMoveIndex >= moveHistory.length"
-          variant="outlined"
+          @click="currentMoveIndex < moveHistory.length && redoMove()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronRight"
@@ -51,9 +51,9 @@
         </v-btn>
 
         <v-btn
-          @click="redoAll"
-          :disabled="currentMoveIndex >= moveHistory.length"
-          variant="outlined"
+          @click="currentMoveIndex < moveHistory.length && redoAll()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronDoubleRight"
@@ -159,7 +159,8 @@
           <div class="history-buttons" v-if="moveHistory.length > 0">
             <v-btn
               @click="copyMoveHistory"
-              variant="outlined"
+              class="site-button-secondary"
+              variant="flat"
               size="small"
               prepend-icon="$mdiContentCopy"
             >
@@ -747,17 +748,6 @@ function formatDate(timestamp) {
   .control-row-right {
     gap: 8px;
     padding-right: 8px;
-  }
-
-  .control-row :deep(.v-btn) {
-    min-width: 28px !important;
-    width: 28px;
-    height: 28px;
-    padding: 0 4px;
-  }
-
-  .control-row :deep(.v-btn .v-icon) {
-    font-size: 14px;
   }
 
   .policy-move-item {

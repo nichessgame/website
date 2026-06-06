@@ -26,15 +26,15 @@
           <template v-if="confirmingAnalysis">
             <v-btn
               @click="confirmOpenAnalysis"
-              variant="outlined"
-              class="gold"
+              class="board-action-button"
+              variant="flat"
             >
               <v-icon icon="$mdiCheckCircle" color="green" />
             </v-btn>
             <v-btn
               @click="confirmingAnalysis = false"
-              variant="outlined"
-              class="ml-2 gold"
+              class="board-action-button"
+              variant="flat"
             >
               <v-icon icon="$mdiClose" color="red" />
             </v-btn>
@@ -42,8 +42,8 @@
           <v-btn
             v-else
             @click="confirmingAnalysis = true"
-            variant="outlined"
-            class="gold"
+            class="board-action-button"
+            variant="flat"
           >
             <v-icon icon="$mdiLaptop" />
           </v-btn>
@@ -56,9 +56,9 @@
       <!-- Center: Control Buttons -->
       <div class="control-row-center">
         <v-btn
-          @click="undoAll"
-          :disabled="currentMoveIndex === 0"
-          variant="outlined"
+          @click="currentMoveIndex > 0 && undoAll()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronDoubleLeft"
@@ -67,9 +67,9 @@
         </v-btn>
 
         <v-btn
-          @click="undoMove"
-          :disabled="currentMoveIndex === 0"
-          variant="outlined"
+          @click="currentMoveIndex > 0 && undoMove()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronLeft"
@@ -78,9 +78,9 @@
         </v-btn>
 
         <v-btn
-          @click="redoMove"
-          :disabled="currentMoveIndex >= moveHistory.length"
-          variant="outlined"
+          @click="currentMoveIndex < moveHistory.length && redoMove()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronRight"
@@ -89,9 +89,9 @@
         </v-btn>
 
         <v-btn
-          @click="redoAll"
-          :disabled="currentMoveIndex >= moveHistory.length"
-          variant="outlined"
+          @click="currentMoveIndex < moveHistory.length && redoAll()"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon
             icon="$mdiChevronDoubleRight"
@@ -104,8 +104,8 @@
       <div class="control-row-right">
         <v-btn
           @click="showNewGameDialog = true"
-          :variant="gameOver ? 'outlined' : 'flat'"
-          :class="{ 'gold': gameOver }"
+          class="board-action-button"
+          variant="flat"
         >
           <v-icon icon="$mdiSwordCross" />
         </v-btn>
@@ -128,7 +128,8 @@
           <div class="history-buttons" v-if="moveHistory.length > 0">
             <v-btn
               @click="copyMoveHistory"
-              variant="outlined"
+              class="site-button-secondary"
+              variant="flat"
               size="small"
               prepend-icon="$mdiContentCopy"
             >
@@ -736,16 +737,6 @@ const props = defineProps({
     min-width: 40px;
   }
 
-  .control-row :deep(.v-btn) {
-    min-width: 28px !important;
-    width: 28px;
-    height: 28px;
-    padding: 0 4px;
-  }
-
-  .control-row :deep(.v-btn .v-icon) {
-    font-size: 14px;
-  }
 }
 
 .tabs-no-scroll {
