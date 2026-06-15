@@ -79,7 +79,6 @@
     <!-- Analysis Tab -->
     <div v-show="activeTab === 'analysis'" class="tab-content">
       <div v-if="!modelReady" class="download-warning mb-3">
-        <v-icon color="warning" class="mr-2">mdi-alert-circle</v-icon>
         <span>Note: The 40 MB AI model will be downloaded when you first use eval.</span>
       </div>
 
