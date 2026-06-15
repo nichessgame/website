@@ -104,7 +104,7 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="#1a1a1a">
+    <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="transparent">
       <v-tab value="moves">Moves</v-tab>
       <v-tab value="games">Games</v-tab>
       <v-tab value="nostr">Nostr</v-tab>
@@ -821,10 +821,10 @@ if (typeof window !== 'undefined') {
 }
 
 .tab-content {
-  background-color: #1a1a1a;
+  background: var(--board-panel-bg);
   padding: 16px;
   border-radius: 0 0 8px 8px;
-  border: 1px solid #444;
+  border: 1px solid var(--board-panel-border);
   border-top: none;
   min-height: 400px;
 }
@@ -873,8 +873,8 @@ if (typeof window !== 'undefined') {
 }
 
 .move-history-view {
-  background-color: #222;
-  border: 1px solid #444;
+  background: var(--board-subpanel-bg);
+  border: 1px solid var(--board-panel-border);
   border-radius: 6px;
   padding: 12px;
   max-height: 300px;
@@ -895,7 +895,7 @@ if (typeof window !== 'undefined') {
 
 .move-item {
   padding: 6px 12px;
-  background-color: #333;
+  background: var(--board-row-bg);
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
@@ -909,8 +909,8 @@ if (typeof window !== 'undefined') {
 }
 
 .move-item.clickable:hover {
-  background-color: #444;
-  border-color: #666;
+  background: var(--board-row-hover-bg);
+  border-color: var(--board-row-hover-border);
 }
 
 .move-item.active {
@@ -931,10 +931,10 @@ if (typeof window !== 'undefined') {
 }
 
 .status-display {
-  background-color: #2a2a2a;
+  background: var(--board-subpanel-bg);
   padding: 12px;
   border-radius: 6px;
-  border: 1px solid #555;
+  border: 1px solid var(--board-panel-border-strong);
 }
 
 .status-info {
@@ -1012,7 +1012,7 @@ if (typeof window !== 'undefined') {
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  background-color: #333;
+  background: var(--board-row-bg);
   border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
@@ -1020,8 +1020,8 @@ if (typeof window !== 'undefined') {
 }
 
 .saved-game-item:hover {
-  background-color: #444;
-  border-color: #666;
+  background: var(--board-row-hover-bg);
+  border-color: var(--board-row-hover-border);
 }
 
 .saved-game-item.current-game {
@@ -1082,8 +1082,8 @@ if (typeof window !== 'undefined') {
   font-size: 13px;
   margin-bottom: 12px;
   padding: 8px 12px;
-  background-color: #2a2a2a;
+  background: var(--board-subpanel-bg);
   border-radius: 4px;
-  border: 1px solid #444;
+  border: 1px solid var(--board-panel-border);
 }
 </style>

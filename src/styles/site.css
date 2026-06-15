@@ -35,11 +35,46 @@
   gap: clamp(14px, 2vw, 20px);
 }
 
+:root {
+  --site-panel-bg: rgba(255, 255, 255, 0.028);
+  --site-panel-border: rgba(255, 255, 255, 0.08);
+  --site-panel-border-strong: rgba(255, 255, 255, 0.13);
+  --board-panel-bg: var(--site-panel-bg);
+  --board-panel-border: var(--site-panel-border);
+  --board-panel-border-strong: var(--site-panel-border-strong);
+  --board-subpanel-bg: rgba(255, 255, 255, 0.04);
+  --board-row-bg: rgba(255, 255, 255, 0.055);
+  --board-row-hover-bg: rgba(255, 255, 255, 0.085);
+  --board-row-hover-border: rgba(255, 255, 255, 0.18);
+}
+
 .site-panel {
-  background: rgba(255, 255, 255, 0.028);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--site-panel-bg);
+  border: 1px solid var(--site-panel-border);
   border-radius: 6px;
   padding: clamp(14px, 2vw, 18px);
+}
+
+.tabs-no-scroll {
+  background: var(--board-panel-bg);
+  border: 1px solid var(--board-panel-border);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+
+.tabs-no-scroll .v-tab {
+  color: #d0d4dc;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.tabs-no-scroll .v-tab:hover {
+  background: var(--board-row-bg);
+  color: #ffffff;
+}
+
+.tabs-no-scroll .v-tab.v-tab--selected {
+  color: #ffffff;
 }
 
 .site-panel h2,
