@@ -839,14 +839,22 @@ function formatDate(timestamp) {
   cursor: pointer;
 }
 
-.move-item.clickable:hover {
-  background: var(--board-row-hover-bg);
-  border-color: var(--board-row-hover-border);
-}
-
-.move-item.active {
+.move-item.active,
+.move-item.clickable.active:hover {
   background-color: #2a4a2a;
   border-color: #4CAF50;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .move-item.clickable:hover {
+    background: var(--board-row-hover-bg);
+    border-color: var(--board-row-hover-border);
+  }
+
+  .move-item.clickable.active:hover {
+    background-color: #2a4a2a;
+    border-color: #4CAF50;
+  }
 }
 
 .move-number {
