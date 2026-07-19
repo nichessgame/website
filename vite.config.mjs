@@ -69,18 +69,34 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
+        // Keep first-visit installation small. Lazy route assets are cached only after use.
+        globPatterns: [
+          'index.html',
+          'assets/index-*.{js,css}',
+          'assets/default-*.{js,css}',
+        ],
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/^\/sitemap\.xml$/, /^\/robots\.txt$/],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         runtimeCaching: [
           {
-            urlPattern: /\.(bin|json)$/,
+            urlPattern: /\/(?:model\.json|group1-shard\d+of9\.bin)$/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'tfjs-model-cache',
               expiration: {
                 maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+          {
+            urlPattern: /\/assets\/.*\.(?:js|css|woff2?|png|svg|ogg)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'app-assets',
+              expiration: {
+                maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
               },
             },

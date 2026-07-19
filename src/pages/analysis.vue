@@ -78,7 +78,7 @@
 
     <!-- Analysis Tab -->
     <div v-show="activeTab === 'analysis'" class="tab-content">
-      <div v-if="!modelReady" class="download-warning mb-3">
+      <div v-if="!modelReady && !modelLoading" class="download-warning mb-3">
         <span>Note: The 40 MB AI model will be downloaded when you first use eval.</span>
       </div>
 
@@ -305,6 +305,7 @@ boardWorker.onmessage = (event) => {
     } else if (event.data.status === 'ready') {
       appStore.setModelLoading(false);
       appStore.setModelReady(true);
+      startAnalysis();
     } else if (event.data.status === 'error') {
       appStore.setModelLoading(false);
       analysisEnabled.value = false;
@@ -322,6 +323,19 @@ boardWorker.onmessage = (event) => {
     };
   }
 };
+
+function loadModelWithConsent() {
+  appStore.grantModelDownloadConsent();
+  boardWorker.postMessage({
+    type: 'load-model',
+    modelDownloadConsent: appStore.modelDownloadConsent
+  });
+}
+
+function startAnalysis() {
+  if (!analysisEnabled.value || !modelReady.value || !currentBoardString.value) return;
+  boardWorker.postMessage({ type: 'analyze', boardString: currentBoardString.value, maxNodes: maxNodes.value });
+}
 
 // Helpers
 function indexToSquare(index) {
@@ -371,9 +385,8 @@ function updateBoardString() {
 // Watchers for analysis
 watch(analysisEnabled, (enabled) => {
   if (enabled) {
-    if (currentBoardString.value) {
-      boardWorker.postMessage({ type: 'analyze', boardString: currentBoardString.value, maxNodes: maxNodes.value });
-    }
+    if (!modelReady.value) loadModelWithConsent();
+    else startAnalysis();
   } else {
     boardWorker.postMessage({ type: 'stop-analysis' });
     analysisResult.value = null;
@@ -392,14 +405,14 @@ watch(formattedTopMoves, (moves) => {
 });
 
 watch(currentBoardString, (newVal) => {
-  if (analysisEnabled.value && newVal) {
+  if (analysisEnabled.value && modelReady.value && newVal) {
     analysisResult.value = null;
     boardWorker.postMessage({ type: 'analyze', boardString: newVal, maxNodes: maxNodes.value });
   }
 });
 
 watch(maxNodes, (newVal) => {
-  if (analysisEnabled.value && currentBoardString.value) {
+  if (analysisEnabled.value && modelReady.value && currentBoardString.value) {
     boardWorker.postMessage({ type: 'stop-analysis' });
     boardWorker.postMessage({ type: 'analyze', boardString: currentBoardString.value, maxNodes: newVal });
   }

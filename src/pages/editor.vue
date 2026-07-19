@@ -599,17 +599,6 @@ watch(sideToMove, (newValue) => {
   border: 1px solid var(--board-panel-border);
 }
 
-.download-warning {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  background-color: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 6px;
-  color: #ffb74d;
-  font-size: 14px;
-}
-
 .eval-controls {
   display: flex;
   background: var(--board-subpanel-bg);

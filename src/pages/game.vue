@@ -13,9 +13,14 @@
       class="mt-10"
     />
 
-    <div v-if="modelLoading" class="model-status mt-4">
-      <v-progress-linear indeterminate color="grey" class="mb-2"></v-progress-linear>
-      <div>Downloading AI model... This may take a while.</div>
+    <div v-if="!modelReady" class="model-status mt-4">
+      <v-progress-linear
+        v-if="modelLoading"
+        class="mb-2"
+        color="grey"
+        indeterminate
+      />
+      <div v-if="modelLoading">Downloading AI model... This may take a while.</div>
     </div>
 
     <!-- Combined Control Row -->
@@ -256,7 +261,8 @@ const aiHistory = [];
 const showNewGameDialog = ref(false)
 const numNodesExplored = ref(0)
 const gameOver = ref(false)
-const modelLoading = ref(false)
+const modelLoading = computed(() => appStore.modelLoading)
+const modelReady = computed(() => appStore.modelReady)
 const currentMoveIndex = ref(0)
 const copyMessage = ref({ text: '', type: 'info', show: false })
 const activeTab = ref('history')
@@ -321,14 +327,12 @@ boardWorker.onmessage = (event) => {
   const { type } = event.data;
   if (type === 'model-status') {
     if (event.data.status === 'starting') {
-      modelLoading.value = true;
       appStore.setModelLoading(true);
     } else if (event.data.status === 'ready') {
-      modelLoading.value = false;
       appStore.setModelLoading(false);
       appStore.setModelReady(true);
+      sendPendingAIRequest();
     } else if (event.data.status === 'error') {
-      modelLoading.value = false;
       appStore.setModelLoading(false);
       console.error('Model load error:', event.data.message);
     }
@@ -368,6 +372,37 @@ boardWorker.onmessage = (event) => {
 }
 
 let boardAPI;
+let pendingAIRequest = null;
+
+function loadModelWithConsent() {
+  if (!appStore.modelDownloadConsent || appStore.modelReady || appStore.modelLoading) return;
+  boardWorker.postMessage({
+    type: 'load-model',
+    modelDownloadConsent: appStore.modelDownloadConsent,
+    gameId: props.gameId
+  });
+}
+
+function queueAIRequest(computingFromIndex) {
+  aiRequestCounter++;
+  currentAIRequestId.value = aiRequestCounter;
+  aiComputingFromIndex.value = computingFromIndex;
+  pendingAIRequest = {
+    type: 'search',
+    gameId: props.gameId,
+    difficulty: difficultyConfig.value,
+    history: [...aiHistory],
+    requestId: currentAIRequestId.value
+  };
+
+  if (appStore.modelReady) sendPendingAIRequest();
+}
+
+function sendPendingAIRequest() {
+  if (!pendingAIRequest || !appStore.modelReady) return;
+  boardWorker.postMessage(pendingAIRequest);
+  pendingAIRequest = null;
+}
 
 function handleBoardCreated(api) {
   boardAPI = api;
@@ -383,9 +418,13 @@ function handleBoardCreated(api) {
   aiRequestCounter = 0;
   currentAIRequestId.value = null;
   aiComputingFromIndex.value = null;
+  pendingAIRequest = null;
 
   // Try to restore a saved game
   const savedGame = loadGame(props.gameId);
+  if (savedGame) appStore.grantModelDownloadConsent();
+  loadModelWithConsent();
+
   if (savedGame && savedGame.moveHistory && savedGame.moveHistory.length > 0) {
     isRestoring = true;
 
@@ -403,37 +442,14 @@ function handleBoardCreated(api) {
 
     // If it's AI's turn and game isn't over, request AI move
     if (!gameOver.value && boardAPI.getTurnColor() !== props.myColor) {
-      aiRequestCounter++;
-      currentAIRequestId.value = aiRequestCounter;
-      aiComputingFromIndex.value = currentMoveIndex.value;
-
-      boardWorker.postMessage({
-        gameId: props.gameId,
-        difficulty: difficultyConfig.value,
-        history: aiHistory,
-        requestId: currentAIRequestId.value
-      });
+      queueAIRequest(currentMoveIndex.value);
     }
   } else {
     // New game
     if(props.myColor === 'black') {
       boardAPI.toggleOrientation();
 
-      // Assign request ID for AI's first move
-      aiRequestCounter++;
-      currentAIRequestId.value = aiRequestCounter;
-      aiComputingFromIndex.value = 0;
-
-      console.log(`Sending AI request with ID: ${currentAIRequestId.value} (first move)`);
-
-      let boardStr = boardAPI.getFen();
-      boardWorker.postMessage({
-        gameId: props.gameId,
-        board: boardStr,
-        difficulty: difficultyConfig.value,
-        history: aiHistory,
-        requestId: currentAIRequestId.value
-      });
+      queueAIRequest(0);
     }
   }
 }
@@ -470,19 +486,7 @@ async function handleMove(move) {
     (boardAPI.getTurnColor() != props.myColor) &&
     (!boardAPI.getIsGameOver())
   ) {
-    aiRequestCounter++;
-    currentAIRequestId.value = aiRequestCounter;
-    aiComputingFromIndex.value = currentMoveIndex.value;
-
-    console.log(`Sending AI request with ID: ${currentAIRequestId.value}`);
-
-    let boardStr = boardAPI.getFen();
-    boardWorker.postMessage({
-      gameId: props.gameId,
-      difficulty: difficultyConfig.value,
-      history: aiHistory,
-      requestId: currentAIRequestId.value
-    });
+    queueAIRequest(currentMoveIndex.value);
   }
 }
 
@@ -676,6 +680,7 @@ const props = defineProps({
 </script>
 
 <style scoped>
+
 .control-row {
   display: flex;
   justify-content: space-between;

@@ -19,6 +19,29 @@ import {
 
 let model;
 
+async function fetchAndCacheModelFile(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const request = new Request(input, init);
+  let cache: Cache | null = null;
+
+  try {
+    cache = await caches.open('tfjs-model-cache');
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) return cachedResponse;
+  } catch (error) {
+    console.warn('Model cache is unavailable:', error);
+  }
+
+  const response = await fetch(request);
+  if (response.ok && cache) {
+    try {
+      await cache.put(request, response.clone());
+    } catch (error) {
+      console.warn('Unable to cache model file:', error);
+    }
+  }
+  return response;
+}
+
 function calcTemp(moveNumber: number, startTemp: number, endTemp: number): number {
   const ln2 = 0.693;
   const TEMP_DECAY_HALF_LIFE = 10;
@@ -39,7 +62,7 @@ export class AIAgent {
   private currentAnalysisId = 0;
   constructor() {}
 
-  async init(): void {
+  async init(): Promise<void> {
     const modelPath = '/model.json';
     await tf.setBackend('webgl');
     await tf.ready();
@@ -47,7 +70,7 @@ export class AIAgent {
     console.log(tf.getBackend());
 
     console.log('loading model')
-    model = await loadGraphModel(modelPath);
+    model = await loadGraphModel(modelPath, { fetchFunc: fetchAndCacheModelFile });
     //
     // Prevents OutOfMemory - forces TFJS to clear WebGL textures when reaching 256Mb
     // TODO: Memory is still slowly growing? Test it.

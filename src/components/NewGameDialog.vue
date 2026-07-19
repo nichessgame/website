@@ -119,6 +119,7 @@ const myColor = computed({
 })
 
 const startGame = () => {
+  appStore.grantModelDownloadConsent()
   router.push({
     name: 'game',
     params: {

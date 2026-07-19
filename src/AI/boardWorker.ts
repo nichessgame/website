@@ -4,24 +4,38 @@ import { AIDifficulty, DifficultyConfig } from './common'
 
 console.log('creating new worker')
 let aiAgent = new AIAgent();
+let modelInitialization: Promise<void> | null = null;
 
 self.onmessage = async (event: MessageEvent) => {
   try {
-    // stop-analysis doesn't need model init
     if (event.data.type === 'stop-analysis') {
       aiAgent.stopAnalysis();
       return;
     }
 
     if(!aiAgent.initialized) {
-      console.log('initializing aiAgent')
-      self.postMessage({ type: 'model-status', status: 'starting', gameId: event.data?.gameId ?? '' });
-      await aiAgent.init()
+      if (event.data.type !== 'load-model' || event.data.modelDownloadConsent !== true) {
+        self.postMessage({
+          type: 'model-status',
+          status: 'consent-required',
+          gameId: event.data?.gameId ?? ''
+        });
+        return;
+      }
+
+      if (!modelInitialization) {
+        console.log('initializing aiAgent')
+        self.postMessage({ type: 'model-status', status: 'starting', gameId: event.data?.gameId ?? '' });
+        modelInitialization = aiAgent.init();
+      }
+      await modelInitialization
       console.log('agent initialized')
       self.postMessage({ type: 'model-status', status: 'ready', gameId: event.data?.gameId ?? '' });
-    } else {
+    } else if (event.data.type === 'load-model') {
       self.postMessage({ type: 'model-status', status: 'ready', gameId: event.data?.gameId ?? '' });
     }
+
+    if (event.data.type === 'load-model') return;
 
     if (event.data.type === 'analyze') {
       // Fire-and-forget so the message loop stays responsive
@@ -60,6 +74,7 @@ self.onmessage = async (event: MessageEvent) => {
       requestId: event.data.requestId
     });
   } catch (e: any) {
+    modelInitialization = null;
     console.error('worker error', e);
     self.postMessage({ type: 'model-status', status: 'error', message: String(e?.message ?? e), gameId: event.data?.gameId ?? '' });
   }

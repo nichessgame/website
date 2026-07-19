@@ -14,6 +14,7 @@ export const useAppStore = defineStore('app', {
     boardWorker: null,
     modelReady: false,
     modelLoading: false,
+    modelDownloadConsent: loadModelDownloadConsentSetting(),
     selectedDifficulty: loadDifficultySetting(),
     selectedColor: loadColorSetting(),
     selectedPointsTextTheme: loadPointsTextThemeSetting(),
@@ -46,6 +47,10 @@ export const useAppStore = defineStore('app', {
     },
     setModelLoading(loading) {
       this.modelLoading = loading;
+    },
+    grantModelDownloadConsent() {
+      this.modelDownloadConsent = true;
+      localStorage.setItem('nichess-model-download-consent', JSON.stringify(true));
     },
     setDifficulty(difficultyConfig) {
       this.selectedDifficulty = difficultyConfig;
@@ -121,6 +126,14 @@ function loadSoundSetting() {
 
 function saveSoundSetting(enabled) {
   localStorage.setItem('nichess-sound-enabled', JSON.stringify(enabled));
+}
+
+function loadModelDownloadConsentSetting() {
+  try {
+    return JSON.parse(localStorage.getItem('nichess-model-download-consent') || 'false') === true;
+  } catch {
+    return false;
+  }
 }
 
 function loadDifficultySetting() {
