@@ -14,6 +14,7 @@ export const useAppStore = defineStore('app', {
     boardWorker: null,
     modelReady: false,
     modelLoading: false,
+    modelCached: null,
     modelDownloadConsent: loadModelDownloadConsentSetting(),
     selectedDifficulty: loadDifficultySetting(),
     selectedColor: loadColorSetting(),
@@ -44,6 +45,7 @@ export const useAppStore = defineStore('app', {
     },
     setModelReady(ready) {
       this.modelReady = ready;
+      if (ready) this.modelCached = true;
     },
     setModelLoading(loading) {
       this.modelLoading = loading;
@@ -51,6 +53,32 @@ export const useAppStore = defineStore('app', {
     grantModelDownloadConsent() {
       this.modelDownloadConsent = true;
       localStorage.setItem('nichess-model-download-consent', JSON.stringify(true));
+    },
+    async refreshModelCacheStatus() {
+      if (!('caches' in globalThis)) {
+        this.modelCached = false;
+        return;
+      }
+
+      try {
+        const cache = await caches.open('tfjs-model-cache');
+        const modelUrl = new URL('/model.json', globalThis.location.origin);
+        const modelResponse = await cache.match(modelUrl.href);
+        if (!modelResponse) {
+          this.modelCached = false;
+          return;
+        }
+
+        const manifest = await modelResponse.clone().json();
+        const modelFiles = manifest.weightsManifest.flatMap(group => group.paths);
+        const cachedFiles = await Promise.all(modelFiles.map(path => {
+          return cache.match(new URL(path, modelUrl).href);
+        }));
+        this.modelCached = cachedFiles.every(Boolean);
+      } catch (error) {
+        console.warn('Unable to check the AI model cache:', error);
+        this.modelCached = false;
+      }
     },
     setDifficulty(difficultyConfig) {
       this.selectedDifficulty = difficultyConfig;

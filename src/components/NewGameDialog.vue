@@ -50,7 +50,7 @@
         ></v-select>
 
         <v-alert
-          v-if="!modelReady"
+          v-if="modelDownloadRequired"
           class="model-alert"
           density="compact"
         >
@@ -93,6 +93,7 @@ const router = useRouter()
 const appStore = useAppStore()
 
 const modelReady = computed(() => appStore.modelReady)
+const modelDownloadRequired = computed(() => !modelReady.value && appStore.modelCached === false)
 
 const difficultyOptions = AIDifficulty.getAllLabels()
 

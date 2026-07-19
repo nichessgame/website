@@ -96,6 +96,7 @@ function updateScrollState() {
 
 onMounted(() => {
   updateScrollState()
+  appStore.refreshModelCacheStatus()
   window.addEventListener('scroll', updateScrollState, { passive: true })
 })
 

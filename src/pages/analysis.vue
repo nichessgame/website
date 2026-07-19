@@ -78,7 +78,7 @@
 
     <!-- Analysis Tab -->
     <div v-show="activeTab === 'analysis'" class="tab-content">
-      <div v-if="!modelReady && !modelLoading" class="download-warning mb-3">
+      <div v-if="modelDownloadRequired && !modelLoading" class="download-warning mb-3">
         <span>Note: The 40 MB AI model will be downloaded when you first use eval.</span>
       </div>
 
@@ -289,6 +289,7 @@ const currentBoardString = ref('');
 const maxNodes = ref(1000);
 const modelLoading = computed(() => appStore.modelLoading);
 const modelReady = computed(() => appStore.modelReady);
+const modelDownloadRequired = computed(() => !modelReady.value && appStore.modelCached === false);
 
 let wheelThrottle = false;
 let suppressSound = false;
