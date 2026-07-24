@@ -744,6 +744,10 @@ if (typeof window !== 'undefined') {
     },
     getMoves: () => parsedMoves.value.map(m => ({ from: m.from, to: m.to, attack: !!m.attack })),
     getCurrentIndex: () => currentMoveIndex.value,
+    setAnimationDuration(duration) {
+      boardConfig.animation.duration = duration
+      boardAPI?.setConfig({ animation: { enabled: true, duration } })
+    },
     setOrientation(color) {
       if (color === 'black' && currentOrientation.value === 'white') flipBoard()
       else if (color === 'white' && currentOrientation.value === 'black') flipBoard()

@@ -42,6 +42,7 @@ Options:
   --scale <n>               Device scale factor         (default: 1, use 2 for 2x)
                             Output pixels = size * scale (e.g. 800 * 2 = 1600px)
   --fps <n>                 Output frame rate           (default: 30)
+  --animation-duration <ms> Visible move animation time (default: 400)
   --delay <ms>              Time between moves          (default: 1000)
   --start-delay <ms>        Hold on starting position   (default: 1000)
   --end-delay <ms>          Hold on final position      (default: 2000)
@@ -74,6 +75,7 @@ function parseArgs() {
     size: 800,
     scale: 1,
     fps: 30,
+    animationDuration: 400,
     moveDelay: 1000,
     startDelay: 1000,
     endDelay: 2000,
@@ -92,6 +94,7 @@ function parseArgs() {
       case '-s': case '--size':        opts.size = parseInt(next()); break;
       case '--scale':                  opts.scale = parseFloat(next()); break;
       case '--fps':                    opts.fps = parseInt(next()); break;
+      case '--animation-duration':     opts.animationDuration = parseInt(next()); break;
       case '--delay':                  opts.moveDelay = parseInt(next()); break;
       case '--start-delay':            opts.startDelay = parseInt(next()); break;
       case '--end-delay':              opts.endDelay = parseInt(next()); break;
@@ -112,6 +115,11 @@ function parseArgs() {
   if (!opts.moves) {
     console.error('Error: --moves is required\n');
     printUsage();
+    process.exit(1);
+  }
+
+  if (!Number.isFinite(opts.animationDuration) || opts.animationDuration <= 0) {
+    console.error('Error: --animation-duration must be a positive number of milliseconds.');
     process.exit(1);
   }
 
@@ -180,12 +188,15 @@ function buildAudioTrack(moves, opts, tmpDir) {
 
   let filterComplex;
   if (moves.length === 1) {
-    filterComplex = filterLines[0].replace(`[a0]`, `[out]`);
+    filterComplex = filterLines[0].replace(`[a0]`, `[mixed]`);
   } else {
     filterComplex =
       filterLines.join('; ') +
-      `; ${padLabels.join('')}amix=inputs=${moves.length}:normalize=0:duration=longest[out]`;
+      `; ${padLabels.join('')}amix=inputs=${moves.length}:normalize=0:duration=longest[mixed]`;
   }
+  // amix ends after the final sound effect; pad it so `-shortest` does not
+  // truncate the video's requested final-position hold.
+  filterComplex += `; [mixed]apad=whole_dur=${totalDurationSec}[out]`;
 
   const filterFile = path.join(tmpDir, 'audio_filter.txt');
   fs.writeFileSync(filterFile, filterComplex);
@@ -214,29 +225,27 @@ function buildAudioTrack(moves, opts, tmpDir) {
 // Video encoding
 // ---------------------------------------------------------------------------
 
-// Read width/height from a PNG file header (bytes 16–23 of the IHDR chunk).
-function getPngDimensions(filePath) {
-  const buf = Buffer.alloc(24);
-  const fd = fs.openSync(filePath, 'r');
-  fs.readSync(fd, buf, 0, 24, 0);
-  fs.closeSync(fd);
-  return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
-}
-
 function encodeVideo(frames, audioFile, opts, tmpDir) {
   const concatFile = path.join(tmpDir, 'concat.txt');
   let content = '';
-  for (const { file, duration } of frames) {
-    content += `file '${file}'\nduration ${duration}\n`;
+  for (const { file, frameCount } of frames) {
+    // The concat demuxer gives still images a 1/25 time base by default, so
+    // sub-40 ms `duration` values are rounded before the output frame rate is
+    // applied. At 30/60/120 fps that drops animation frames and duplicates
+    // others, which makes motion visibly stutter. Repeat each image once per
+    // intended output frame and force the input timestamps to the requested
+    // CFR instead.
+    for (let i = 0; i < frameCount; i++) {
+      content += `file '${file}'\n`;
+    }
   }
-  // Concat demuxer requires last file repeated without duration
-  content += `file '${frames[frames.length - 1].file}'\n`;
   fs.writeFileSync(concatFile, content);
 
   const outputPath = path.resolve(opts.output);
 
   const args = [
     'ffmpeg', '-y',
+    '-r', String(opts.fps),
     '-f', 'concat', '-safe', '0', '-i', concatFile,
   ];
 
@@ -245,22 +254,22 @@ function encodeVideo(frames, audioFile, opts, tmpDir) {
   }
 
   // Build the video filter chain.
+  // DevTools screencast frames use CSS-pixel dimensions and ignore the page's
+  // device scale factor, so explicitly scale them to the requested output size.
   // Force BT.709 matrix during the RGB→YUV conversion (swscale default for
   // sub-HD content is BT.601, which mismatches the BT.709 decode in players).
-  let vf = 'scale=in_range=full:out_range=limited:out_color_matrix=bt709';
+  const boardPx = Math.round(opts.size * opts.scale);
+  let vf = `scale=${boardPx}:${boardPx}:flags=lanczos:in_range=full:out_range=limited:out_color_matrix=bt709`;
   if (opts.letterbox) {
     const { w, h } = opts.letterbox;
-    // Read actual frame dimensions from the first captured PNG so we use
-    // concrete pixel offsets (no shell-parsed expressions, no guessing).
-    const { w: frameW, h: frameH } = getPngDimensions(frames[0].file);
-    if (frameW > w || frameH > h) {
+    if (boardPx > w || boardPx > h) {
       throw new Error(
-        `Board frame size (${frameW}x${frameH}) exceeds letterbox dimensions ` +
+        `Board frame size (${boardPx}x${boardPx}) exceeds letterbox dimensions ` +
         `(${w}x${h}). Reduce --size or --scale so the board fits.`
       );
     }
-    const padX = Math.floor((w - frameW) / 2);
-    const padY = Math.floor((h - frameH) / 2);
+    const padX = Math.floor((w - boardPx) / 2);
+    const padY = Math.floor((h - boardPx) / 2);
     vf += `,pad=${w}:${h}:${padX}:${padY}:black`;
   }
 
@@ -311,7 +320,7 @@ async function main() {
     // Launch browser
     // ------------------------------------------------------------------
     const vpWidth = opts.size;
-    const vpHeight = opts.size + 300;
+    const vpHeight = opts.size;
 
     browser = await puppeteer.launch({
       headless: true,
@@ -319,6 +328,7 @@ async function main() {
     });
 
     const page = await browser.newPage();
+    const cdp = await page.createCDPSession();
     await page.setViewport({
       width: vpWidth,
       height: vpHeight,
@@ -376,45 +386,6 @@ async function main() {
     console.log(`${moves.length} moves loaded (orientation: ${opts.orientation})`);
 
     // ------------------------------------------------------------------
-    // Install frame-stepping controls
-    //
-    // Override requestAnimationFrame and performance.now so we can
-    // advance the animation clock in precise increments and capture
-    // every frame deterministically.
-    // ------------------------------------------------------------------
-    await page.evaluate(() => {
-      const pendingCallbacks = [];
-      let virtualNow = performance.now();
-      let nextId = 1;
-
-      window.requestAnimationFrame = (cb) => {
-        const id = nextId++;
-        pendingCallbacks.push({ id, cb });
-        return id;
-      };
-
-      window.cancelAnimationFrame = (id) => {
-        const idx = pendingCallbacks.findIndex(c => c.id === id);
-        if (idx !== -1) pendingCallbacks.splice(idx, 1);
-      };
-
-      performance.now = () => virtualNow;
-
-      // Advance virtual clock by dtMs, execute all pending rAF callbacks,
-      // and return whether new callbacks were scheduled (animation ongoing).
-      window.__tick = (dtMs) => {
-        virtualNow += dtMs;
-        const batch = pendingCallbacks.splice(0);
-        for (const { cb } of batch) {
-          try { cb(virtualNow); } catch (e) {}
-        }
-        return pendingCallbacks.length > 0;
-      };
-
-      window.__hasPendingFrames = () => pendingCallbacks.length > 0;
-    });
-
-    // ------------------------------------------------------------------
     // Find the board element to screenshot
     // ------------------------------------------------------------------
     const boardEl = await page.$('.main-board');
@@ -423,58 +394,114 @@ async function main() {
       process.exit(1);
     }
 
+    // Screencast frames are emitted after Chromium's native rAF/layout/paint
+    // lifecycle. This avoids the damage-only screenshots produced when rAF is
+    // replaced and invoked synchronously by the recorder.
+    await page.setViewport({
+      width: opts.size,
+      height: opts.size,
+      deviceScaleFactor: opts.scale,
+    });
+    await boardEl.evaluate((el) => {
+      Object.assign(el.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100vw',
+        height: '100vw',
+        paddingBottom: '0',
+        zIndex: '2147483647',
+      });
+    });
+
+    let screencastFrames = [];
+    cdp.on('Page.screencastFrame', (event) => {
+      void cdp.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
+      screencastFrames.push(event);
+    });
+    await cdp.send('Page.startScreencast', {
+      format: 'png',
+      everyNthFrame: 1,
+    });
+
     // ------------------------------------------------------------------
     // Capture frames
     // ------------------------------------------------------------------
     const frames = [];
     let frameIdx = 0;
-    const frameDt = 1000 / opts.fps;
-    const MAX_ANIM_FRAMES = Math.ceil(500 / frameDt); // safety cap
+    const composedCaptureFps = 30;
 
-    async function capture(durationSec) {
+    function capture(data, frameCount = 1) {
       const file = path.join(tmpDir, `f${String(frameIdx).padStart(5, '0')}.png`);
-      await boardEl.screenshot({ path: file });
-      frames.push({ file, duration: durationSec });
+      fs.writeFileSync(file, data, 'base64');
+      frames.push({ file, frameCount });
       frameIdx++;
     }
 
     // Starting position
     process.stdout.write('Capturing: start');
-    await capture(opts.startDelay / 1000);
+    const startingFrame = await boardEl.screenshot({ encoding: 'base64' });
+    capture(startingFrame, Math.max(1, Math.round(opts.startDelay * opts.fps / 1000)));
 
     // Each move
     for (let i = 0; i < moves.length; i++) {
-      // Trigger the move — the keyboard handler calls redoMove() which
-      // invokes nichessground's animate(). That function:
-      //   1. Sets animation.start = performance.now()  (our virtual time)
-      //   2. Calls step() synchronously for the first frame (rest=1, piece at origin)
-      //   3. Schedules a rAF callback for the next frame
-      await page.keyboard.press('ArrowRight');
-
-      // Capture animation frames by ticking virtual time forward
-      let animFrameCount = 0;
-      let hasMore = await page.evaluate(() => window.__hasPendingFrames());
-
-      while (hasMore && animFrameCount < MAX_ANIM_FRAMES) {
-        hasMore = await page.evaluate((dt) => window.__tick(dt), frameDt);
-        await capture(1 / opts.fps);
-        animFrameCount++;
-      }
-
-      // Set the last animation frame's duration to cover the hold period.
-      // --delay is the total time per move (animation + hold).
       const isLast = i === moves.length - 1;
       const totalMoveTimeMs = isLast ? opts.endDelay : opts.moveDelay;
-      const animTimeMs = animFrameCount * frameDt;
-      // holdSec replaces the last animation frame's duration (which was 1/fps),
-      // so we add 1/fps back to avoid losing that time from the total.
-      const holdSec = Math.max(1 / opts.fps, (totalMoveTimeMs - animTimeMs) / 1000 + 1 / opts.fps);
+      const outputAnimationMs = Math.min(opts.animationDuration, totalMoveTimeMs);
+      const animFrameCount = Math.max(
+        1,
+        Math.round(outputAnimationMs * opts.fps / 1000),
+      );
+
+      // Capture the same easing curve in slow motion so every requested output
+      // frame has its own fully composed source position. The slow capture time
+      // never leaks into the encoded timeline.
+      const captureAnimationMs = Math.max(
+        outputAnimationMs,
+        Math.ceil(animFrameCount * 1000 / composedCaptureFps) + 100,
+      );
+      await page.evaluate((duration) => {
+        window.__gameRecorder.setAnimationDuration(duration);
+      }, captureAnimationMs);
+
+      screencastFrames = [];
+      await page.keyboard.press('ArrowRight');
+      await sleep(captureAnimationMs + 100);
+
+      if (screencastFrames.length === 0) {
+        throw new Error(`Chromium did not produce frames for move ${i + 1}.`);
+      }
+
+      // Screencast alternates a fully composed display frame with a damage
+      // update. Damage frames omit unchanged layers and were the source of the
+      // visible flicker/stutter in the old recorder. Keep the composed frames
+      // and append an explicit final-position screenshot after animation ends.
+      const composedFrames = screencastFrames.filter((_, index) => index % 2 === 0);
+      const finalFrame = await boardEl.screenshot({ encoding: 'base64' });
+      composedFrames.push({ data: finalFrame });
+
+      // Resample the native display frames onto the requested output rate.
+      // Values above the browser's display rate duplicate source frames; 60
+      // fps is the practical maximum for distinct browser paints.
+      for (let frame = 0; frame < animFrameCount; frame++) {
+        const sourceIndex = animFrameCount === 1
+          ? composedFrames.length - 1
+          : Math.round(frame * (composedFrames.length - 1) / (animFrameCount - 1));
+        capture(composedFrames[sourceIndex].data);
+      }
+
+      // Repeat the final animation frame for the rest of this move's allotted
+      // time. --delay is the total time per move (animation + hold).
+      const totalMoveFrames = Math.max(1, Math.round(totalMoveTimeMs * opts.fps / 1000));
 
       if (animFrameCount > 0) {
-        frames[frames.length - 1].duration = holdSec;
+        frames[frames.length - 1].frameCount = Math.max(
+          1,
+          totalMoveFrames - (animFrameCount - 1),
+        );
       } else {
         // No animation frames captured (animation disabled?) — just hold
-        await capture(holdSec);
+        await capture(totalMoveFrames);
       }
 
       process.stdout.write(`\rCapturing: move ${i + 1}/${moves.length} (${animFrameCount} anim frames)`);
