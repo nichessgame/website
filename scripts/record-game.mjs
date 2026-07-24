@@ -167,13 +167,32 @@ function buildAudioTrack(moves, opts, tmpDir) {
     return null;
   }
 
+  // Schedule each sound so its end lines up with the end of the visible
+  // animation. The sound files have different durations, so determine the
+  // duration from the actual asset rather than using one fixed offset.
+  const audioDurationMs = new Map();
+  for (const sound of [moveSound, captureSound]) {
+    try {
+      const durationSec = Number(execFileSync(
+        'ffprobe',
+        ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', sound],
+        { encoding: 'utf8' },
+      ).trim());
+      if (!Number.isFinite(durationSec) || durationSec < 0) throw new Error('invalid duration');
+      audioDurationMs.set(sound, Math.ceil(durationSec * 1000));
+    } catch {
+      console.warn(`Could not determine duration for ${path.basename(sound)}, skipping audio.`);
+      return null;
+    }
+  }
+
   const audioFile = path.join(tmpDir, 'audio.wav');
   const totalDurationSec =
     opts.startDelay / 1000 +
     (moves.length - 1) * (opts.moveDelay / 1000) +
     opts.endDelay / 1000;
 
-  // Build ffmpeg filter_complex — one delayed copy of the appropriate sound per move
+  // Build ffmpeg filter_complex — one delayed copy of the appropriate sound per move.
   const inputs = [];
   const filterLines = [];
   const padLabels = [];
@@ -181,7 +200,10 @@ function buildAudioTrack(moves, opts, tmpDir) {
   for (let i = 0; i < moves.length; i++) {
     const src = moves[i].attack ? captureSound : moveSound;
     inputs.push('-i', src);
-    const delayMs = opts.startDelay + i * opts.moveDelay;
+    const moveWindowMs = i === moves.length - 1 ? opts.endDelay : opts.moveDelay;
+    const animationDurationMs = Math.min(opts.animationDuration, moveWindowMs);
+    const animationEndMs = opts.startDelay + i * opts.moveDelay + animationDurationMs;
+    const delayMs = Math.max(0, animationEndMs - audioDurationMs.get(src));
     filterLines.push(`[${i}]adelay=${delayMs}|${delayMs}[a${i}]`);
     padLabels.push(`[a${i}]`);
   }
