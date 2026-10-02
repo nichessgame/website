@@ -172,7 +172,7 @@
                 variant="text"
                 @click.stop="deleteSavedGame(game.gameId)"
               >
-                <v-icon icon="$mdiCheckCircle" size="small" color="green" />
+                <v-icon icon="$mdiCheckCircle" size="small" color="success" />
               </v-btn>
               <v-btn
                 icon
@@ -180,7 +180,7 @@
                 variant="text"
                 @click.stop="confirmingDeleteId = null"
               >
-                <v-icon icon="$mdiClose" size="small" color="red" />
+                <v-icon icon="$mdiClose" size="small" color="error" />
               </v-btn>
             </template>
             <v-btn
@@ -680,12 +680,12 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .relay-status {
-  color: #f44336;
+  color: var(--site-error);
   font-size: 13px;
 }
 
 .relay-status.connected {
-  color: #4CAF50;
+  color: var(--site-success);
 }
 
 .control-row {
@@ -769,13 +769,13 @@ onBeforeUnmount(() => {
 }
 
 .share-id-label {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   white-space: nowrap;
 }
 
 .share-id {
-  color: #ffd700;
+  color: var(--site-gold);
   font-family: monospace;
   font-size: 14px;
   font-weight: bold;
@@ -785,11 +785,11 @@ onBeforeUnmount(() => {
 
 .copy-message {
   font-size: 13px;
-  color: #66bb6a;
+  color: var(--site-success);
 }
 
 .copy-message.message-error {
-  color: #ef5350;
+  color: var(--site-error);
 }
 
 .history-header {
@@ -800,7 +800,7 @@ onBeforeUnmount(() => {
 }
 
 .history-label {
-  color: #ccc;
+  color: var(--site-text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -820,7 +820,7 @@ onBeforeUnmount(() => {
 }
 
 .no-moves {
-  color: #999;
+  color: var(--site-text-subtle);
   text-align: center;
   padding: 20px;
 }
@@ -848,8 +848,8 @@ onBeforeUnmount(() => {
 
 .move-item.active,
 .move-item.clickable.active:hover {
-  background-color: #2a4a2a;
-  border-color: #4CAF50;
+  background-color: var(--site-gold-bg);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -859,18 +859,18 @@ onBeforeUnmount(() => {
   }
 
   .move-item.clickable.active:hover {
-    background-color: #2a4a2a;
-    border-color: #4CAF50;
+    background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
 .move-number {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 13px;
 }
 
 .move-notation {
-  color: #fff;
+  color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
   font-family: monospace;
@@ -894,7 +894,7 @@ onBeforeUnmount(() => {
 }
 
 .games-info-message {
-  color: #aaa;
+  color: var(--site-text-muted);
   font-size: 13px;
   margin-bottom: 12px;
   padding: 8px 12px;
@@ -930,8 +930,8 @@ onBeforeUnmount(() => {
 }
 
 .saved-game-item.current-game {
-  background-color: #2a4a2a;
-  border-color: #4CAF50;
+  background-color: var(--site-gold-bg);
+  border-color: var(--site-gold);
   cursor: default;
 }
 
@@ -942,26 +942,26 @@ onBeforeUnmount(() => {
 }
 
 .saved-game-number {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   font-weight: 600;
   min-width: 30px;
 }
 
 .saved-game-color {
-  color: #fff;
+  color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
   font-family: monospace;
 }
 
 .saved-game-moves {
-  color: #aaa;
+  color: var(--site-text-muted);
   font-size: 13px;
 }
 
 .saved-game-over {
-  color: #ffd700;
+  color: var(--site-gold);
   font-size: 13px;
   font-weight: 600;
 }
@@ -973,7 +973,7 @@ onBeforeUnmount(() => {
 }
 
 .saved-game-date {
-  color: #888;
+  color: var(--site-text-subtle);
   font-size: 12px;
   white-space: nowrap;
 }

@@ -112,7 +112,7 @@ function toggleSound(enabled) {
 <style scoped>
 .board-settings-card {
   background: #17191f;
-  color: #e7eaf0;
+  color: var(--site-text-strong);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
 }
@@ -134,7 +134,7 @@ function toggleSound(enabled) {
 }
 
 .close-button {
-  color: #aeb4bf;
+  color: var(--site-text-muted);
 }
 
 .close-button:hover {
@@ -164,7 +164,7 @@ function toggleSound(enabled) {
 
 .toggle-label {
   align-items: center;
-  color: #d7dbe3;
+  color: var(--site-text);
   display: flex;
   font-size: 0.92rem;
   font-weight: 560;

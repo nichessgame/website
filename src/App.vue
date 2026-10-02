@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
 }
 
 .brand-link {
-  color: #b9bec8;
+  color: var(--site-text-muted);
   font-size: 0.92rem;
   font-weight: 620;
   letter-spacing: 0;
@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
 }
 
 .brand-link:hover {
-  color: #e7eaf0;
+  color: var(--site-text-strong);
 }
 
 .desktop-nav {
@@ -138,7 +138,7 @@ onBeforeUnmount(() => {
 }
 
 .nav-link {
-  color: #aeb4bf;
+  color: var(--site-text-muted);
   font-size: 0.9rem;
   font-weight: 560;
   letter-spacing: 0;
@@ -150,20 +150,20 @@ onBeforeUnmount(() => {
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.035);
-  color: #f0f2f6;
+  color: var(--site-text-strong);
 }
 
 .donate-link {
-  color: #c7b46b;
+  color: var(--site-gold);
 }
 
 .donate-link:hover {
-  background: rgba(199, 180, 107, 0.055);
-  color: #dccb86;
+  background: rgba(242, 201, 76, 0.06);
+  color: var(--site-gold-hover);
 }
 
 .mobile-menu-button {
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   margin-right: 8px;
 }
 
@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
 .mobile-play-item,
 .mobile-nav-item {
   border-radius: 6px;
-  color: #b9bec8;
+  color: var(--site-text-muted);
   font-size: 0.92rem;
   font-weight: 560;
   min-height: 48px;
@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
 }
 
 .mobile-play-item {
-  color: #b9bec8;
+  color: var(--site-text-muted);
 }
 
 .mobile-nav-item:hover {
@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
 }
 
 .mobile-donate-item {
-  color: #c7b46b;
+  color: var(--site-gold);
 }
 
 @media (max-width: 599px) {

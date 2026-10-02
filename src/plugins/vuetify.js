@@ -16,6 +16,20 @@ import { mdiSwordCross, mdiLightningBolt, mdiRobot, mdiInformation, mdiScriptTex
 export default createVuetify({
   theme: {
     defaultTheme: 'dark',
+    themes: {
+      // Keep in sync with the accent and status colors in styles/site.css
+      dark: {
+        colors: {
+          'primary': '#8bb5ff',
+          'info': '#8bb5ff',
+          'success': '#66bb6a',
+          'error': '#ef5350',
+          'warning': '#ffb74d',
+          // Switch thumb (Vuetify's default is lavender)
+          'surface-bright': '#f1f3f6',
+        },
+      },
+    },
   },
   icons: {
     defaultSet: 'mdi',

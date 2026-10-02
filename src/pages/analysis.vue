@@ -794,7 +794,7 @@ function formatDate(timestamp) {
 }
 
 .config-label {
-  color: #ccc;
+  color: var(--site-text);
   font-size: 14px;
   min-width: 200px;
 }
@@ -807,7 +807,7 @@ function formatDate(timestamp) {
 }
 
 .history-label {
-  color: #ccc;
+  color: var(--site-text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -827,7 +827,7 @@ function formatDate(timestamp) {
 }
 
 .no-moves {
-  color: #999;
+  color: var(--site-text-subtle);
   text-align: center;
   padding: 20px;
 }
@@ -855,8 +855,8 @@ function formatDate(timestamp) {
 
 .move-item.active,
 .move-item.clickable.active:hover {
-  background-color: #2a4a2a;
-  border-color: #4CAF50;
+  background-color: var(--site-gold-bg);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -866,18 +866,18 @@ function formatDate(timestamp) {
   }
 
   .move-item.clickable.active:hover {
-    background-color: #2a4a2a;
-    border-color: #4CAF50;
+    background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
 .move-number {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 13px;
 }
 
 .move-notation {
-  color: #fff;
+  color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
   font-family: monospace;
@@ -890,9 +890,9 @@ function formatDate(timestamp) {
   padding: 10px 12px;
   border-radius: 6px;
   font-size: 13px;
-  background-color: rgba(76, 175, 80, 0.15);
-  border: 1px solid rgba(76, 175, 80, 0.3);
-  color: #66bb6a;
+  background-color: var(--site-success-bg);
+  border: 1px solid var(--site-success-border);
+  color: var(--site-success);
 }
 
 .copy-message .message-icon {
@@ -901,9 +901,9 @@ function formatDate(timestamp) {
 }
 
 .copy-message.message-error {
-  background-color: rgba(244, 67, 54, 0.15);
-  border: 1px solid rgba(244, 67, 54, 0.3);
-  color: #ef5350;
+  background-color: var(--site-error-bg);
+  border: 1px solid var(--site-error-border);
+  color: var(--site-error);
 }
 
 .saved-games-list {
@@ -933,8 +933,8 @@ function formatDate(timestamp) {
 }
 
 .saved-game-item.current-game {
-  background-color: #2a4a2a;
-  border-color: #4CAF50;
+  background-color: var(--site-gold-bg);
+  border-color: var(--site-gold);
 }
 
 .saved-game-info {
@@ -944,26 +944,26 @@ function formatDate(timestamp) {
 }
 
 .saved-game-number {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   font-weight: 600;
   min-width: 30px;
 }
 
 .saved-game-color {
-  color: #fff;
+  color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
   text-transform: capitalize;
 }
 
 .saved-game-moves {
-  color: #aaa;
+  color: var(--site-text-muted);
   font-size: 13px;
 }
 
 .saved-game-over {
-  color: #ffd700;
+  color: var(--site-gold);
   font-size: 13px;
   font-weight: 600;
 }
@@ -975,13 +975,13 @@ function formatDate(timestamp) {
 }
 
 .saved-game-date {
-  color: #888;
+  color: var(--site-text-subtle);
   font-size: 12px;
   white-space: nowrap;
 }
 
 .games-info-message {
-  color: #aaa;
+  color: var(--site-text-muted);
   font-size: 13px;
   margin-bottom: 12px;
   padding: 8px 12px;
@@ -995,10 +995,10 @@ function formatDate(timestamp) {
   display: flex;
   align-items: center;
   padding: 12px;
-  background-color: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  background-color: var(--site-warning-bg);
+  border: 1px solid var(--site-warning-border);
   border-radius: 6px;
-  color: #ffb74d;
+  color: var(--site-warning);
   font-size: 14px;
 }
 
@@ -1010,7 +1010,7 @@ function formatDate(timestamp) {
 }
 
 .model-status-text {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   text-align: center;
 }
@@ -1025,7 +1025,7 @@ function formatDate(timestamp) {
 }
 
 .evaluation-label {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   margin-bottom: 12px;
   font-weight: 600;
@@ -1047,12 +1047,12 @@ function formatDate(timestamp) {
 }
 
 .evaluation-key {
-  color: #ccc;
+  color: var(--site-text);
   font-size: 14px;
 }
 
 .evaluation-value {
-  color: #ffd700;
+  color: var(--site-gold);
   font-weight: bold;
   font-size: 16px;
   font-family: monospace;
@@ -1074,14 +1074,14 @@ function formatDate(timestamp) {
 }
 
 .continuation-move {
-  color: #fff;
+  color: var(--site-text-strong);
   font-family: monospace;
   font-size: 14px;
   font-weight: bold;
 }
 
 .continuation-separator {
-  color: #999;
+  color: var(--site-text-subtle);
 }
 
 .policy-section {
@@ -1105,14 +1105,14 @@ function formatDate(timestamp) {
 }
 
 .move-rank {
-  color: #999;
+  color: var(--site-text-subtle);
   font-weight: bold;
   font-size: 14px;
   min-width: 24px;
 }
 
 .move-wld {
-  color: #ffd700;
+  color: var(--site-gold);
   font-family: monospace;
   font-size: 13px;
   white-space: nowrap;

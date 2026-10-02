@@ -74,7 +74,7 @@
             variant="flat"
             @click="confirmOpenAnalysis"
           >
-            <v-icon icon="$mdiCheckCircle" color="green" />
+            <v-icon icon="$mdiCheckCircle" color="success" />
           </v-btn>
           <v-btn
             aria-label="Cancel analysis"
@@ -82,7 +82,7 @@
             variant="flat"
             @click="confirmingAnalysis = false"
           >
-            <v-icon icon="$mdiClose" color="red" />
+            <v-icon icon="$mdiClose" color="error" />
           </v-btn>
         </template>
         <v-btn
@@ -486,7 +486,7 @@ watch(sideToMove, (newValue) => {
 }
 
 .piece-icon.selected {
-  border-color: #ffd700;
+  border-color: var(--site-gold);
   background: var(--board-row-hover-bg);
 }
 
@@ -517,7 +517,7 @@ watch(sideToMove, (newValue) => {
 }
 
 .move-index-label {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   margin-bottom: 12px;
 }
@@ -530,13 +530,13 @@ watch(sideToMove, (newValue) => {
 }
 
 .move-index-result {
-  color: #fff;
+  color: var(--site-text-strong);
   font-family: monospace;
   font-size: 16px;
 }
 
 .move-index-value {
-  color: #ffd700;
+  color: var(--site-gold);
   font-weight: bold;
 }
 
@@ -548,13 +548,13 @@ watch(sideToMove, (newValue) => {
 }
 
 .board-string-label {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   margin-bottom: 8px;
 }
 
 .board-string {
-  color: #fff;
+  color: var(--site-text-strong);
   font-family: monospace;
   font-size: 14px;
   word-break: break-all;
@@ -591,7 +591,7 @@ watch(sideToMove, (newValue) => {
 }
 
 .model-status-text {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   text-align: center;
 }
@@ -623,12 +623,12 @@ watch(sideToMove, (newValue) => {
 }
 
 .evaluating-text {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 12px;
 }
 
 .evaluation-label {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   margin-bottom: 12px;
   font-weight: 600;
@@ -650,12 +650,12 @@ watch(sideToMove, (newValue) => {
 }
 
 .evaluation-key {
-  color: #ccc;
+  color: var(--site-text);
   font-size: 14px;
 }
 
 .evaluation-value {
-  color: #ffd700;
+  color: var(--site-gold);
   font-weight: bold;
   font-size: 16px;
   font-family: monospace;
@@ -682,21 +682,21 @@ watch(sideToMove, (newValue) => {
 }
 
 .move-rank {
-  color: #999;
+  color: var(--site-text-subtle);
   font-weight: bold;
   font-size: 14px;
   min-width: 24px;
 }
 
 .move-notation {
-  color: #fff;
+  color: var(--site-text-strong);
   font-family: monospace;
   font-size: 14px;
   flex-grow: 1;
 }
 
 .move-probability {
-  color: #4CAF50;
+  color: var(--site-gold);
   font-weight: bold;
   font-size: 14px;
   font-family: monospace;

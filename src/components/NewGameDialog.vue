@@ -138,7 +138,7 @@ const startGame = () => {
   background: #17191f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  color: #e7eaf0;
+  color: var(--site-text-strong);
 }
 
 .dialog-header {
@@ -150,7 +150,7 @@ const startGame = () => {
 }
 
 .dialog-title {
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   font-size: 1rem;
   font-weight: 650;
   letter-spacing: 0;
@@ -159,7 +159,7 @@ const startGame = () => {
 }
 
 .close-button {
-  color: #aeb4bf;
+  color: var(--site-text-muted);
 }
 
 .close-button:hover {
@@ -182,7 +182,7 @@ const startGame = () => {
 }
 
 .section-label {
-  color: #d7dbe3;
+  color: var(--site-text);
   font-size: 0.92rem;
   font-weight: 560;
   letter-spacing: 0;
@@ -200,7 +200,7 @@ const startGame = () => {
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 6px;
-  color: #d0d4dc;
+  color: var(--site-text);
   cursor: pointer;
   font: inherit;
   font-size: 0.94rem;
@@ -223,21 +223,21 @@ const startGame = () => {
   background: rgba(226, 232, 240, 0.1);
   border-color: rgba(226, 232, 240, 0.76);
   box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.16);
-  color: #f4f4f5;
+  color: var(--site-text-strong);
 }
 
 .color-option-selected:hover {
   background: rgba(226, 232, 240, 0.14);
-  border-color: #f4f4f5;
+  border-color: var(--site-text-strong);
   color: #ffffff;
 }
 
 .dialog-text :deep(.v-field) {
-  color: #e7eaf0;
+  color: var(--site-text-strong);
 }
 
 .dialog-text :deep(.v-label) {
-  color: #b9bec8;
+  color: var(--site-text-muted);
   opacity: 1;
 }
 
@@ -246,10 +246,10 @@ const startGame = () => {
 }
 
 .model-alert {
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  background: var(--site-warning-bg);
+  border: 1px solid var(--site-warning-border);
   border-radius: 6px;
-  color: #ffb74d;
+  color: var(--site-warning);
   font-size: 0.88rem;
   line-height: 1.45;
   text-align: left;

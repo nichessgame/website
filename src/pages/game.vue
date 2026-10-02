@@ -34,14 +34,14 @@
               class="board-action-button"
               variant="flat"
             >
-              <v-icon icon="$mdiCheckCircle" color="green" />
+              <v-icon icon="$mdiCheckCircle" color="success" />
             </v-btn>
             <v-btn
               @click="confirmingAnalysis = false"
               class="board-action-button"
               variant="flat"
             >
-              <v-icon icon="$mdiClose" color="red" />
+              <v-icon icon="$mdiClose" color="error" />
             </v-btn>
           </template>
           <v-btn
@@ -192,7 +192,7 @@
                 variant="text"
                 @click.stop="deleteSavedGame(game)"
               >
-                <v-icon icon="$mdiCheckCircle" size="small" color="green" />
+                <v-icon icon="$mdiCheckCircle" size="small" color="success" />
               </v-btn>
               <v-btn
                 icon
@@ -200,7 +200,7 @@
                 variant="text"
                 @click.stop="confirmingDeleteId = null"
               >
-                <v-icon icon="$mdiClose" size="small" color="red" />
+                <v-icon icon="$mdiClose" size="small" color="error" />
               </v-btn>
             </template>
             <v-btn
@@ -713,7 +713,7 @@ const props = defineProps({
 .nodes-count {
   font-size: 18px;
   font-weight: 600;
-  color: #ccc;
+  color: var(--site-text);
   min-width: 60px;
   text-align: left;
 }
@@ -777,7 +777,7 @@ const props = defineProps({
 }
 
 .history-label {
-  color: #ccc;
+  color: var(--site-text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -797,7 +797,7 @@ const props = defineProps({
 }
 
 .no-moves {
-  color: #999;
+  color: var(--site-text-subtle);
   text-align: center;
   padding: 20px;
 }
@@ -825,8 +825,8 @@ const props = defineProps({
 
 .move-item.active,
 .move-item.clickable.active:hover {
-  background-color: #2a4a2a;
-  border-color: #4CAF50;
+  background-color: var(--site-gold-bg);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -836,18 +836,18 @@ const props = defineProps({
   }
 
   .move-item.clickable.active:hover {
-    background-color: #2a4a2a;
-    border-color: #4CAF50;
+    background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
 .move-number {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 13px;
 }
 
 .move-notation {
-  color: #fff;
+  color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
   font-family: monospace;
@@ -860,9 +860,9 @@ const props = defineProps({
   padding: 10px 12px;
   border-radius: 6px;
   font-size: 13px;
-  background-color: rgba(76, 175, 80, 0.15);
-  border: 1px solid rgba(76, 175, 80, 0.3);
-  color: #66bb6a;
+  background-color: var(--site-success-bg);
+  border: 1px solid var(--site-success-border);
+  color: var(--site-success);
 }
 
 .copy-message .message-icon {
@@ -871,13 +871,13 @@ const props = defineProps({
 }
 
 .copy-message.message-error {
-  background-color: rgba(244, 67, 54, 0.15);
-  border: 1px solid rgba(244, 67, 54, 0.3);
-  color: #ef5350;
+  background-color: var(--site-error-bg);
+  border: 1px solid var(--site-error-border);
+  color: var(--site-error);
 }
 
 .gold {
-  color: #ffd700;
+  color: var(--site-gold);
 }
 
 .saved-games-list {
@@ -907,8 +907,8 @@ const props = defineProps({
 }
 
 .saved-game-item.current-game {
-  background-color: #2a4a2a;
-  border-color: #4CAF50;
+  background-color: var(--site-gold-bg);
+  border-color: var(--site-gold);
   cursor: default;
 }
 
@@ -919,26 +919,26 @@ const props = defineProps({
 }
 
 .saved-game-number {
-  color: #999;
+  color: var(--site-text-subtle);
   font-size: 14px;
   font-weight: 600;
   min-width: 30px;
 }
 
 .saved-game-color {
-  color: #fff;
+  color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
   text-transform: capitalize;
 }
 
 .saved-game-detail {
-  color: #aaa;
+  color: var(--site-text-muted);
   font-size: 13px;
 }
 
 .saved-game-over {
-  color: #ffd700;
+  color: var(--site-gold);
   font-size: 13px;
   font-weight: 600;
 }
@@ -950,13 +950,13 @@ const props = defineProps({
 }
 
 .saved-game-date {
-  color: #888;
+  color: var(--site-text-subtle);
   font-size: 12px;
   white-space: nowrap;
 }
 
 .games-info-message {
-  color: #aaa;
+  color: var(--site-text-muted);
   font-size: 13px;
   margin-bottom: 12px;
   padding: 8px 12px;

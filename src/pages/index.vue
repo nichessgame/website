@@ -119,7 +119,7 @@ useHead({
 }
 
 .hero h1 {
-  color: #f4f4f5;
+  color: var(--site-text-strong);
   font-size: clamp(2.75rem, 7vw, 5.25rem);
   font-weight: 620;
   letter-spacing: 0;
@@ -128,7 +128,7 @@ useHead({
 }
 
 .hero p {
-  color: #d4d7dd;
+  color: var(--site-text);
   font-size: clamp(1rem, 1.6vw, 1.22rem);
   line-height: 1.45;
   margin: 0;
@@ -176,7 +176,7 @@ useHead({
 .secondary-action {
   background: transparent;
   border-color: #6f7787;
-  color: #f4f4f5;
+  color: var(--site-text-strong);
 }
 
 .secondary-action:hover {
@@ -199,7 +199,7 @@ useHead({
 }
 
 .info-panel h2 {
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   font-size: clamp(1.05rem, 1.55vw, 1.22rem);
   font-weight: 680;
   line-height: 1.2;
@@ -208,7 +208,7 @@ useHead({
 
 .info-panel p,
 .info-panel span {
-  color: #d0d4dc;
+  color: var(--site-text);
   font-size: 0.94rem;
   line-height: 1.55;
   margin: 0;

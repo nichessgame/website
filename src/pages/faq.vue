@@ -92,7 +92,7 @@ useHead({
 
 summary {
   align-items: center;
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   cursor: pointer;
   display: flex;
   font-size: 0.98rem;
@@ -104,8 +104,8 @@ summary {
 }
 
 summary::after {
-  border-bottom: 2px solid #aeb4bf;
-  border-right: 2px solid #aeb4bf;
+  border-bottom: 2px solid var(--site-text-muted);
+  border-right: 2px solid var(--site-text-muted);
   content: "";
   flex: 0 0 auto;
   height: 8px;
@@ -136,7 +136,7 @@ summary::-webkit-details-marker {
 }
 
 details p {
-  color: #d0d4dc;
+  color: var(--site-text);
   font-size: 0.92rem;
   line-height: 1.55;
   margin-top: 10px;

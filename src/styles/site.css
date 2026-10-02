@@ -34,7 +34,7 @@
 }
 
 .page-title {
-  color: #f4f4f5;
+  color: var(--site-text-strong);
   font-size: clamp(1.55rem, 3vw, 2.2rem);
   font-weight: 720;
   letter-spacing: 0;
@@ -43,7 +43,7 @@
 }
 
 .page-subtitle {
-  color: #d4d7dd;
+  color: var(--site-text);
   font-size: clamp(0.95rem, 1.35vw, 1.05rem);
   line-height: 1.5;
   margin: 8px 0 0;
@@ -67,6 +67,35 @@
   --board-row-bg: rgba(255, 255, 255, 0.055);
   --board-row-hover-bg: rgba(255, 255, 255, 0.085);
   --board-row-hover-border: rgba(255, 255, 255, 0.18);
+
+  /* Text, from most to least prominent */
+  --site-text-strong: #f1f3f6;
+  --site-text: #d0d4dc;
+  --site-text-muted: #aeb4bf;
+  --site-text-subtle: #8b919c;
+
+  /*
+   * Accents mirror the board's point labels: blue for links and controls,
+   * gold (the health points color) for game data, selections and Donate.
+   * Keep the Vuetify theme colors in plugins/vuetify.js in sync.
+   */
+  --site-link: #8bb5ff;
+  --site-link-bg: rgba(139, 181, 255, 0.15);
+  --site-link-border: rgba(139, 181, 255, 0.3);
+  --site-gold: #f2c94c;
+  --site-gold-hover: #f7da7e;
+  --site-gold-bg: rgba(242, 201, 76, 0.12);
+
+  /* Status messages */
+  --site-success: #66bb6a;
+  --site-success-bg: rgba(102, 187, 106, 0.15);
+  --site-success-border: rgba(102, 187, 106, 0.3);
+  --site-error: #ef5350;
+  --site-error-bg: rgba(239, 83, 80, 0.15);
+  --site-error-border: rgba(239, 83, 80, 0.3);
+  --site-warning: #ffb74d;
+  --site-warning-bg: rgba(255, 183, 77, 0.15);
+  --site-warning-border: rgba(255, 183, 77, 0.3);
 }
 
 .site-panel {
@@ -84,7 +113,7 @@
 }
 
 .tabs-no-scroll .v-tab {
-  color: #d0d4dc;
+  color: var(--site-text);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -101,7 +130,7 @@
 .site-panel h2,
 .site-panel h3,
 .site-panel h4 {
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   letter-spacing: 0;
   line-height: 1.25;
   margin: 0 0 10px;
@@ -130,7 +159,7 @@
 
 .site-panel p,
 .site-panel li {
-  color: #d0d4dc;
+  color: var(--site-text);
   font-size: 0.92rem;
   line-height: 1.55;
 }
@@ -144,7 +173,7 @@
 }
 
 .site-link {
-  color: #8bb5ff;
+  color: var(--site-link);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -157,7 +186,7 @@
   background: rgba(255, 255, 255, 0.055);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 6px;
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   height: 34px;
   min-width: 48px;
   padding: 0;
@@ -179,7 +208,7 @@
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 6px;
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   font-weight: 620;
   letter-spacing: 0;
   text-transform: none;
@@ -225,7 +254,7 @@
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  color: #eceff4;
+  color: var(--site-text-strong);
   display: block;
   font-family: "Courier New", Courier, monospace;
   font-size: 0.88rem;
@@ -241,7 +270,7 @@
 }
 
 .address-text {
-  color: #d0d4dc;
+  color: var(--site-text);
   font-family: "Courier New", Courier, monospace;
   font-size: 0.85rem;
   line-height: 1.5;
@@ -253,7 +282,7 @@
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 6px;
-  color: #f1f3f6;
+  color: var(--site-text-strong);
   display: flex;
   justify-content: space-between;
   min-height: 48px;
@@ -281,7 +310,7 @@
 
 .rules-nav a {
   border-radius: 6px;
-  color: #d0d4dc;
+  color: var(--site-text);
   display: block;
   font-size: 0.9rem;
   padding: 7px 9px;
