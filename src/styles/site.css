@@ -8,6 +8,27 @@
   width: min(100% - 32px, 1120px);
 }
 
+/*
+ * Board pages: the board, its control row and the panels below share one column.
+ * Portrait: the board fills the column, which is capped at 80vh (but never below 864px).
+ * Landscape: the board is 80vh wide so it fits on screen, and the column matches it.
+ * The column never drops below 480px, so the controls still fit on very short screens.
+ */
+:root {
+  --board-column-width: clamp(864px, 80vh, 1920px);
+}
+
+@media (orientation: landscape) {
+  :root {
+    --board-column-width: max(480px, min(80vh, 2160px));
+  }
+
+  .board-column .main-wrap {
+    max-width: 100%;
+    width: min(80vh, 2160px);
+  }
+}
+
 .page-header {
   margin-bottom: clamp(16px, 3vw, 26px);
 }

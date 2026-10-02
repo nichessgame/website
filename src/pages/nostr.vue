@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="clamp(864px, 80vh, 1920px)" class="pa-0">
+  <v-container max-width="var(--board-column-width)" class="pa-0 board-column">
     <TheChessboard
       @board-created="handleBoardCreated"
       @move="handleMove"

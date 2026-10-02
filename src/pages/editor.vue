@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="clamp(900px, 47vw, 1440px)" class="pa-0">
+  <v-container max-width="var(--board-column-width)" class="pa-0 board-column">
     <!-- Piece selector section -->
     <div class="piece-selector">
       <div class="selector-layout">
@@ -65,7 +65,7 @@
       />
     </div>
 
-    <BoardControlRow class="mt-2">
+    <BoardControlRow class="mt-2" max-width="100%">
       <template #left>
         <template v-if="confirmingAnalysis">
           <v-btn
@@ -463,10 +463,10 @@ watch(sideToMove, (newValue) => {
 
 .pieces-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
-  max-width: 360px;
-  flex-shrink: 0;
+  flex: 0 1 360px;
+  min-width: 0;
 }
 
 .piece-icon {
@@ -559,37 +559,6 @@ watch(sideToMove, (newValue) => {
   font-size: 14px;
   word-break: break-all;
   line-height: 1.6;
-}
-
-.chessboard-wrapper {
-  width: 100%;
-  max-width: 832px;
-  aspect-ratio: 1;
-  margin: 0 auto;
-  overflow: hidden;
-}
-
-.chessboard-wrapper :deep(div) {
-  max-width: 100% !important;
-  max-height: 100% !important;
-}
-
-.chessboard-wrapper :deep(.cg-wrap) {
-  width: 100% !important;
-  height: 100% !important;
-  aspect-ratio: 1 !important;
-}
-
-@media (min-width: 900px) {
-  .chessboard-wrapper {
-    width: 832px;
-    height: 832px;
-  }
-
-  .chessboard-wrapper :deep(.cg-wrap) {
-    width: 832px !important;
-    height: 832px !important;
-  }
 }
 
 .neural-net-eval {
