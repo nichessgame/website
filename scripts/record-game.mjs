@@ -54,7 +54,11 @@ Options:
   --start-delay <ms>        Hold on starting position   (default: 1000)
   --end-delay <ms>          Hold on final position      (default: 2000)
   --orientation <color>     Board orientation            (default: white)
-  --letterbox <WxH>         Pad board to WxH with black bars (e.g. 1920x1080)
+  --letterbox <WxH>         Pad board to WxH with bars (e.g. 1920x1080)
+  --background <color>      Letterbox bar color, hex    (default: #000000)
+  --white-name <name>       Show White's name in the letterbox, beside White's side
+  --black-name <name>       Show Black's name in the letterbox, beside Black's side
+  --name-font <family>      CSS font family for names   (default: EB Garamond)
   --no-sound                Omit sound effects
   --dev-server <url>        Dev server URL              (default: http://localhost:3000)
   -h, --help                Show this help
@@ -71,6 +75,10 @@ Examples:
 
   # Fast playback, 60fps, black's perspective
   node scripts/record-game.mjs -m moves.txt --delay 500 --fps 60 --orientation black
+
+  # 1200x1200 output with player names on a dark background
+  node scripts/record-game.mjs -m moves.txt -s 1080 --letterbox 1200x1200 \
+    --background '#1b1b1b' --white-name 'Alice' --black-name 'Bob'
 
   # Start from an encoded custom board position
   # SET_POSITION "0|empty,empty,..."
@@ -91,6 +99,10 @@ function parseArgs() {
     endDelay: 2000,
     orientation: 'white',
     letterbox: null,   // { w, h } if --letterbox was supplied
+    background: '#000000',
+    whiteName: null,
+    blackName: null,
+    nameFont: 'EB Garamond',
     sound: true,
     devServer: 'http://localhost:3000',
   };
@@ -116,6 +128,10 @@ function parseArgs() {
         opts.letterbox = { w: parseInt(m[1]), h: parseInt(m[2]) };
         break;
       }
+      case '--background':             opts.background = next(); break;
+      case '--white-name':             opts.whiteName = next(); break;
+      case '--black-name':             opts.blackName = next(); break;
+      case '--name-font':              opts.nameFont = next(); break;
       case '--no-sound':               opts.sound = false; break;
       case '--dev-server':             opts.devServer = next(); break;
       case '-h': case '--help':        printUsage(); process.exit(0);
@@ -130,6 +146,16 @@ function parseArgs() {
 
   if (!Number.isFinite(opts.animationDuration) || opts.animationDuration <= 0) {
     console.error('Error: --animation-duration must be a positive number of milliseconds.');
+    process.exit(1);
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(opts.background)) {
+    console.error(`Error: --background must be a hex color such as #1b1b1b, got: ${opts.background}`);
+    process.exit(1);
+  }
+
+  if ((opts.whiteName || opts.blackName) && !opts.letterbox) {
+    console.error('Error: --white-name and --black-name need --letterbox to make room for the names.');
     process.exit(1);
   }
 
@@ -255,10 +281,101 @@ function buildAudioTrack(moves, opts, tmpDir) {
 }
 
 // ---------------------------------------------------------------------------
+// Player names overlay
+// ---------------------------------------------------------------------------
+
+function letterboxLayout(opts) {
+  const boardPx = Math.round(opts.size * opts.scale);
+  const { w, h } = opts.letterbox;
+  return {
+    w, h, boardPx,
+    padX: Math.floor((w - boardPx) / 2),
+    padY: Math.floor((h - boardPx) / 2),
+  };
+}
+
+// Render the player names into a transparent PNG covering the whole output
+// frame. The browser does the text layout so any web or system font works.
+async function renderNamesOverlay(browser, opts, tmpDir) {
+  const { w, h, boardPx, padX, padY } = letterboxLayout(opts);
+  const page = await browser.newPage();
+  await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
+
+  const fontUrl = 'https://fonts.googleapis.com/css2?family=' +
+    encodeURIComponent(opts.nameFont).replace(/%20/g, '+') + '&display=block';
+  await page.setContent(`<!doctype html>
+    <html><head>
+      <link rel="stylesheet" href="${fontUrl}">
+      <style>
+        html, body { margin: 0; width: ${w}px; height: ${h}px; background: transparent; overflow: hidden; }
+        .name {
+          position: absolute;
+          left: ${padX}px;
+          width: ${boardPx}px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #f2f2f2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      </style>
+    </head><body></body></html>`, { waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {});
+
+  // White's pieces start at the bottom unless the board is flipped.
+  const topMargin = padY;
+  const bottomMargin = h - padY - boardPx;
+  const bottomName = opts.orientation === 'black' ? opts.blackName : opts.whiteName;
+  const topName = opts.orientation === 'black' ? opts.whiteName : opts.blackName;
+  const labels = [
+    { text: topName, top: 0, height: topMargin },
+    { text: bottomName, top: padY + boardPx, height: bottomMargin },
+  ].filter(label => label.text);
+
+  const fontAvailable = await page.evaluate(async (family, labels) => {
+    for (const { text, top, height } of labels) {
+      const el = document.createElement('div');
+      el.className = 'name';
+      el.textContent = text;
+      Object.assign(el.style, {
+        top: `${top}px`,
+        height: `${height}px`,
+        fontSize: `${Math.round(height * 0.6)}px`,
+        fontFamily: `"${family}", serif`,
+      });
+      document.body.appendChild(el);
+    }
+    const sample = labels.map(label => label.text).join(' ');
+    await document.fonts.load(`32px "${family}"`, sample);
+    await document.fonts.ready;
+
+    // A font that is neither downloaded nor installed falls back to the
+    // generic family, so measuring both fallbacks detects its absence.
+    const ctx = document.createElement('canvas').getContext('2d');
+    const width = font => { ctx.font = font; return ctx.measureText(sample).width; };
+    return ['serif', 'monospace'].some(generic =>
+      width(`32px "${family}", ${generic}`) !== width(`32px ${generic}`));
+  }, opts.nameFont, labels);
+
+  if (!fontAvailable) {
+    throw new Error(
+      `Font "${opts.nameFont}" is not available. It is loaded from Google Fonts, ` +
+      `so check your internet connection or install the font locally.`
+    );
+  }
+
+  const file = path.join(tmpDir, 'names.png');
+  await page.screenshot({ path: file, omitBackground: true });
+  await page.close();
+  return file;
+}
+
+// ---------------------------------------------------------------------------
 // Video encoding
 // ---------------------------------------------------------------------------
 
-function encodeVideo(frames, audioFile, opts, tmpDir) {
+function encodeVideo(frames, audioFile, namesOverlay, opts, tmpDir) {
   const concatFile = path.join(tmpDir, 'concat.txt');
   let content = '';
   for (const { file, frameCount } of frames) {
@@ -282,32 +399,48 @@ function encodeVideo(frames, audioFile, opts, tmpDir) {
     '-f', 'concat', '-safe', '0', '-i', concatFile,
   ];
 
+  let nextInput = 1;
+  const overlayInput = namesOverlay ? nextInput++ : null;
+  if (namesOverlay) {
+    args.push('-i', namesOverlay);
+  }
+  const audioInput = audioFile ? nextInput++ : null;
   if (audioFile) {
     args.push('-i', audioFile);
   }
 
-  // Build the video filter chain.
+  // Build the video filter graph.
   // DevTools screencast frames use CSS-pixel dimensions and ignore the page's
   // device scale factor, so explicitly scale them to the requested output size.
-  // Force BT.709 matrix during the RGB→YUV conversion (swscale default for
-  // sub-HD content is BT.601, which mismatches the BT.709 decode in players).
+  // Letterboxing and the names overlay are composed in RGB so the background
+  // color is exact, then a single conversion to YUV forces the BT.709 matrix
+  // (swscale default for sub-HD content is BT.601, which mismatches the BT.709
+  // decode in players).
   const boardPx = Math.round(opts.size * opts.scale);
-  let vf = `scale=${boardPx}:${boardPx}:flags=lanczos:in_range=full:out_range=limited:out_color_matrix=bt709`;
+  let filter = `[0:v]scale=${boardPx}:${boardPx}:flags=lanczos,format=rgb24`;
   if (opts.letterbox) {
-    const { w, h } = opts.letterbox;
+    const { w, h, padX, padY } = letterboxLayout(opts);
     if (boardPx > w || boardPx > h) {
       throw new Error(
         `Board frame size (${boardPx}x${boardPx}) exceeds letterbox dimensions ` +
         `(${w}x${h}). Reduce --size or --scale so the board fits.`
       );
     }
-    const padX = Math.floor((w - boardPx) / 2);
-    const padY = Math.floor((h - boardPx) / 2);
-    vf += `,pad=${w}:${h}:${padX}:${padY}:black`;
+    filter += `,pad=${w}:${h}:${padX}:${padY}:color=0x${opts.background.slice(1)}`;
+  }
+  if (namesOverlay) {
+    // A single still image input is held for the whole video by overlay's
+    // default eof_action=repeat.
+    filter += `[bg];[bg][${overlayInput}:v]overlay=0:0:format=rgb`;
+  }
+  filter += ',scale=in_range=full:out_range=limited:out_color_matrix=bt709,format=yuv420p[v]';
+
+  args.push('-filter_complex', filter, '-map', '[v]');
+  if (audioFile) {
+    args.push('-map', `${audioInput}:a`);
   }
 
   args.push(
-    '-vf', vf,
     '-c:v', 'libx264',
     '-pix_fmt', 'yuv420p',
     '-colorspace', 'bt709',
@@ -359,6 +492,13 @@ async function main() {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--force-color-profile=srgb'],
     });
+
+    let namesOverlay = null;
+    if (opts.whiteName || opts.blackName) {
+      process.stdout.write('Rendering player names... ');
+      namesOverlay = await renderNamesOverlay(browser, opts, tmpDir);
+      console.log('done');
+    }
 
     const page = await browser.newPage();
     const cdp = await page.createCDPSession();
@@ -566,7 +706,7 @@ async function main() {
     // Encode video
     // ------------------------------------------------------------------
     process.stdout.write('Encoding video... ');
-    const outputPath = encodeVideo(frames, audioFile, opts, tmpDir);
+    const outputPath = encodeVideo(frames, audioFile, namesOverlay, opts, tmpDir);
     console.log('done');
     console.log(`\nSaved to ${outputPath}`);
 

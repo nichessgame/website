@@ -55,6 +55,9 @@ To record all `.txt` files in `scripts/games`, run
 `node scripts/record-all-games.mjs`. See `node scripts/record-game.mjs --help` for
 resolution, timing, orientation, and sound options.
 
+To show player names, add `--letterbox` with `--white-name` and `--black-name`;
+`--background` sets the letterbox color.
+
 ## Rendering benchmarks
 
 Use the rendering benchmark to compare board point-label performance across
