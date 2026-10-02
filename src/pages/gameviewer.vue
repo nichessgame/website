@@ -734,26 +734,6 @@ function formatDate(timestamp) {
   })
 }
 
-// Recording API — used by scripts/record-game.mjs via Puppeteer
-if (typeof window !== 'undefined') {
-  window.__gameRecorder = {
-    loadMoves(text) {
-      moveHistoryText.value = text
-      loadMoveHistory()
-      return parsedMoves.value.map(m => ({ from: m.from, to: m.to, attack: !!m.attack }))
-    },
-    getMoves: () => parsedMoves.value.map(m => ({ from: m.from, to: m.to, attack: !!m.attack })),
-    getCurrentIndex: () => currentMoveIndex.value,
-    setAnimationDuration(duration) {
-      boardConfig.animation.duration = duration
-      boardAPI?.setConfig({ animation: { enabled: true, duration } })
-    },
-    setOrientation(color) {
-      if (color === 'black' && currentOrientation.value === 'white') flipBoard()
-      else if (color === 'white' && currentOrientation.value === 'black') flipBoard()
-    },
-  }
-}
 </script>
 
 <style scoped>

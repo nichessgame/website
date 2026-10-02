@@ -32,6 +32,29 @@ npm run build
 npm run dev
 ```
 
+## Recording games
+
+Start the development server with `npm run dev`, then record a move file with:
+
+```bash
+node scripts/record-game.mjs --moves scripts/sample_moves.txt --output replay.mp4
+```
+
+The script requires `ffmpeg` and `ffprobe` and uses `/gamerecorder`, a board-only
+page with a Puppeteer API. This page is available only in development, has no
+navigation links, and is excluded from production routes and bundles.
+
+Move files contain numbered moves such as `1.e2 -> e4`. For tutorials, they may
+also contain `SET_POSITION "<encoded Nichess board>"` commands, including illegal
+positions. Leading commands set the starting position; commands between moves
+replace the board immediately and do not count toward move numbering or timing.
+These commands are supported only by the recorder. The public Game Viewer
+accepts ordinary legal move histories.
+
+To record all `.txt` files in `scripts/games`, run
+`node scripts/record-all-games.mjs`. See `node scripts/record-game.mjs --help` for
+resolution, timing, orientation, and sound options.
+
 ## Rendering benchmarks
 
 Use the rendering benchmark to compare board point-label performance across

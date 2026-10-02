@@ -3,16 +3,23 @@
 // Record a nichess game replay as a high-quality video at any resolution.
 //
 // Prerequisites:
-//   - ffmpeg installed and on PATH
+//   - ffmpeg and ffprobe installed and on PATH
 //   - Dev server running (npm run dev)
 //
 // Usage:
 //   node scripts/record-game.mjs -m scripts/sample_moves.txt --fps 60 -s 1080 --scale 1 --letterbox 1920x1080 -o replay.mp4
 //
-// The moves file format is the same as the game viewer:
+// Uses the development-only /gamerecorder page. Numbered moves use the same
+// format as the game viewer:
 //   1.e2 -> e4
 //   2.d7 -> d6
 //   3.g1 -> f3
+//
+// A file can also contain a SET_POSITION command with a Nichess encoded board
+// string in double quotes. It replaces the current board position immediately:
+//   SET_POSITION "0|empty,empty,..."
+// SET_POSITION does not count as a numbered move. It may appear at the start
+// of the file to choose the initial position, or between ordinary moves.
 
 import puppeteer from 'puppeteer';
 import { execSync, execFileSync } from 'child_process';
@@ -64,6 +71,9 @@ Examples:
 
   # Fast playback, 60fps, black's perspective
   node scripts/record-game.mjs -m moves.txt --delay 500 --fps 60 --orientation black
+
+  # Start from an encoded custom board position
+  # SET_POSITION "0|empty,empty,..."
 `);
 }
 
@@ -187,9 +197,10 @@ function buildAudioTrack(moves, opts, tmpDir) {
   }
 
   const audioFile = path.join(tmpDir, 'audio.wav');
+  const playableMoves = moves.filter(move => move.type !== 'set_position');
   const totalDurationSec =
     opts.startDelay / 1000 +
-    (moves.length - 1) * (opts.moveDelay / 1000) +
+    (playableMoves.length - 1) * (opts.moveDelay / 1000) +
     opts.endDelay / 1000;
 
   // Build ffmpeg filter_complex — one delayed copy of the appropriate sound per move.
@@ -197,10 +208,10 @@ function buildAudioTrack(moves, opts, tmpDir) {
   const filterLines = [];
   const padLabels = [];
 
-  for (let i = 0; i < moves.length; i++) {
-    const src = moves[i].attack ? captureSound : moveSound;
+  for (let i = 0; i < playableMoves.length; i++) {
+    const src = playableMoves[i].attack ? captureSound : moveSound;
     inputs.push('-i', src);
-    const moveWindowMs = i === moves.length - 1 ? opts.endDelay : opts.moveDelay;
+    const moveWindowMs = i === playableMoves.length - 1 ? opts.endDelay : opts.moveDelay;
     const animationDurationMs = Math.min(opts.animationDuration, moveWindowMs);
     const animationEndMs = opts.startDelay + i * opts.moveDelay + animationDurationMs;
     const delayMs = Math.max(0, animationEndMs - audioDurationMs.get(src));
@@ -209,12 +220,12 @@ function buildAudioTrack(moves, opts, tmpDir) {
   }
 
   let filterComplex;
-  if (moves.length === 1) {
+  if (playableMoves.length === 1) {
     filterComplex = filterLines[0].replace(`[a0]`, `[mixed]`);
   } else {
     filterComplex =
       filterLines.join('; ') +
-      `; ${padLabels.join('')}amix=inputs=${moves.length}:normalize=0:duration=longest[mixed]`;
+      `; ${padLabels.join('')}amix=inputs=${playableMoves.length}:normalize=0:duration=longest[mixed]`;
   }
   // amix ends after the final sound effect; pad it so `-shortest` does not
   // truncate the video's requested final-position hold.
@@ -368,7 +379,7 @@ async function main() {
     // ------------------------------------------------------------------
     // Navigate & wait for board
     // ------------------------------------------------------------------
-    const url = `${opts.devServer}/gameviewer`;
+    const url = `${opts.devServer}/gamerecorder`;
     console.log(`Opening ${url} ...`);
 
     try {
@@ -465,9 +476,18 @@ async function main() {
     const startingFrame = await boardEl.screenshot({ encoding: 'base64' });
     capture(startingFrame, Math.max(1, Math.round(opts.startDelay * opts.fps / 1000)));
 
-    // Each move
+    // Each timeline step. SET_POSITION changes the board immediately and does
+    // not consume a move's animation or hold time.
+    const playableMoveCount = moves.filter(move => move.type !== 'set_position').length;
+    let playableMoveIndex = 0;
     for (let i = 0; i < moves.length; i++) {
-      const isLast = i === moves.length - 1;
+      if (moves[i].type === 'set_position') {
+        await page.evaluate(() => window.__gameRecorder.stepForward());
+        await sleep(100);
+        continue;
+      }
+
+      const isLast = playableMoveIndex === playableMoveCount - 1;
       const totalMoveTimeMs = isLast ? opts.endDelay : opts.moveDelay;
       const outputAnimationMs = Math.min(opts.animationDuration, totalMoveTimeMs);
       const animFrameCount = Math.max(
@@ -487,7 +507,7 @@ async function main() {
       }, captureAnimationMs);
 
       screencastFrames = [];
-      await page.keyboard.press('ArrowRight');
+      await page.evaluate(() => window.__gameRecorder.stepForward());
       await sleep(captureAnimationMs + 100);
 
       if (screencastFrames.length === 0) {
@@ -526,7 +546,8 @@ async function main() {
         await capture(totalMoveFrames);
       }
 
-      process.stdout.write(`\rCapturing: move ${i + 1}/${moves.length} (${animFrameCount} anim frames)`);
+      process.stdout.write(`\rCapturing: move ${playableMoveIndex + 1}/${playableMoveCount} (${animFrameCount} anim frames)`);
+      playableMoveIndex++;
     }
 
     console.log('\nCapture complete');

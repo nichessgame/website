@@ -31,6 +31,18 @@ const router = createRouter({
   routes: layoutRoutes,
 })
 
+// Recording scripts use this board-only page on the local dev server.
+// Vite removes this branch and its component from production builds.
+if (import.meta.env.DEV) {
+  for (const route of setupLayouts([{
+    path: '/gamerecorder',
+    name: 'gamerecorder',
+    component: () => import('../pages/gamerecorder.vue'),
+  }])) {
+    router.addRoute(route)
+  }
+}
+
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {

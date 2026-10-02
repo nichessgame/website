@@ -21,7 +21,10 @@ const staticRoutes = ['/', '/rules', '/faq', '/donate', '/tools', '/urbit', '/ed
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    VueRouter(),
+    VueRouter({
+      // The recorder is registered manually in development only.
+      exclude: ['**/gamerecorder.vue'],
+    }),
     Layouts(),
     Vue({
       template: { transformAssetUrls },
