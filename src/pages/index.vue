@@ -121,7 +121,7 @@ useHead({
 .hero h1 {
   color: var(--site-text-strong);
   font-size: clamp(2.75rem, 7vw, 5.25rem);
-  font-weight: 620;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1;
   margin: 0;
@@ -158,7 +158,7 @@ useHead({
   padding: 0 18px;
   font: inherit;
   font-size: 0.94rem;
-  font-weight: 680;
+  font-weight: 700;
   line-height: 1.2;
   text-decoration: none;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
@@ -201,7 +201,7 @@ useHead({
 .info-panel h2 {
   color: var(--site-text-strong);
   font-size: clamp(1.05rem, 1.55vw, 1.22rem);
-  font-weight: 680;
+  font-weight: 700;
   line-height: 1.2;
   margin: 0 0 10px;
 }

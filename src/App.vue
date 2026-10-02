@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
 .brand-link {
   color: var(--site-text-muted);
   font-size: 0.92rem;
-  font-weight: 620;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1;
   margin-right: 30px;
@@ -140,7 +140,7 @@ onBeforeUnmount(() => {
 .nav-link {
   color: var(--site-text-muted);
   font-size: 0.9rem;
-  font-weight: 560;
+  font-weight: 700;
   letter-spacing: 0;
   min-height: 40px;
   min-width: auto;
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   color: var(--site-text-muted);
   font-size: 0.92rem;
-  font-weight: 560;
+  font-weight: 700;
   min-height: 48px;
   text-transform: uppercase;
 }

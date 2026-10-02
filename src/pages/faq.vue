@@ -96,7 +96,7 @@ summary {
   cursor: pointer;
   display: flex;
   font-size: 0.98rem;
-  font-weight: 650;
+  font-weight: 700;
   gap: 14px;
   justify-content: space-between;
   line-height: 1.35;

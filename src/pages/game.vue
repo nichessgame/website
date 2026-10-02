@@ -712,7 +712,7 @@ const props = defineProps({
 
 .nodes-count {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--site-text);
   min-width: 60px;
   text-align: left;
@@ -779,7 +779,7 @@ const props = defineProps({
 .history-label {
   color: var(--site-text);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .history-buttons {
@@ -921,7 +921,7 @@ const props = defineProps({
 .saved-game-number {
   color: var(--site-text-subtle);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   min-width: 30px;
 }
 
@@ -940,7 +940,7 @@ const props = defineProps({
 .saved-game-over {
   color: var(--site-gold);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .saved-game-actions {

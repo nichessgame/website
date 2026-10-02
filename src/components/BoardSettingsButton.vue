@@ -127,7 +127,7 @@ function toggleSound(enabled) {
 
 .board-settings-title {
   font-size: 1rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1.2;
   padding: 0;
@@ -167,7 +167,7 @@ function toggleSound(enabled) {
   color: var(--site-text);
   display: flex;
   font-size: 0.92rem;
-  font-weight: 560;
+  font-weight: 700;
   gap: 10px;
   letter-spacing: 0;
 }

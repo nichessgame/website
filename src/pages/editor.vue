@@ -631,7 +631,7 @@ watch(sideToMove, (newValue) => {
   color: var(--site-text-subtle);
   font-size: 14px;
   margin-bottom: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .evaluation-values {

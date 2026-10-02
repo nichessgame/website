@@ -848,7 +848,7 @@ function formatDate(timestamp) {
 .history-label {
   color: var(--site-text);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .history-buttons {
@@ -1030,7 +1030,7 @@ function formatDate(timestamp) {
 .saved-game-number {
   color: var(--site-text-subtle);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   min-width: 30px;
 }
 
@@ -1054,7 +1054,7 @@ function formatDate(timestamp) {
 .saved-game-over {
   color: var(--site-gold);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .saved-game-actions {

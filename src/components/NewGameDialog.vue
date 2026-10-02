@@ -152,7 +152,7 @@ const startGame = () => {
 .dialog-title {
   color: var(--site-text-strong);
   font-size: 1rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1.2;
   padding: 0;
@@ -184,7 +184,7 @@ const startGame = () => {
 .section-label {
   color: var(--site-text);
   font-size: 0.92rem;
-  font-weight: 560;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -204,7 +204,7 @@ const startGame = () => {
   cursor: pointer;
   font: inherit;
   font-size: 0.94rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0;
   min-height: 46px;
   padding: 0 14px;
