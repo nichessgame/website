@@ -78,8 +78,9 @@
 
     <!-- Analysis Tab -->
     <div v-show="activeTab === 'analysis'" class="tab-content">
-      <div v-if="modelDownloadRequired && !modelLoading" class="download-warning mb-3">
-        <span>Note: The 40 MB AI model will be downloaded when you first use eval.</span>
+      <div v-if="modelDownloadRequired && !modelLoading" class="site-note mb-3">
+        <v-icon icon="$mdiInformation" class="site-note-icon" />
+        <span><strong>The 40 MB AI model will be downloaded when you first use eval.</strong></span>
       </div>
 
       <div v-if="modelLoading" class="model-status mb-3">
@@ -991,17 +992,6 @@ function formatDate(timestamp) {
 }
 
 /* Analysis / Evaluation styles */
-.download-warning {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  background-color: var(--site-warning-bg);
-  border: 1px solid var(--site-warning-border);
-  border-radius: 6px;
-  color: var(--site-warning);
-  font-size: 14px;
-}
-
 .model-status {
   padding: 12px;
   background: var(--board-subpanel-bg);

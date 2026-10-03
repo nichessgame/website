@@ -234,6 +234,27 @@
   background: #ffffff;
 }
 
+/* Quiet informational note, e.g. the AI model download notice */
+.site-note {
+  align-items: flex-start;
+  color: var(--site-text-subtle);
+  display: flex;
+  font-size: 0.82rem;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.site-note strong {
+  color: var(--site-text);
+  font-weight: 500;
+}
+
+.site-note-icon.v-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+  margin-top: 1px;
+}
+
 .content-stack {
   display: grid;
   gap: 12px;

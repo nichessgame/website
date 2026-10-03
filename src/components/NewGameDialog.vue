@@ -17,46 +17,49 @@
 
       <v-card-text class="dialog-text">
         <section class="dialog-section" aria-labelledby="color-label">
-          <div id="color-label" class="section-label">Color</div>
-          <div class="color-toggle" role="radiogroup" aria-labelledby="color-label">
+          <div id="color-label" class="section-label">Play as</div>
+          <div class="option-grid color-grid" role="radiogroup" aria-labelledby="color-label">
             <button
-              :class="['color-option', { 'color-option-selected': myColor === 'white' }]"
+              v-for="option in colorOptions"
+              :key="option.value"
+              :class="['dialog-option', 'color-option', { 'dialog-option-selected': myColor === option.value }]"
               type="button"
               role="radio"
-              :aria-checked="myColor === 'white'"
-              @click="myColor = 'white'"
+              :aria-checked="myColor === option.value"
+              @click="myColor = option.value"
             >
-              White
-            </button>
-            <button
-              :class="['color-option', { 'color-option-selected': myColor === 'black' }]"
-              type="button"
-              role="radio"
-              :aria-checked="myColor === 'black'"
-              @click="myColor = 'black'"
-            >
-              Black
+              <img :src="option.image" alt="" class="color-piece" />
+              {{ option.label }}
             </button>
           </div>
         </section>
 
-        <v-select
-          v-model="selectedDifficultyLabel"
-          :items="difficultyOptions"
-          label="Difficulty"
-          variant="outlined"
-          density="compact"
-          hide-details
-        ></v-select>
+        <section class="dialog-section" aria-labelledby="difficulty-label">
+          <div id="difficulty-label" class="section-label">Difficulty</div>
+          <div class="option-grid difficulty-grid" role="radiogroup" aria-labelledby="difficulty-label">
+            <button
+              v-for="option in difficultyOptions"
+              :key="option.level"
+              :class="['dialog-option', { 'dialog-option-selected': selectedDifficulty.level === option.level }]"
+              type="button"
+              role="radio"
+              :aria-checked="selectedDifficulty.level === option.level"
+              :aria-label="option.label"
+              @click="appStore.setDifficultyByLevel(option.level)"
+            >
+              {{ option.level }}
+            </button>
+          </div>
+          <div class="difficulty-hint">AI thinks {{ selectedDifficulty.timeInSeconds }} seconds per move</div>
+        </section>
 
-        <v-alert
-          v-if="modelDownloadRequired"
-          class="model-alert"
-          density="compact"
-        >
-          The 40 MB AI model will be downloaded when you start the game. This might take a while if
-          your internet is slow.
-        </v-alert>
+        <div v-if="modelDownloadRequired" class="site-note">
+          <v-icon icon="$mdiInformation" class="site-note-icon" />
+          <span>
+            <strong>The 40 MB AI model will be downloaded when you start the game.</strong>
+            This might take a while if your internet is slow.
+          </span>
+        </div>
       </v-card-text>
 
       <v-card-actions class="dialog-actions">
@@ -73,6 +76,8 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { AIDifficulty } from '../AI/common'
+import whiteKing from '@/assets/wK.svg'
+import blackKing from '@/assets/bk.svg'
 
 const props = defineProps({
   modelValue: Boolean
@@ -95,20 +100,13 @@ const appStore = useAppStore()
 const modelReady = computed(() => appStore.modelReady)
 const modelDownloadRequired = computed(() => !modelReady.value && appStore.modelCached === false)
 
-const difficultyOptions = AIDifficulty.getAllLabels()
+const difficultyOptions = AIDifficulty.getAllConfigs()
+const selectedDifficulty = computed(() => appStore.selectedDifficulty)
 
-// Work with labels in the UI, but store the full config
-const selectedDifficultyLabel = computed({
-  get() {
-    return appStore.selectedDifficulty.label
-  },
-  set(label) {
-    const config = AIDifficulty.getAllConfigs().find(c => c.label === label)
-    if (config) {
-      appStore.setDifficulty(config)
-    }
-  }
-})
+const colorOptions = [
+  { value: 'white', label: 'White', image: whiteKing },
+  { value: 'black', label: 'Black', image: blackKing },
+]
 
 const myColor = computed({
   get() {
@@ -135,9 +133,10 @@ const startGame = () => {
 
 <style scoped>
 .new-game-dialog {
-  background: #17191f;
+  background: #1a1c21;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   color: var(--site-text-strong);
 }
 
@@ -145,13 +144,12 @@ const startGame = () => {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  min-height: 52px;
-  padding: 8px 10px 6px 18px;
+  padding: 16px 12px 0 22px;
 }
 
 .dialog-title {
   color: var(--site-text-strong);
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.2;
@@ -159,7 +157,7 @@ const startGame = () => {
 }
 
 .close-button {
-  color: var(--site-text-muted);
+  color: var(--site-text-subtle);
 }
 
 .close-button:hover {
@@ -168,105 +166,109 @@ const startGame = () => {
 
 .dialog-text {
   display: grid;
-  gap: 14px;
-  padding: 10px 18px 14px;
+  gap: 20px;
+  padding: 16px 22px 20px !important;
 }
 
 .dialog-section {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 6px;
   display: grid;
-  gap: 10px;
-  padding: 12px;
+  gap: 8px;
 }
 
 .section-label {
-  color: var(--site-text);
-  font-size: 0.92rem;
+  color: var(--site-text-subtle);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.color-toggle {
+.option-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  width: 100%;
 }
 
-.color-option {
+.color-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.difficulty-grid {
+  gap: 6px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.dialog-option {
+  align-items: center;
   appearance: none;
   background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 6px;
-  color: var(--site-text);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--site-text-muted);
   cursor: pointer;
+  display: flex;
   font: inherit;
   font-size: 0.94rem;
   font-weight: 700;
+  justify-content: center;
   letter-spacing: 0;
-  min-height: 46px;
-  padding: 0 14px;
-  position: relative;
-  text-align: center;
-  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
+  min-height: 40px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
-.color-option:hover {
+.dialog-option:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
 
-.color-option-selected {
-  background: rgba(226, 232, 240, 0.1);
-  border-color: rgba(226, 232, 240, 0.76);
-  box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.16);
-  color: var(--site-text-strong);
+.dialog-option:focus-visible {
+  outline: 2px solid rgba(226, 232, 240, 0.6);
+  outline-offset: 2px;
 }
 
-.color-option-selected:hover {
-  background: rgba(226, 232, 240, 0.14);
-  border-color: var(--site-text-strong);
+.dialog-option-selected,
+.dialog-option-selected:hover {
+  background: rgba(226, 232, 240, 0.1);
+  border-color: rgba(226, 232, 240, 0.85);
   color: #ffffff;
 }
 
-.dialog-text :deep(.v-field) {
-  color: var(--site-text-strong);
+.color-option {
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0 10px;
 }
 
-.dialog-text :deep(.v-label) {
-  color: var(--site-text-muted);
-  opacity: 1;
+.color-piece {
+  height: 48px;
+  width: 48px;
+}
+
+.difficulty-hint {
+  color: var(--site-text-subtle);
+  font-size: 0.82rem;
 }
 
 .dialog-actions {
-  padding: 0 18px 18px;
-}
-
-.model-alert {
-  background: var(--site-warning-bg);
-  border: 1px solid var(--site-warning-border);
-  border-radius: 6px;
-  color: var(--site-warning);
-  font-size: 0.88rem;
-  line-height: 1.45;
-  text-align: left;
-}
-
-.model-alert :deep(.v-alert__content) {
-  text-align: left;
+  padding: 0 22px 22px;
 }
 
 @media (max-width: 420px) {
-  .color-toggle {
-    gap: 8px;
+  .dialog-header {
+    padding-left: 18px;
   }
 
-  .color-option {
-    min-height: 44px;
-    padding: 0 8px;
+  .dialog-text {
+    padding: 14px 18px 18px !important;
+  }
+
+  .dialog-actions {
+    padding: 0 18px 18px;
+  }
+
+  .color-piece {
+    height: 40px;
+    width: 40px;
   }
 }
 </style>
