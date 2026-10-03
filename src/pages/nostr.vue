@@ -1,5 +1,9 @@
 <template>
   <v-container max-width="var(--board-column-width)" class="pa-0 board-column">
+    <!-- Always rendered at a fixed height, so showing the result doesn't move the board -->
+    <div class="game-result-slot" aria-live="polite">
+      <span v-if="gameOver">{{ gameResultText }}</span>
+    </div>
     <TheChessboard
       @board-created="handleBoardCreated"
       @move="handleMove"
@@ -9,7 +13,6 @@
       :board-config="boardConfig"
       :reactive-config="true"
       :key="currentGameId"
-      class="mt-10"
     />
 
     <!-- Control Row -->
@@ -245,6 +248,7 @@ const activeTab = ref('moves')
 const joinGameId = ref('')
 const confirmingDeleteId = ref(null)
 const gameOver = ref(false)
+const gameResultText = ref('')
 const savedNostrGames = computed(() => appStore.savedNostrGames)
 
 // Nostr config
@@ -424,7 +428,7 @@ function applyNostrMove({ move, fen }) {
     const isAttack = move.attack || false
     moveHistory.value.push({ from: move.from, to: move.to, attack: isAttack })
     currentMoveIndex.value = moveHistory.value.length
-    gameOver.value = boardAPI.getIsGameOver()
+    updateGameOver()
     if (!restoringMoves && appStore.soundEnabled) {
       new Audio(isAttack ? CaptureSound : MoveSound).play().catch(() => {})
     }
@@ -455,11 +459,26 @@ function updateMovable() {
   }
 }
 
+// Call with the board at the final position
+function updateGameOver() {
+  gameOver.value = boardAPI.getIsGameOver()
+  if (!gameOver.value) {
+    gameResultText.value = ''
+    return
+  }
+
+  const winner = boardAPI.getWinner()
+  if (winner === 'white') gameResultText.value = '1 - 0'
+  else if (winner === 'black') gameResultText.value = '0 - 1'
+  else gameResultText.value = '½ - ½'
+}
+
 function handleBoardCreated(api) {
   boardAPI = api
   moveHistory.value = []
   currentMoveIndex.value = 0
   gameOver.value = false
+  gameResultText.value = ''
 }
 
 async function handleMove(move) {
@@ -477,19 +496,19 @@ async function handleMove(move) {
     }
   }
 
-  gameOver.value = boardAPI.getIsGameOver()
+  updateGameOver()
   const fen = boardAPI.getFen()
   await sendGame({ move: { from: move.from, to: move.to, attack: move.attack }, fen })
   saveGameToStorage()
 }
 
 function handleCheckmate() {
-  gameOver.value = true
+  updateGameOver()
   saveGameToStorage()
 }
 
 function handleDraw() {
-  gameOver.value = true
+  updateGameOver()
   saveGameToStorage()
 }
 
@@ -679,6 +698,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* Takes the place of the board's top margin (mt-10) */
+.game-result-slot {
+  align-items: center;
+  color: var(--site-text-strong);
+  display: flex;
+  /* Grows with the board, which is sized from the viewport height */
+  font-size: clamp(16px, 2.2vh, 26px);
+  font-weight: 700;
+  height: 40px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
 .relay-status {
   color: var(--site-error);
   font-size: 13px;
@@ -734,7 +766,6 @@ onBeforeUnmount(() => {
     gap: 8px;
     padding-right: 8px;
   }
-
 }
 
 .tabs-no-scroll {

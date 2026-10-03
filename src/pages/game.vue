@@ -1,6 +1,10 @@
 <template>
   <v-container max-width="var(--board-column-width)" class="pa-0 board-column">
     <NewGameDialog v-model="showNewGameDialog" />
+    <!-- Always rendered at a fixed height, so showing the result doesn't move the board -->
+    <div class="game-result-slot" aria-live="polite">
+      <span v-if="gameOver">{{ gameResultText }}</span>
+    </div>
     <TheChessboard
       @board-created="handleBoardCreated"
       @move="handleMove"
@@ -10,7 +14,6 @@
       :board-config="boardConfig"
       :reactive-config="true"
       :key="props.gameId"
-      class="mt-10"
     />
 
     <div v-if="!modelReady" class="model-status mt-4">
@@ -109,7 +112,7 @@
       <div class="control-row-right">
         <v-btn
           @click="showNewGameDialog = true"
-          class="board-action-button"
+          :class="['board-action-button', { 'game-over-button': gameOver }]"
           variant="flat"
         >
           <v-icon icon="$mdiSwordCross" />
@@ -261,6 +264,7 @@ const aiHistory = [];
 const showNewGameDialog = ref(false)
 const numNodesExplored = ref(0)
 const gameOver = ref(false)
+const gameResultText = ref('')
 const modelLoading = computed(() => appStore.modelLoading)
 const modelReady = computed(() => appStore.modelReady)
 const currentMoveIndex = ref(0)
@@ -404,6 +408,20 @@ function sendPendingAIRequest() {
   pendingAIRequest = null;
 }
 
+// Call with the board at the final position
+function updateGameOver() {
+  gameOver.value = boardAPI.getIsGameOver();
+  if (!gameOver.value) {
+    gameResultText.value = '';
+    return;
+  }
+
+  const winner = boardAPI.getWinner();
+  if (winner === 'white') gameResultText.value = '1 - 0';
+  else if (winner === 'black') gameResultText.value = '0 - 1';
+  else gameResultText.value = '½ - ½';
+}
+
 function handleBoardCreated(api) {
   boardAPI = api;
   moveHistory.value = [];
@@ -412,6 +430,7 @@ function handleBoardCreated(api) {
   console.log('aih')
   console.log(aiHistory);
   gameOver.value = false;
+  gameResultText.value = '';
   numNodesExplored.value = 0;
 
   // Reset AI request tracking for new game
@@ -437,7 +456,7 @@ function handleBoardCreated(api) {
       boardAPI.move({ from: move.from, to: move.to, promotion: undefined });
     }
 
-    gameOver.value = savedGame.gameOver || boardAPI.getIsGameOver();
+    updateGameOver();
     isRestoring = false;
 
     // If it's AI's turn and game isn't over, request AI move
@@ -468,7 +487,7 @@ async function handleMove(move) {
   aiHistory.push([chessSquares.indexOf(move.from), chessSquares.indexOf(move.to)]);
   currentMoveIndex.value = moveHistory.value.length;
 
-  gameOver.value = boardAPI.getIsGameOver();
+  updateGameOver();
 
   if (isRestoring) return;
 
@@ -491,13 +510,13 @@ async function handleMove(move) {
 }
 
 function handleCheckmate(isMated) {
-  gameOver.value = true;
+  updateGameOver();
   saveGameToStorage();
   console.log(isMated);
 }
 
 function handleDraw() {
-  gameOver.value = true;
+  updateGameOver();
   saveGameToStorage();
   console.log('draw');
 }
@@ -708,6 +727,31 @@ const props = defineProps({
   align-items: center;
   justify-content: flex-end;
   flex: 1;
+}
+
+.game-over-button.v-btn {
+  background: var(--site-gold-bg);
+  border-color: var(--site-gold);
+  color: var(--site-gold);
+}
+
+.game-over-button.v-btn:hover {
+  background: rgba(242, 201, 76, 0.2);
+  border-color: var(--site-gold-hover);
+  color: var(--site-gold-hover);
+}
+
+/* Takes the place of the board's top margin (mt-10) */
+.game-result-slot {
+  align-items: center;
+  color: var(--site-text-strong);
+  display: flex;
+  /* Grows with the board, which is sized from the viewport height */
+  font-size: clamp(16px, 2.2vh, 26px);
+  font-weight: 700;
+  height: 40px;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .nodes-count {
