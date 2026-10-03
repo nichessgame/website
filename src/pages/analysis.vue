@@ -89,13 +89,7 @@
       </div>
 
       <div class="analysis-controls">
-        <v-switch
-          v-model="analysisEnabled"
-          label="Analysis"
-          color="primary"
-          density="compact"
-          hide-details
-        ></v-switch>
+        <SiteSwitch v-model="analysisEnabled" label="Analysis" />
 
         <v-text-field
           v-model.number="maxNodes"
@@ -261,6 +255,7 @@ import { AgentCache } from '@/AI/agent_cache';
 import MoveSound from '@/assets/Move.ogg';
 import CaptureSound from '@/assets/Capture.ogg';
 import { useBoardDisplaySettings } from '@/composables/useBoardDisplaySettings';
+import SiteSwitch from '@/components/SiteSwitch.vue';
 import BoardSettingsButton from '@/components/BoardSettingsButton.vue';
 
 const appStore = useAppStore();

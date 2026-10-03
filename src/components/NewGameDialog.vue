@@ -1,11 +1,11 @@
 <template>
-  <v-dialog v-model="dialog" max-width="460">
-    <v-card class="new-game-dialog">
-      <div class="dialog-header">
-        <v-card-title class="dialog-title">New game</v-card-title>
+  <v-dialog v-model="dialog" max-width="440">
+    <v-card class="site-dialog">
+      <div class="site-dialog-header">
+        <v-card-title class="site-dialog-title">New game</v-card-title>
         <v-btn
           aria-label="Close new game dialog"
-          class="close-button"
+          class="site-dialog-close"
           icon
           size="small"
           variant="text"
@@ -15,14 +15,14 @@
         </v-btn>
       </div>
 
-      <v-card-text class="dialog-text">
-        <section class="dialog-section" aria-labelledby="color-label">
-          <div id="color-label" class="section-label">Play as</div>
+      <v-card-text class="site-dialog-body">
+        <section class="site-dialog-section" aria-labelledby="color-label">
+          <div id="color-label" class="site-dialog-label">Play as</div>
           <div class="option-grid color-grid" role="radiogroup" aria-labelledby="color-label">
             <button
               v-for="option in colorOptions"
               :key="option.value"
-              :class="['dialog-option', 'color-option', { 'dialog-option-selected': myColor === option.value }]"
+              :class="['site-option', 'color-option', { 'site-option-selected': myColor === option.value }]"
               type="button"
               role="radio"
               :aria-checked="myColor === option.value"
@@ -34,13 +34,13 @@
           </div>
         </section>
 
-        <section class="dialog-section" aria-labelledby="difficulty-label">
-          <div id="difficulty-label" class="section-label">Difficulty</div>
+        <section class="site-dialog-section" aria-labelledby="difficulty-label">
+          <div id="difficulty-label" class="site-dialog-label">Difficulty</div>
           <div class="option-grid difficulty-grid" role="radiogroup" aria-labelledby="difficulty-label">
             <button
               v-for="option in difficultyOptions"
               :key="option.level"
-              :class="['dialog-option', { 'dialog-option-selected': selectedDifficulty.level === option.level }]"
+              :class="['site-option', { 'site-option-selected': selectedDifficulty.level === option.level }]"
               type="button"
               role="radio"
               :aria-checked="selectedDifficulty.level === option.level"
@@ -62,7 +62,7 @@
         </div>
       </v-card-text>
 
-      <v-card-actions class="dialog-actions">
+      <v-card-actions class="site-dialog-actions">
         <v-btn block class="site-button-primary" size="large" variant="flat" @click="startGame">
           Play
         </v-btn>
@@ -132,57 +132,6 @@ const startGame = () => {
 </script>
 
 <style scoped>
-.new-game-dialog {
-  background: #1a1c21;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-  color: var(--site-text-strong);
-}
-
-.dialog-header {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  padding: 16px 12px 0 22px;
-}
-
-.dialog-title {
-  color: var(--site-text-strong);
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1.2;
-  padding: 0;
-}
-
-.close-button {
-  color: var(--site-text-subtle);
-}
-
-.close-button:hover {
-  color: #ffffff;
-}
-
-.dialog-text {
-  display: grid;
-  gap: 20px;
-  padding: 16px 22px 20px !important;
-}
-
-.dialog-section {
-  display: grid;
-  gap: 8px;
-}
-
-.section-label {
-  color: var(--site-text-subtle);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .option-grid {
   display: grid;
   gap: 10px;
@@ -195,42 +144,6 @@ const startGame = () => {
 .difficulty-grid {
   gap: 6px;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.dialog-option {
-  align-items: center;
-  appearance: none;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: var(--site-text-muted);
-  cursor: pointer;
-  display: flex;
-  font: inherit;
-  font-size: 0.94rem;
-  font-weight: 700;
-  justify-content: center;
-  letter-spacing: 0;
-  min-height: 40px;
-  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
-}
-
-.dialog-option:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
-}
-
-.dialog-option:focus-visible {
-  outline: 2px solid rgba(226, 232, 240, 0.6);
-  outline-offset: 2px;
-}
-
-.dialog-option-selected,
-.dialog-option-selected:hover {
-  background: rgba(226, 232, 240, 0.1);
-  border-color: rgba(226, 232, 240, 0.85);
-  color: #ffffff;
 }
 
 .color-option {
@@ -249,23 +162,7 @@ const startGame = () => {
   font-size: 0.82rem;
 }
 
-.dialog-actions {
-  padding: 0 22px 22px;
-}
-
 @media (max-width: 420px) {
-  .dialog-header {
-    padding-left: 18px;
-  }
-
-  .dialog-text {
-    padding: 14px 18px 18px !important;
-  }
-
-  .dialog-actions {
-    padding: 0 18px 18px;
-  }
-
   .color-piece {
     height: 40px;
     width: 40px;

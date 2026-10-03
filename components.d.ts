@@ -14,5 +14,6 @@ declare module 'vue' {
     NewGameDialog: typeof import('./src/components/NewGameDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SiteSwitch: typeof import('./src/components/SiteSwitch.vue')['default']
   }
 }

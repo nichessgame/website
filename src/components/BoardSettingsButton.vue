@@ -8,13 +8,13 @@
     <v-icon icon="$mdiCog" />
   </v-btn>
 
-  <v-dialog v-model="dialogOpen" max-width="420">
-    <v-card class="board-settings-card">
-      <div class="board-settings-header">
-        <v-card-title class="board-settings-title">Board settings</v-card-title>
+  <v-dialog v-model="dialogOpen" max-width="440">
+    <v-card class="site-dialog">
+      <div class="site-dialog-header">
+        <v-card-title class="site-dialog-title">Board settings</v-card-title>
         <v-btn
           aria-label="Close board settings"
-          class="close-button"
+          class="site-dialog-close"
           icon
           size="small"
           variant="text"
@@ -24,52 +24,53 @@
         </v-btn>
       </div>
 
-      <v-card-text class="board-settings-content">
-        <v-select
-          v-model="selectedPointsTextTheme"
-          :items="POINTS_TEXT_THEMES"
-          item-title="title"
-          item-value="value"
-          label="Text style"
-          variant="outlined"
-          density="compact"
-          hide-details
-        />
-
-        <div class="settings-row toggle-row">
-          <div class="toggle-label">
-            <v-icon icon="$mdiLightningBolt" size="20" />
-            <span>Ability points</span>
-          </div>
-
-          <v-switch
-            :model-value="appStore.abilityPointsVisible"
-            color="primary"
+      <v-card-text class="site-dialog-body">
+        <section class="site-dialog-section">
+          <div id="text-style-label" class="site-dialog-label">Text style</div>
+          <v-select
+            v-model="selectedPointsTextTheme"
+            :items="POINTS_TEXT_THEMES"
+            item-title="title"
+            item-value="value"
+            aria-labelledby="text-style-label"
+            variant="outlined"
             density="compact"
             hide-details
-            inset
-            @update:model-value="appStore.setAbilityPointsVisible"
           />
-        </div>
+        </section>
 
-        <div class="settings-row sound-row">
-          <div class="toggle-label">
-            <v-icon
-              :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'"
-              size="20"
+        <section class="site-dialog-section">
+          <div class="site-dialog-label">Display</div>
+
+          <div class="toggle-row">
+            <div class="toggle-label">
+              <v-icon icon="$mdiLightningBolt" size="20" />
+              <span>Ability points</span>
+            </div>
+
+            <SiteSwitch
+              :model-value="appStore.abilityPointsVisible"
+              aria-label="Ability points"
+              @update:model-value="appStore.setAbilityPointsVisible"
             />
-            <span>Sound</span>
           </div>
 
-          <v-switch
-            :model-value="appStore.soundEnabled"
-            color="primary"
-            density="compact"
-            hide-details
-            inset
-            @update:model-value="toggleSound"
-          />
-        </div>
+          <div class="toggle-row">
+            <div class="toggle-label">
+              <v-icon
+                :icon="appStore.soundEnabled ? '$mdiVolumeHigh' : '$mdiVolumeOff'"
+                size="20"
+              />
+              <span>Sound</span>
+            </div>
+
+            <SiteSwitch
+              :model-value="appStore.soundEnabled"
+              aria-label="Sound"
+              @update:model-value="toggleSound"
+            />
+          </div>
+        </section>
 
         <v-btn
           block
@@ -89,6 +90,7 @@
 import { computed, ref } from 'vue'
 import { POINTS_TEXT_THEMES, useAppStore } from '@/stores/app'
 import MoveSound from '@/assets/Move.ogg'
+import SiteSwitch from '@/components/SiteSwitch.vue'
 
 const emit = defineEmits(['flip-board'])
 const appStore = useAppStore()
@@ -110,56 +112,11 @@ function toggleSound(enabled) {
 </script>
 
 <style scoped>
-.board-settings-card {
-  background: #17191f;
-  color: var(--site-text-strong);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-.board-settings-header {
+.toggle-row {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  min-height: 52px;
-  padding: 8px 10px 6px 18px;
-}
-
-.board-settings-title {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1.2;
-  padding: 0;
-}
-
-.close-button {
-  color: var(--site-text-muted);
-}
-
-.close-button:hover {
-  color: #ffffff;
-}
-
-.board-settings-content {
-  display: grid;
-  gap: 14px;
-  padding: 10px 18px 18px;
-}
-
-.settings-row {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 6px;
-  display: flex;
-  min-height: 48px;
-  padding: 6px 10px 6px 12px;
-}
-
-.toggle-row,
-.sound-row {
-  justify-content: space-between;
+  min-height: 44px;
 }
 
 .toggle-label {

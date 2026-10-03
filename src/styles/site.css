@@ -86,6 +86,9 @@
   --site-gold-hover: #f7da7e;
   --site-gold-bg: rgba(242, 201, 76, 0.12);
 
+  /* Switch (SiteSwitch) track when on */
+  --site-switch: #3b82f6;
+
   /* Status messages */
   --site-success: #66bb6a;
   --site-success-bg: rgba(102, 187, 106, 0.15);
@@ -219,6 +222,112 @@
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.16);
   color: #ffffff;
+}
+
+/* Dialogs (new game, board settings) */
+.site-dialog {
+  background: #1a1c21 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
+  color: var(--site-text-strong) !important;
+}
+
+.site-dialog-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 12px 0 22px;
+}
+
+.site-dialog-title.v-card-title {
+  color: var(--site-text-strong);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.2;
+  padding: 0;
+}
+
+.site-dialog-close.v-btn {
+  color: var(--site-text-subtle);
+}
+
+.site-dialog-close.v-btn:hover {
+  color: #ffffff;
+}
+
+.site-dialog-body.v-card-text {
+  display: grid;
+  gap: 20px;
+  padding: 16px 22px 22px;
+}
+
+.site-dialog-section {
+  display: grid;
+  gap: 8px;
+}
+
+.site-dialog-label {
+  color: var(--site-text-subtle);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-dialog-actions.v-card-actions {
+  padding: 0 22px 22px;
+}
+
+.site-option {
+  align-items: center;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--site-text-muted);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+  justify-content: center;
+  letter-spacing: 0;
+  min-height: 40px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.site-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.site-option:focus-visible {
+  outline: 2px solid rgba(226, 232, 240, 0.6);
+  outline-offset: 2px;
+}
+
+.site-option-selected,
+.site-option-selected:hover {
+  background: rgba(226, 232, 240, 0.1);
+  border-color: rgba(226, 232, 240, 0.85);
+  color: #ffffff;
+}
+
+@media (max-width: 420px) {
+  .site-dialog-header {
+    padding-left: 18px;
+  }
+
+  .site-dialog-body.v-card-text {
+    padding: 14px 18px 18px;
+  }
+
+  .site-dialog-actions.v-card-actions {
+    padding: 0 18px 18px;
+  }
 }
 
 .site-button-primary.v-btn {
