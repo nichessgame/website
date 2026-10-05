@@ -2,14 +2,10 @@
   <main class="page-shell">
     <header class="page-header">
       <h1 class="page-title">Urbit Guide</h1>
-      <p class="page-subtitle">
-        Play Nichess against another person through Urbit.
-      </p>
     </header>
 
     <article class="site-panel">
-      <p>Don't worry if this seems too difficult. Soon we'll have real servers that are
-        simple to use and Urbit will only be used by the developers.</p>
+      <p>You probably want to use <router-link to="/nostr" class="site-link">Nostr</router-link> as it's much easier to use and doesn't require you to install anything. However, if you're on Urbit already or if Nostr isn't working for some reason, you can follow this guide.</p>
       <p>
         <b>NOTE:</b> There is no matchmaking system. If you want to play against someone, you'll need
         to know their username.

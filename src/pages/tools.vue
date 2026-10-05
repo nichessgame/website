@@ -2,7 +2,6 @@
   <main class="page-shell">
     <header class="page-header">
       <h1 class="page-title">Tools</h1>
-      <p class="page-subtitle">Utilities for setting up positions, replaying games, and evaluating play.</p>
     </header>
 
     <nav class="content-stack" aria-label="Nichess tools">

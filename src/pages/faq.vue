@@ -15,7 +15,7 @@
       <details class="faq-item site-panel">
         <summary>I don't like X. You should add Y.</summary>
         <p>
-            Unfortunately, even a small change requires retraining the AI from scratch. We appreciate the suggestions, but don't expect frequent changes once a variant is released. As more people get involved, we'll be able to make changes more frequently.
+            Unfortunately, even a small change requires retraining the AI from scratch. We appreciate the suggestions, but don't expect frequent changes once a variant is released.
         </p>
       </details>
 
@@ -46,6 +46,14 @@
             Sometimes it can take a while to download the AI model. Make sure you have a good internet connection.
         </p>
       </details>
+
+      <details class="faq-item site-panel">
+        <summary>I made a mistake. Can I take back a move?</summary>
+        <p>
+            Yes. When playing against the AI, use the buttons below the board to go back to an earlier position and try a different move.
+        </p>
+      </details>
+
 
       <details class="faq-item site-panel">
         <summary>How do I report a bug?</summary>
