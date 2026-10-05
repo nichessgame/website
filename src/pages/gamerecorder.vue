@@ -70,8 +70,15 @@
   }
 
   function applyStep (step) {
-    if (step.type === 'set_position') boardAPI.setPosition(step.position)
-    else boardAPI.move(step)
+    if (step.type === 'set_position') {
+      // A new position is a cut, not a move: pieces must not slide from the
+      // previous position into it.
+      boardAPI.setConfig({ animation: { enabled: false } })
+      boardAPI.setPosition(step.position)
+      boardAPI.setConfig({ animation: { enabled: true, duration: boardConfig.animation.duration } })
+    } else {
+      boardAPI.move(step)
+    }
   }
 
   function rebuildBoard () {
