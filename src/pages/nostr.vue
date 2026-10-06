@@ -65,135 +65,137 @@
       <v-tab value="nostr">Nostr</v-tab>
     </v-tabs>
 
-    <!-- Moves Tab -->
-    <div v-show="activeTab === 'moves'" class="tab-content">
-      <!-- Game ID share row -->
-      <div class="share-row mb-3">
-        <span class="share-id-label">Game ID:</span>
-        <span class="share-id">{{ currentGameId }}</span>
-        <v-btn
-          @click="copyGameId"
-          class="site-button-secondary"
-          variant="flat"
-          size="small"
-          prepend-icon="$mdiContentCopy"
-        >
-          Copy
-        </v-btn>
-      </div>
-      <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
-        <span>{{ copyMessage.text }}</span>
-      </div>
-
-      <div class="move-history-section">
-        <div class="history-header" v-if="moveHistory.length > 0">
-          <div class="history-buttons">
-            <v-btn
-              @click="copyMoveHistory"
-              class="site-button-secondary"
-              variant="flat"
-              size="small"
-              prepend-icon="$mdiContentCopy"
-            >
-              Copy
-            </v-btn>
-          </div>
+    <div class="tab-panels">
+      <!-- Moves Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'moves' }]">
+        <!-- Game ID share row -->
+        <div class="share-row mb-3">
+          <span class="share-id-label">Game ID:</span>
+          <span class="share-id">{{ currentGameId }}</span>
+          <v-btn
+            @click="copyGameId"
+            class="site-button-secondary"
+            variant="flat"
+            size="small"
+            prepend-icon="$mdiContentCopy"
+          >
+            Copy
+          </v-btn>
+        </div>
+        <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+          <span>{{ copyMessage.text }}</span>
         </div>
 
-        <div class="move-history-view mt-2">
-          <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
-          <div v-else class="move-list">
-            <div
-              v-for="(move, index) in moveHistory"
-              :key="index"
-              :class="['move-item', { active: index === currentMoveIndex - 1, clickable: true }]"
-              @click="jumpToMove(index + 1)"
-            >
-              <span class="move-number">{{ index + 1 }}.</span>
-              <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+        <div class="move-history-section">
+          <div class="history-header" v-if="moveHistory.length > 0">
+            <div class="history-buttons">
+              <v-btn
+                @click="copyMoveHistory"
+                class="site-button-secondary"
+                variant="flat"
+                size="small"
+                prepend-icon="$mdiContentCopy"
+              >
+                Copy
+              </v-btn>
+            </div>
+          </div>
+
+          <div class="move-history-view mt-2">
+            <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
+            <div v-else class="move-list">
+              <div
+                v-for="(move, index) in moveHistory"
+                :key="index"
+                :class="['move-item', { active: index === currentMoveIndex - 1, clickable: true }]"
+                @click="jumpToMove(index + 1)"
+              >
+                <span class="move-number">{{ index + 1 }}.</span>
+                <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Games Tab -->
-    <div v-show="activeTab === 'nostr'" class="tab-content">
-      <!-- Join / Create -->
-      <div class="join-section mb-3">
-        <div class="join-row">
-          <v-text-field
-            v-model="joinGameId"
-            label="Game ID"
-            variant="outlined"
-            density="compact"
-            hide-details
-            class="join-input"
-          ></v-text-field>
-          <v-btn
-            @click="joinGame"
-            :disabled="!joinGameId.trim()"
-            class="site-button-secondary"
-            variant="flat"
-            size="small"
-          >
-            Join
-          </v-btn>
-          <v-btn
-            @click="createNewGame"
-            class="site-button-secondary"
-            variant="flat"
-            size="small"
-          >
-            New
-          </v-btn>
-        </div>
-      </div>
-
-      <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} games will be saved here.</div>
-      <div v-if="savedNostrGames.length === 0" class="no-moves">No saved games</div>
-      <div v-else class="saved-games-list">
-        <div
-          v-for="(game, index) in savedNostrGames"
-          :key="game.gameId"
-          :class="['saved-game-item', { 'current-game': game.gameId === currentGameId }]"
-          @click="switchToGame(game.gameId)"
-        >
-          <div class="saved-game-info">
-            <span class="saved-game-number">{{ index + 1 }}.</span>
-            <span class="saved-game-color">{{ game.gameId }}</span>
-            <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
-            <span v-if="game.gameOver" class="saved-game-over">ended</span>
-          </div>
-          <div class="saved-game-actions">
-            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
-            <template v-if="confirmingDeleteId === game.gameId">
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                @click.stop="deleteSavedGame(game.gameId)"
-              >
-                <v-icon icon="$mdiCheckCircle" size="small" color="success" />
-              </v-btn>
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                @click.stop="confirmingDeleteId = null"
-              >
-                <v-icon icon="$mdiClose" size="small" color="error" />
-              </v-btn>
-            </template>
+      <!-- Games Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'nostr' }]">
+        <!-- Join / Create -->
+        <div class="join-section mb-3">
+          <div class="join-row">
+            <v-text-field
+              v-model="joinGameId"
+              label="Game ID"
+              variant="outlined"
+              density="compact"
+              hide-details
+              class="join-input"
+            ></v-text-field>
             <v-btn
-              v-else
-              icon
-              size="x-small"
-              variant="text"
-              @click.stop="confirmingDeleteId = game.gameId"
+              @click="joinGame"
+              :disabled="!joinGameId.trim()"
+              class="site-button-secondary"
+              variant="flat"
+              size="small"
             >
-              <v-icon icon="$mdiDelete" size="small" />
+              Join
             </v-btn>
+            <v-btn
+              @click="createNewGame"
+              class="site-button-secondary"
+              variant="flat"
+              size="small"
+            >
+              New
+            </v-btn>
+          </div>
+        </div>
+
+        <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} games will be saved here.</div>
+        <div v-if="savedNostrGames.length === 0" class="no-moves">No saved games</div>
+        <div v-else class="saved-games-list">
+          <div
+            v-for="(game, index) in savedNostrGames"
+            :key="game.gameId"
+            :class="['saved-game-item', { 'current-game': game.gameId === currentGameId }]"
+            @click="switchToGame(game.gameId)"
+          >
+            <div class="saved-game-info">
+              <span class="saved-game-number">{{ index + 1 }}.</span>
+              <span class="saved-game-color">{{ game.gameId }}</span>
+              <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
+              <span v-if="game.gameOver" class="saved-game-over">ended</span>
+            </div>
+            <div class="saved-game-actions">
+              <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+              <template v-if="confirmingDeleteId === game.gameId">
+                <v-btn
+                  icon
+                  size="x-small"
+                  variant="text"
+                  @click.stop="deleteSavedGame(game.gameId)"
+                >
+                  <v-icon icon="$mdiCheckCircle" size="small" color="success" />
+                </v-btn>
+                <v-btn
+                  icon
+                  size="x-small"
+                  variant="text"
+                  @click.stop="confirmingDeleteId = null"
+                >
+                  <v-icon icon="$mdiClose" size="small" color="error" />
+                </v-btn>
+              </template>
+              <v-btn
+                v-else
+                icon
+                size="x-small"
+                variant="text"
+                @click.stop="confirmingDeleteId = game.gameId"
+              >
+                <v-icon icon="$mdiDelete" size="small" />
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -787,6 +789,33 @@ onBeforeUnmount(() => {
   border-top: none;
 }
 
+/*
+ * All tab panels share one grid cell and inactive ones are only made invisible,
+ * so the panel is always as tall as the tallest tab. Switching tabs then never
+ * changes the page height, which would otherwise make the page jump when it is
+ * scrolled to the bottom.
+ */
+.tab-panels {
+  display: grid;
+}
+
+.tab-panels > .tab-content {
+  grid-area: 1 / 1;
+}
+
+.tab-panels > .tab-hidden {
+  visibility: hidden;
+}
+
+/*
+ * visibility is inherited and animatable, so a descendant with a transition
+ * on it (e.g. transition: all) would stay visible for the transition's
+ * duration and briefly overlap the newly shown tab.
+ */
+.tab-panels > .tab-hidden * {
+  transition: none !important;
+}
+
 .share-row {
   display: flex;
   align-items: center;
@@ -844,32 +873,21 @@ onBeforeUnmount(() => {
   padding: 20px;
 }
 
-/* Each row of two moves reads as one bar, like the saved game rows */
 .move-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 2px;
+  gap: 4px;
 }
 
 .move-item {
   padding: 6px 12px;
   background: var(--board-row-bg);
+  border: 2px solid transparent;
+  border-radius: 6px;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  transition: background-color 0.15s;
-}
-
-.move-item:nth-child(odd) {
-  border-radius: 6px 0 0 6px;
-}
-
-.move-item:nth-child(even) {
-  border-radius: 0 6px 6px 0;
-}
-
-.move-item:nth-child(odd):last-child {
-  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .move-item.clickable {
@@ -879,19 +897,18 @@ onBeforeUnmount(() => {
 .move-item.active,
 .move-item.clickable.active:hover {
   background-color: var(--site-gold-bg);
-}
-
-.move-item.active .move-notation {
-  color: var(--site-gold);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .move-item.clickable:hover {
     background: var(--board-row-hover-bg);
+    border-color: var(--board-row-hover-border);
   }
 
   .move-item.clickable.active:hover {
     background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
@@ -955,7 +972,7 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .saved-game-item:hover {

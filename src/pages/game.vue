@@ -128,97 +128,98 @@
       <v-tab value="games">Games</v-tab>
     </v-tabs>
 
-    <!-- Moves Tab -->
-    <div v-show="activeTab === 'moves'" class="tab-content">
-      <div class="move-history-section">
-        <div class="history-header" v-if="moveHistory.length > 0">
-          <div class="history-buttons">
-            <v-btn
-              @click="copyMoveHistory"
-              class="site-button-secondary"
-              variant="flat"
-              size="small"
-              prepend-icon="$mdiContentCopy"
-            >
-              Copy
-            </v-btn>
+    <div class="tab-panels">
+      <!-- Moves Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'moves' }]">
+        <div class="move-history-section">
+          <div class="history-header" v-if="moveHistory.length > 0">
+            <div class="history-buttons">
+              <v-btn
+                @click="copyMoveHistory"
+                class="site-button-secondary"
+                variant="flat"
+                size="small"
+                prepend-icon="$mdiContentCopy"
+              >
+                Copy
+              </v-btn>
+            </div>
+          </div>
+
+          <div class="move-history-view mt-2">
+            <!-- Copy Message Display -->
+            <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+              <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+              <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+              <span>{{ copyMessage.text }}</span>
+            </div>
+
+            <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
+            <div v-else class="move-list">
+              <div
+                v-for="(move, index) in moveHistory"
+                :key="index"
+                :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
+                @click="jumpToMove(index + 1)"
+              >
+                <span class="move-number">{{ index + 1 }}.</span>
+                <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="move-history-view mt-2">
-          <!-- Copy Message Display -->
-          <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
-            <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-            <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-            <span>{{ copyMessage.text }}</span>
-          </div>
-
-          <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
-          <div v-else class="move-list">
-            <div
-              v-for="(move, index) in moveHistory"
-              :key="index"
-              :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
-              @click="jumpToMove(index + 1)"
-            >
-              <span class="move-number">{{ index + 1 }}.</span>
-              <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+      <!-- Games Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'games' }]">
+        <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
+        <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
+        <div v-else class="saved-games-list">
+          <div
+            v-for="(game, index) in savedGames"
+            :key="game.gameId"
+            :class="['saved-game-item', { 'current-game': game.gameId === props.gameId }]"
+            @click="loadSavedGame(game)"
+          >
+            <div class="saved-game-info">
+              <span class="saved-game-number">{{ index + 1 }}.</span>
+              <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
+              <span v-if="game.gameOver" class="saved-game-over">ended</span>
+            </div>
+            <div class="saved-game-actions">
+              <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+              <template v-if="confirmingDeleteId === game.gameId">
+                <v-btn
+                  icon
+                  size="x-small"
+                  variant="text"
+                  @click.stop="deleteSavedGame(game)"
+                >
+                  <v-icon icon="$mdiCheckCircle" size="small" color="success" />
+                </v-btn>
+                <v-btn
+                  icon
+                  size="x-small"
+                  variant="text"
+                  @click.stop="confirmingDeleteId = null"
+                >
+                  <v-icon icon="$mdiClose" size="small" color="error" />
+                </v-btn>
+              </template>
+              <v-btn
+                v-else
+                icon
+                size="x-small"
+                variant="text"
+                @click.stop="confirmingDeleteId = game.gameId"
+              >
+                <v-icon icon="$mdiDelete" size="small" />
+              </v-btn>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Games Tab -->
-    <div v-show="activeTab === 'games'" class="tab-content">
-      <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
-      <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
-      <div v-else class="saved-games-list">
-        <div
-          v-for="(game, index) in savedGames"
-          :key="game.gameId"
-          :class="['saved-game-item', { 'current-game': game.gameId === props.gameId }]"
-          @click="loadSavedGame(game)"
-        >
-          <div class="saved-game-info">
-            <span class="saved-game-number">{{ index + 1 }}.</span>
-            <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
-            <span v-if="game.gameOver" class="saved-game-over">ended</span>
-          </div>
-          <div class="saved-game-actions">
-            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
-            <template v-if="confirmingDeleteId === game.gameId">
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                @click.stop="deleteSavedGame(game)"
-              >
-                <v-icon icon="$mdiCheckCircle" size="small" color="success" />
-              </v-btn>
-              <v-btn
-                icon
-                size="x-small"
-                variant="text"
-                @click.stop="confirmingDeleteId = null"
-              >
-                <v-icon icon="$mdiClose" size="small" color="error" />
-              </v-btn>
-            </template>
-            <v-btn
-              v-else
-              icon
-              size="x-small"
-              variant="text"
-              @click.stop="confirmingDeleteId = game.gameId"
-            >
-              <v-icon icon="$mdiDelete" size="small" />
-            </v-btn>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </v-container>
 </template>
 
@@ -807,6 +808,33 @@ const props = defineProps({
   border-top: none;
 }
 
+/*
+ * All tab panels share one grid cell and inactive ones are only made invisible,
+ * so the panel is always as tall as the tallest tab. Switching tabs then never
+ * changes the page height, which would otherwise make the page jump when it is
+ * scrolled to the bottom.
+ */
+.tab-panels {
+  display: grid;
+}
+
+.tab-panels > .tab-content {
+  grid-area: 1 / 1;
+}
+
+.tab-panels > .tab-hidden {
+  visibility: hidden;
+}
+
+/*
+ * visibility is inherited and animatable, so a descendant with a transition
+ * on it (e.g. transition: all) would stay visible for the transition's
+ * duration and briefly overlap the newly shown tab.
+ */
+.tab-panels > .tab-hidden * {
+  transition: none !important;
+}
+
 .move-history-section {
   /* Styling provided by parent .tab-content */
 }
@@ -834,32 +862,21 @@ const props = defineProps({
   padding: 20px;
 }
 
-/* Each row of two moves reads as one bar, like the saved game rows */
 .move-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 2px;
+  gap: 4px;
 }
 
 .move-item {
   padding: 6px 12px;
   background: var(--board-row-bg);
+  border: 2px solid transparent;
+  border-radius: 6px;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  transition: background-color 0.15s;
-}
-
-.move-item:nth-child(odd) {
-  border-radius: 6px 0 0 6px;
-}
-
-.move-item:nth-child(even) {
-  border-radius: 0 6px 6px 0;
-}
-
-.move-item:nth-child(odd):last-child {
-  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .move-item.clickable {
@@ -869,19 +886,18 @@ const props = defineProps({
 .move-item.active,
 .move-item.clickable.active:hover {
   background-color: var(--site-gold-bg);
-}
-
-.move-item.active .move-notation {
-  color: var(--site-gold);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .move-item.clickable:hover {
     background: var(--board-row-hover-bg);
+    border-color: var(--board-row-hover-border);
   }
 
   .move-item.clickable.active:hover {
     background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
@@ -945,7 +961,7 @@ const props = defineProps({
   border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .saved-game-item:hover {

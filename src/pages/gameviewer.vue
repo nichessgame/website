@@ -111,151 +111,153 @@
       <v-tab value="settings">Settings</v-tab>
     </v-tabs>
 
-    <!-- Tab Content -->
-    <!-- Moves Tab -->
-    <div v-show="activeTab === 'moves'" class="tab-content">
-      <div class="move-history-section">
-        <div class="history-header" v-if="parsedMoves.length > 0">
-          <div class="history-buttons">
+    <div class="tab-panels">
+      <!-- Tab Content -->
+      <!-- Moves Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'moves' }]">
+        <div class="move-history-section">
+          <div class="history-header" v-if="parsedMoves.length > 0">
+            <div class="history-buttons">
+              <v-btn
+                v-if="viewMode"
+                @click="copyMoveHistory"
+                class="site-button-secondary"
+                variant="flat"
+                size="small"
+                prepend-icon="$mdiContentCopy"
+              >
+                Copy
+              </v-btn>
+              <v-btn
+                @click="toggleViewMode"
+                class="site-button-secondary"
+                variant="flat"
+                size="small"
+              >
+                {{ viewMode ? 'Edit' : 'View' }}
+              </v-btn>
+            </div>
+          </div>
+
+          <!-- Input Mode -->
+          <div v-if="!viewMode">
+            <v-textarea
+              v-model="moveHistoryText"
+              placeholder="Enter move history, e.g.:
+  1.e2 -> e4
+  2.d7 -> d6
+  3.g1 -> f3
+  4.b7 -> b6"
+              rows="8"
+              variant="outlined"
+              class="mt-2"
+            ></v-textarea>
             <v-btn
-              v-if="viewMode"
-              @click="copyMoveHistory"
-              class="site-button-secondary"
+              @click="loadMoveHistory"
+              class="site-button-secondary mt-2"
               variant="flat"
-              size="small"
-              prepend-icon="$mdiContentCopy"
+              prepend-icon="$mdiUpload"
             >
-              Copy
+              Load Moves
             </v-btn>
-            <v-btn
-              @click="toggleViewMode"
-              class="site-button-secondary"
-              variant="flat"
-              size="small"
-            >
-              {{ viewMode ? 'Edit' : 'View' }}
-            </v-btn>
-          </div>
-        </div>
 
-        <!-- Input Mode -->
-        <div v-if="!viewMode">
-          <v-textarea
-            v-model="moveHistoryText"
-            placeholder="Enter move history, e.g.:
-1.e2 -> e4
-2.d7 -> d6
-3.g1 -> f3
-4.b7 -> b6"
-            rows="8"
-            variant="outlined"
-            class="mt-2"
-          ></v-textarea>
-          <v-btn
-            @click="loadMoveHistory"
-            class="site-button-secondary mt-2"
-            variant="flat"
-            prepend-icon="$mdiUpload"
-          >
-            Load Moves
-          </v-btn>
-
-          <!-- Load Message Display -->
-          <div v-if="loadMessage.text" :class="['load-message', 'mt-3', `message-${loadMessage.type}`]">
-            <v-icon v-if="loadMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-            <v-icon v-else-if="loadMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-            <v-icon v-else icon="$mdiInformation" class="message-icon" />
-            <span>{{ loadMessage.text }}</span>
-          </div>
-        </div>
-
-        <!-- Viewing Mode -->
-        <div v-else class="move-history-view mt-2">
-          <!-- Copy Message Display -->
-          <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
-            <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-            <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-            <span>{{ copyMessage.text }}</span>
+            <!-- Load Message Display -->
+            <div v-if="loadMessage.text" :class="['load-message', 'mt-3', `message-${loadMessage.type}`]">
+              <v-icon v-if="loadMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+              <v-icon v-else-if="loadMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+              <v-icon v-else icon="$mdiInformation" class="message-icon" />
+              <span>{{ loadMessage.text }}</span>
+            </div>
           </div>
 
-          <div v-if="parsedMoves.length === 0" class="no-moves">No moves loaded</div>
-          <div v-else class="move-list">
-            <div
-              v-for="(move, index) in parsedMoves"
-              :key="index"
-              :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
-              @click="jumpToMove(index + 1)"
-            >
-              <span class="move-number">{{ index + 1 }}.</span>
-              <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+          <!-- Viewing Mode -->
+          <div v-else class="move-history-view mt-2">
+            <!-- Copy Message Display -->
+            <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+              <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+              <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+              <span>{{ copyMessage.text }}</span>
+            </div>
+
+            <div v-if="parsedMoves.length === 0" class="no-moves">No moves loaded</div>
+            <div v-else class="move-list">
+              <div
+                v-for="(move, index) in parsedMoves"
+                :key="index"
+                :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
+                @click="jumpToMove(index + 1)"
+              >
+                <span class="move-number">{{ index + 1 }}.</span>
+                <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Games Tab -->
-    <div v-show="activeTab === 'games'" class="tab-content">
-      <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
-      <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
-      <div v-else class="saved-games-list">
-        <div
-          v-for="(game, index) in savedGames"
-          :key="game.gameId"
-          :class="['saved-game-item', { 'current-game': game.gameId === loadedGameId }]"
-          @click="loadSavedGame(game)"
-        >
-          <div class="saved-game-info">
-            <span class="saved-game-number">{{ index + 1 }}.</span>
-            <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
-            <span v-if="game.gameOver" class="saved-game-over">ended</span>
-          </div>
-          <div class="saved-game-actions">
-            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+      <!-- Games Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'games' }]">
+        <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
+        <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
+        <div v-else class="saved-games-list">
+          <div
+            v-for="(game, index) in savedGames"
+            :key="game.gameId"
+            :class="['saved-game-item', { 'current-game': game.gameId === loadedGameId }]"
+            @click="loadSavedGame(game)"
+          >
+            <div class="saved-game-info">
+              <span class="saved-game-number">{{ index + 1 }}.</span>
+              <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
+              <span v-if="game.gameOver" class="saved-game-over">ended</span>
+            </div>
+            <div class="saved-game-actions">
+              <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Nostr Tab -->
-    <div v-show="activeTab === 'nostr'" class="tab-content">
-      <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} Nostr games will be saved here.</div>
-      <div v-if="savedNostrGames.length === 0" class="no-moves">No saved Nostr games</div>
-      <div v-else class="saved-games-list">
-        <div
-          v-for="(game, index) in savedNostrGames"
-          :key="game.gameId"
-          :class="['saved-game-item', { 'current-game': game.gameId === loadedGameId }]"
-          @click="loadNostrSavedGame(game)"
-        >
-          <div class="saved-game-info">
-            <span class="saved-game-number">{{ index + 1 }}.</span>
-            <span class="saved-game-color">{{ game.gameId }}</span>
-            <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
-            <span v-if="game.gameOver" class="saved-game-over">ended</span>
-          </div>
-          <div class="saved-game-actions">
-            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+      <!-- Nostr Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'nostr' }]">
+        <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} Nostr games will be saved here.</div>
+        <div v-if="savedNostrGames.length === 0" class="no-moves">No saved Nostr games</div>
+        <div v-else class="saved-games-list">
+          <div
+            v-for="(game, index) in savedNostrGames"
+            :key="game.gameId"
+            :class="['saved-game-item', { 'current-game': game.gameId === loadedGameId }]"
+            @click="loadNostrSavedGame(game)"
+          >
+            <div class="saved-game-info">
+              <span class="saved-game-number">{{ index + 1 }}.</span>
+              <span class="saved-game-color">{{ game.gameId }}</span>
+              <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
+              <span v-if="game.gameOver" class="saved-game-over">ended</span>
+            </div>
+            <div class="saved-game-actions">
+              <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Settings Tab -->
-    <div v-show="activeTab === 'settings'" class="tab-content">
-      <div class="settings-section">
-        <div class="config-row">
-          <label class="config-label">Time between moves (ms):</label>
-          <v-text-field
-            v-model.number="moveDelay"
-            type="number"
-            :min="100"
-            :max="5000"
-            :step="100"
-            variant="outlined"
-            density="compact"
-            style="max-width: 150px;"
-          ></v-text-field>
+      <!-- Settings Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'settings' }]">
+        <div class="settings-section">
+          <div class="config-row">
+            <label class="config-label">Time between moves (ms):</label>
+            <v-text-field
+              v-model.number="moveDelay"
+              type="number"
+              :min="100"
+              :max="5000"
+              :step="100"
+              variant="outlined"
+              density="compact"
+              style="max-width: 150px;"
+            ></v-text-field>
+          </div>
         </div>
       </div>
     </div>
@@ -811,6 +813,33 @@ function formatDate(timestamp) {
   border-top: none;
 }
 
+/*
+ * All tab panels share one grid cell and inactive ones are only made invisible,
+ * so the panel is always as tall as the tallest tab. Switching tabs then never
+ * changes the page height, which would otherwise make the page jump when it is
+ * scrolled to the bottom.
+ */
+.tab-panels {
+  display: grid;
+}
+
+.tab-panels > .tab-content {
+  grid-area: 1 / 1;
+}
+
+.tab-panels > .tab-hidden {
+  visibility: hidden;
+}
+
+/*
+ * visibility is inherited and animatable, so a descendant with a transition
+ * on it (e.g. transition: all) would stay visible for the transition's
+ * duration and briefly overlap the newly shown tab.
+ */
+.tab-panels > .tab-hidden * {
+  transition: none !important;
+}
+
 .config-row {
   display: flex;
   align-items: center;
@@ -859,32 +888,21 @@ function formatDate(timestamp) {
   padding: 20px;
 }
 
-/* Each row of two moves reads as one bar, like the saved game rows */
 .move-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 2px;
+  gap: 4px;
 }
 
 .move-item {
   padding: 6px 12px;
   background: var(--board-row-bg);
+  border: 2px solid transparent;
+  border-radius: 6px;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  transition: background-color 0.15s;
-}
-
-.move-item:nth-child(odd) {
-  border-radius: 6px 0 0 6px;
-}
-
-.move-item:nth-child(even) {
-  border-radius: 0 6px 6px 0;
-}
-
-.move-item:nth-child(odd):last-child {
-  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .move-item.clickable {
@@ -894,19 +912,18 @@ function formatDate(timestamp) {
 .move-item.active,
 .move-item.clickable.active:hover {
   background-color: var(--site-gold-bg);
-}
-
-.move-item.active .move-notation {
-  color: var(--site-gold);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .move-item.clickable:hover {
     background: var(--board-row-hover-bg);
+    border-color: var(--board-row-hover-border);
   }
 
   .move-item.clickable.active:hover {
     background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
@@ -1011,7 +1028,7 @@ function formatDate(timestamp) {
   border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .saved-game-item:hover {

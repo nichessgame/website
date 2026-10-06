@@ -76,157 +76,159 @@
       <v-tab value="nostr">Nostr</v-tab>
     </v-tabs>
 
-    <!-- Analysis Tab -->
-    <div v-show="activeTab === 'analysis'" class="tab-content">
-      <div v-if="modelDownloadRequired && !modelLoading" class="site-note mb-3">
-        <v-icon icon="$mdiInformation" class="site-note-icon" />
-        <span><strong>The 40 MB AI model will be downloaded when you first use eval.</strong></span>
-      </div>
-
-      <div v-if="modelLoading" class="model-status mb-3">
-        <v-progress-linear indeterminate color="grey" class="mb-2"></v-progress-linear>
-        <div class="model-status-text">Downloading AI model (40 MB)... This may take a while.</div>
-      </div>
-
-      <div class="analysis-controls">
-        <SiteSwitch v-model="analysisEnabled" label="Analysis" />
-
-        <v-text-field
-          v-model.number="maxNodes"
-          type="number"
-          label="Max nodes"
-          variant="outlined"
-          density="compact"
-          :min="100"
-          :max="100000"
-          :step="1000"
-          hide-details
-          style="max-width: 150px;"
-        ></v-text-field>
-      </div>
-
-      <div v-if="analysisResult" class="evaluation-result mt-3">
-        <div class="evaluation-label">MCTS Search — {{ analysisResult.nodes }} nodes</div>
-        <div class="evaluation-values">
-          <div class="evaluation-item">
-            <span class="evaluation-key">White Win:</span>
-            <span class="evaluation-value">{{ formattedWLD.whiteWin }}%</span>
-          </div>
-          <div class="evaluation-item">
-            <span class="evaluation-key">Black Win:</span>
-            <span class="evaluation-value">{{ formattedWLD.blackWin }}%</span>
-          </div>
-          <div class="evaluation-item">
-            <span class="evaluation-key">Draw:</span>
-            <span class="evaluation-value">{{ formattedWLD.draw }}%</span>
-          </div>
+    <div class="tab-panels">
+      <!-- Analysis Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'analysis' }]">
+        <div v-if="modelDownloadRequired && !modelLoading" class="site-note mb-3">
+          <v-icon icon="$mdiInformation" class="site-note-icon" />
+          <span><strong>The 40 MB AI model will be downloaded when you first use eval.</strong></span>
         </div>
 
-        <div v-if="formattedTopMoves.length > 0" class="policy-section mt-3">
-          <div class="evaluation-label">Top Moves:</div>
-          <div class="policy-moves">
-            <div
-              v-for="(entry, index) in formattedTopMoves"
-              :key="index"
-              class="policy-move-item"
-            >
-              <span class="move-rank">{{ index + 1 }}.</span>
-              <span class="continuation-line-inline">
-                <span
-                  v-for="(move, mIdx) in entry.moves"
-                  :key="mIdx"
-                  class="continuation-move"
-                >{{ move.from }} → {{ move.to }}<span v-if="mIdx < entry.moves.length - 1" class="continuation-separator">,&nbsp;</span></span>
-              </span>
-              <span class="move-wld">{{ entry.visits }} visits</span>
+        <div v-if="modelLoading" class="model-status mb-3">
+          <v-progress-linear indeterminate color="grey" class="mb-2"></v-progress-linear>
+          <div class="model-status-text">Downloading AI model (40 MB)... This may take a while.</div>
+        </div>
+
+        <div class="analysis-controls">
+          <SiteSwitch v-model="analysisEnabled" label="Analysis" />
+
+          <v-text-field
+            v-model.number="maxNodes"
+            type="number"
+            label="Max nodes"
+            variant="outlined"
+            density="compact"
+            :min="100"
+            :max="100000"
+            :step="1000"
+            hide-details
+            style="max-width: 150px;"
+          ></v-text-field>
+        </div>
+
+        <div v-if="analysisResult" class="evaluation-result mt-3">
+          <div class="evaluation-label">MCTS Search — {{ analysisResult.nodes }} nodes</div>
+          <div class="evaluation-values">
+            <div class="evaluation-item">
+              <span class="evaluation-key">White Win:</span>
+              <span class="evaluation-value">{{ formattedWLD.whiteWin }}%</span>
+            </div>
+            <div class="evaluation-item">
+              <span class="evaluation-key">Black Win:</span>
+              <span class="evaluation-value">{{ formattedWLD.blackWin }}%</span>
+            </div>
+            <div class="evaluation-item">
+              <span class="evaluation-key">Draw:</span>
+              <span class="evaluation-value">{{ formattedWLD.draw }}%</span>
+            </div>
+          </div>
+
+          <div v-if="formattedTopMoves.length > 0" class="policy-section mt-3">
+            <div class="evaluation-label">Top Moves:</div>
+            <div class="policy-moves">
+              <div
+                v-for="(entry, index) in formattedTopMoves"
+                :key="index"
+                class="policy-move-item"
+              >
+                <span class="move-rank">{{ index + 1 }}.</span>
+                <span class="continuation-line-inline">
+                  <span
+                    v-for="(move, mIdx) in entry.moves"
+                    :key="mIdx"
+                    class="continuation-move"
+                  >{{ move.from }} → {{ move.to }}<span v-if="mIdx < entry.moves.length - 1" class="continuation-separator">,&nbsp;</span></span>
+                </span>
+                <span class="move-wld">{{ entry.visits }} visits</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Moves Tab -->
-    <div v-show="activeTab === 'moves'" class="tab-content">
-      <div class="move-history-section">
-        <div class="history-header" v-if="moveHistory.length > 0">
-          <div class="history-buttons">
-            <v-btn
-              @click="copyMoveHistory"
-              class="site-button-secondary"
-              variant="flat"
-              size="small"
-              prepend-icon="$mdiContentCopy"
-            >
-              Copy
-            </v-btn>
-          </div>
-        </div>
-
-        <div class="move-history-view mt-2">
-          <!-- Copy Message Display -->
-          <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
-            <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
-            <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
-            <span>{{ copyMessage.text }}</span>
+      <!-- Moves Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'moves' }]">
+        <div class="move-history-section">
+          <div class="history-header" v-if="moveHistory.length > 0">
+            <div class="history-buttons">
+              <v-btn
+                @click="copyMoveHistory"
+                class="site-button-secondary"
+                variant="flat"
+                size="small"
+                prepend-icon="$mdiContentCopy"
+              >
+                Copy
+              </v-btn>
+            </div>
           </div>
 
-          <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
-          <div v-else class="move-list">
-            <div
-              v-for="(move, index) in moveHistory"
-              :key="index"
-              :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
-              @click="jumpToMove(index + 1)"
-            >
-              <span class="move-number">{{ index + 1 }}.</span>
-              <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+          <div class="move-history-view mt-2">
+            <!-- Copy Message Display -->
+            <div v-if="copyMessage.show" :class="['copy-message', 'mb-3', `message-${copyMessage.type}`]">
+              <v-icon v-if="copyMessage.type === 'error'" icon="$mdiAlertCircle" class="message-icon" />
+              <v-icon v-else-if="copyMessage.type === 'success'" icon="$mdiCheckCircle" class="message-icon" />
+              <span>{{ copyMessage.text }}</span>
+            </div>
+
+            <div v-if="moveHistory.length === 0" class="no-moves">No moves yet</div>
+            <div v-else class="move-list">
+              <div
+                v-for="(move, index) in moveHistory"
+                :key="index"
+                :class="['move-item', { 'active': index === currentMoveIndex - 1, 'clickable': true }]"
+                @click="jumpToMove(index + 1)"
+              >
+                <span class="move-number">{{ index + 1 }}.</span>
+                <span class="move-notation">{{ move.from }} -> {{ move.to }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Games Tab -->
-    <div v-show="activeTab === 'games'" class="tab-content">
-      <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
-      <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
-      <div v-else class="saved-games-list">
-        <div
-          v-for="(game, index) in savedGames"
-          :key="game.gameId"
-          :class="['saved-game-item', { 'current-game': game.gameId === selectedGameId }]"
-          @click="loadSavedGame(game)"
-        >
-          <div class="saved-game-info">
-            <span class="saved-game-number">{{ index + 1 }}.</span>
-            <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
-            <span v-if="game.gameOver" class="saved-game-over">ended</span>
-          </div>
-          <div class="saved-game-actions">
-            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+      <!-- Games Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'games' }]">
+        <div class="games-info-message">Your last {{ MAX_SAVED_GAMES }} games will be saved here.</div>
+        <div v-if="savedGames.length === 0" class="no-moves">No saved games</div>
+        <div v-else class="saved-games-list">
+          <div
+            v-for="(game, index) in savedGames"
+            :key="game.gameId"
+            :class="['saved-game-item', { 'current-game': game.gameId === selectedGameId }]"
+            @click="loadSavedGame(game)"
+          >
+            <div class="saved-game-info">
+              <span class="saved-game-number">{{ index + 1 }}.</span>
+              <span class="saved-game-color">{{ game.myColor === 'white' ? 'W' : 'B' }} {{ game.gameId }}</span>
+              <span v-if="game.gameOver" class="saved-game-over">ended</span>
+            </div>
+            <div class="saved-game-actions">
+              <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Nostr Tab -->
-    <div v-show="activeTab === 'nostr'" class="tab-content">
-      <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} Nostr games will be saved here.</div>
-      <div v-if="savedNostrGames.length === 0" class="no-moves">No saved Nostr games</div>
-      <div v-else class="saved-games-list">
-        <div
-          v-for="(game, index) in savedNostrGames"
-          :key="game.gameId"
-          :class="['saved-game-item', { 'current-game': game.gameId === selectedGameId }]"
-          @click="loadNostrSavedGame(game)"
-        >
-          <div class="saved-game-info">
-            <span class="saved-game-number">{{ index + 1 }}.</span>
-            <span class="saved-game-color">{{ game.gameId }}</span>
-            <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
-            <span v-if="game.gameOver" class="saved-game-over">ended</span>
-          </div>
-          <div class="saved-game-actions">
-            <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+      <!-- Nostr Tab -->
+      <div :class="['tab-content', { 'tab-hidden': activeTab !== 'nostr' }]">
+        <div class="games-info-message">Your last {{ MAX_SAVED_NOSTR_GAMES }} Nostr games will be saved here.</div>
+        <div v-if="savedNostrGames.length === 0" class="no-moves">No saved Nostr games</div>
+        <div v-else class="saved-games-list">
+          <div
+            v-for="(game, index) in savedNostrGames"
+            :key="game.gameId"
+            :class="['saved-game-item', { 'current-game': game.gameId === selectedGameId }]"
+            @click="loadNostrSavedGame(game)"
+          >
+            <div class="saved-game-info">
+              <span class="saved-game-number">{{ index + 1 }}.</span>
+              <span class="saved-game-color">{{ game.gameId }}</span>
+              <span class="saved-game-moves">{{ game.moveCount || 0 }} moves</span>
+              <span v-if="game.gameOver" class="saved-game-over">ended</span>
+            </div>
+            <div class="saved-game-actions">
+              <span class="saved-game-date">{{ formatDate(game.savedAt) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -776,6 +778,33 @@ function formatDate(timestamp) {
   border-top: none;
 }
 
+/*
+ * All tab panels share one grid cell and inactive ones are only made invisible,
+ * so the panel is always as tall as the tallest tab. Switching tabs then never
+ * changes the page height, which would otherwise make the page jump when it is
+ * scrolled to the bottom.
+ */
+.tab-panels {
+  display: grid;
+}
+
+.tab-panels > .tab-content {
+  grid-area: 1 / 1;
+}
+
+.tab-panels > .tab-hidden {
+  visibility: hidden;
+}
+
+/*
+ * visibility is inherited and animatable, so a descendant with a transition
+ * on it (e.g. transition: all) would stay visible for the transition's
+ * duration and briefly overlap the newly shown tab.
+ */
+.tab-panels > .tab-hidden * {
+  transition: none !important;
+}
+
 .config-row {
   display: flex;
   align-items: center;
@@ -816,32 +845,21 @@ function formatDate(timestamp) {
   padding: 20px;
 }
 
-/* Each row of two moves reads as one bar, like the saved game rows */
 .move-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 2px;
+  gap: 4px;
 }
 
 .move-item {
   padding: 6px 12px;
   background: var(--board-row-bg);
+  border: 2px solid transparent;
+  border-radius: 6px;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  transition: background-color 0.15s;
-}
-
-.move-item:nth-child(odd) {
-  border-radius: 6px 0 0 6px;
-}
-
-.move-item:nth-child(even) {
-  border-radius: 0 6px 6px 0;
-}
-
-.move-item:nth-child(odd):last-child {
-  border-radius: 6px;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .move-item.clickable {
@@ -851,19 +869,18 @@ function formatDate(timestamp) {
 .move-item.active,
 .move-item.clickable.active:hover {
   background-color: var(--site-gold-bg);
-}
-
-.move-item.active .move-notation {
-  color: var(--site-gold);
+  border-color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .move-item.clickable:hover {
     background: var(--board-row-hover-bg);
+    border-color: var(--board-row-hover-border);
   }
 
   .move-item.clickable.active:hover {
     background-color: var(--site-gold-bg);
+    border-color: var(--site-gold);
   }
 }
 
@@ -923,7 +940,7 @@ function formatDate(timestamp) {
   border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .saved-game-item:hover {
