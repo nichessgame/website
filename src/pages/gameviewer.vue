@@ -104,7 +104,7 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll" bg-color="transparent">
+    <v-tabs v-model="activeTab" class="mt-4 tabs-no-scroll">
       <v-tab value="moves">Moves</v-tab>
       <v-tab value="games">Games</v-tab>
       <v-tab value="nostr">Nostr</v-tab>
@@ -115,9 +115,8 @@
     <!-- Moves Tab -->
     <div v-show="activeTab === 'moves'" class="tab-content">
       <div class="move-history-section">
-        <div class="history-header">
-          <div class="history-label">History:</div>
-          <div class="history-buttons" v-if="parsedMoves.length > 0">
+        <div class="history-header" v-if="parsedMoves.length > 0">
+          <div class="history-buttons">
             <v-btn
               v-if="viewMode"
               @click="copyMoveHistory"
@@ -810,7 +809,6 @@ function formatDate(timestamp) {
   border-radius: 0 0 8px 8px;
   border: 1px solid var(--board-panel-border);
   border-top: none;
-  min-height: 400px;
 }
 
 .config-row {
@@ -840,15 +838,9 @@ function formatDate(timestamp) {
 
 .history-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 8px;
-}
-
-.history-label {
-  color: var(--site-text);
-  font-size: 16px;
-  font-weight: 700;
 }
 
 .history-buttons {
@@ -857,10 +849,6 @@ function formatDate(timestamp) {
 }
 
 .move-history-view {
-  background: var(--board-subpanel-bg);
-  border: 1px solid var(--board-panel-border);
-  border-radius: 6px;
-  padding: 12px;
   max-height: 300px;
   overflow-y: auto;
 }
@@ -871,21 +859,32 @@ function formatDate(timestamp) {
   padding: 20px;
 }
 
+/* Each row of two moves reads as one bar, like the saved game rows */
 .move-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 2px;
 }
 
 .move-item {
   padding: 6px 12px;
   background: var(--board-row-bg);
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
-  border: 2px solid transparent;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  transition: background-color 0.15s;
+}
+
+.move-item:nth-child(odd) {
+  border-radius: 6px 0 0 6px;
+}
+
+.move-item:nth-child(even) {
+  border-radius: 0 6px 6px 0;
+}
+
+.move-item:nth-child(odd):last-child {
+  border-radius: 6px;
 }
 
 .move-item.clickable {
@@ -895,31 +894,35 @@ function formatDate(timestamp) {
 .move-item.active,
 .move-item.clickable.active:hover {
   background-color: var(--site-gold-bg);
-  border-color: var(--site-gold);
+}
+
+.move-item.active .move-notation {
+  color: var(--site-gold);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .move-item.clickable:hover {
     background: var(--board-row-hover-bg);
-    border-color: var(--board-row-hover-border);
   }
 
   .move-item.clickable.active:hover {
     background-color: var(--site-gold-bg);
-    border-color: var(--site-gold);
   }
 }
 
 .move-number {
   color: var(--site-text-subtle);
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  /* fits "333." so every move's notation starts at the same offset */
+  min-width: 4ch;
+  text-align: right;
 }
 
 .move-notation {
   color: var(--site-text-strong);
-  font-weight: bold;
+  font-weight: 500;
   font-size: 14px;
-  font-family: monospace;
 }
 
 .status-display {
