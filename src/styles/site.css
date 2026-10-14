@@ -418,25 +418,6 @@
   overflow-wrap: anywhere;
 }
 
-.tool-link {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 6px;
-  color: var(--site-text-strong);
-  display: flex;
-  justify-content: space-between;
-  min-height: 48px;
-  padding: 0 16px;
-  text-decoration: none;
-  transition: background-color 140ms ease, border-color 140ms ease;
-}
-
-.tool-link:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
 .rules-layout {
   display: grid;
   gap: 16px;
