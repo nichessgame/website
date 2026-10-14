@@ -88,7 +88,13 @@ useHead({
 </script>
 
 <style scoped>
+/*
+ * The padding sits on the question instead of the panel, so the whole closed
+ * panel is clickable, and on the answer below it.
+ */
 .faq-item {
+  --faq-padding: clamp(14px, 2vw, 18px);
+  padding: 0;
   transition: background-color 140ms ease, border-color 140ms ease;
 }
 
@@ -109,6 +115,7 @@ summary {
   justify-content: space-between;
   line-height: 1.35;
   list-style: none;
+  padding: var(--faq-padding);
 }
 
 summary::after {
@@ -133,10 +140,14 @@ summary:focus-visible::after,
   transform: rotate(225deg);
 }
 
+/* The focus ring goes around the whole panel, like the links on the Tools page */
 summary:focus-visible {
-  border-radius: 4px;
+  outline: none;
+}
+
+.faq-item:has(summary:focus-visible) {
   outline: 2px solid rgba(139, 181, 255, 0.55);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
 summary::-webkit-details-marker {
@@ -147,7 +158,8 @@ details p {
   color: var(--site-text);
   font-size: 0.92rem;
   line-height: 1.55;
-  margin-top: 10px;
-  padding-right: 28px;
+  /* Keeps the 10px gap below the question */
+  margin-top: calc(10px - var(--faq-padding));
+  padding: 0 calc(var(--faq-padding) + 28px) var(--faq-padding) var(--faq-padding);
 }
 </style>
