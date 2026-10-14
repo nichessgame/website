@@ -42,6 +42,9 @@ export default defineConfig({
         families: [{
           name: 'Roboto',
           styles: 'wght@400;500;700',
+        }, {
+          name: 'Roboto Mono',
+          styles: 'wght@400;500',
         }],
       },
     }),

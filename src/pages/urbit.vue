@@ -21,10 +21,12 @@
         and 4 in the previous link). If you're on Windows, you'll need to use WSL. The whole process
         should look something like:
       </p>
-      <code class="code-line">curl -L https://urbit.org/install/linux-x86_64/latest | tar xzk --transform='s/.*/urbit/g'</code>
-      <code class="code-line">./urbit -c mycomet</code>
-      <code class="code-line">./mycomet/.run</code>
-      <code class="code-line">+code</code>
+      <div class="code-block">
+        <code>curl -L https://urbit.org/install/linux-x86_64/latest | tar xzk --transform='s/.*/urbit/g'</code>
+        <code>./urbit -c mycomet</code>
+        <code>./mycomet/.run</code>
+        <code>+code</code>
+      </div>
       <p>
         Open http://localhost:8080 in your web browser and paste the password that you got from the
         +code command. When you're done using your comet, press Ctrl + D to shut it down.
@@ -54,7 +56,9 @@
       </p>
       <h2>2. Install Nichess</h2>
       <p>Once you're logged in, open the terminal app and run:</p>
-      <code class="code-line">|install ~riclur-macned %nichess</code>
+      <div class="code-block">
+        <code>|install ~riclur-macned %nichess</code>
+      </div>
       <h2>3. Find a game</h2>
       <p>
         Once you open the app, go to the Games page in the navigation bar and then click on Challenges.
