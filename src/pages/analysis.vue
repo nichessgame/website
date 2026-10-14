@@ -970,7 +970,7 @@ function formatDate(timestamp) {
   color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
-  text-transform: capitalize;
+  font-family: var(--site-font-mono);
 }
 
 .saved-game-moves {
@@ -1060,7 +1060,7 @@ function formatDate(timestamp) {
   color: var(--site-gold);
   font-weight: bold;
   font-size: 16px;
-  font-family: monospace;
+  font-family: var(--site-font-mono);
 }
 
 .analysis-controls {
@@ -1080,7 +1080,7 @@ function formatDate(timestamp) {
 
 .continuation-move {
   color: var(--site-text-strong);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 14px;
   font-weight: bold;
 }
@@ -1118,7 +1118,7 @@ function formatDate(timestamp) {
 
 .move-wld {
   color: var(--site-gold);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 13px;
   white-space: nowrap;
 }

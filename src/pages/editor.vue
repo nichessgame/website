@@ -531,7 +531,7 @@ watch(sideToMove, (newValue) => {
 
 .move-index-result {
   color: var(--site-text-strong);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 16px;
 }
 
@@ -555,7 +555,7 @@ watch(sideToMove, (newValue) => {
 
 .board-string {
   color: var(--site-text-strong);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 14px;
   word-break: break-all;
   line-height: 1.6;
@@ -658,7 +658,7 @@ watch(sideToMove, (newValue) => {
   color: var(--site-gold);
   font-weight: bold;
   font-size: 16px;
-  font-family: monospace;
+  font-family: var(--site-font-mono);
 }
 
 .policy-section {
@@ -690,7 +690,7 @@ watch(sideToMove, (newValue) => {
 
 .move-notation {
   color: var(--site-text-strong);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 14px;
   flex-grow: 1;
 }
@@ -699,7 +699,7 @@ watch(sideToMove, (newValue) => {
   color: var(--site-gold);
   font-weight: bold;
   font-size: 14px;
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   min-width: 60px;
   text-align: right;
 }

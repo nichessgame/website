@@ -834,7 +834,7 @@ onBeforeUnmount(() => {
 
 .share-id {
   color: var(--site-gold);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 14px;
   font-weight: bold;
   flex: 1;
@@ -1003,7 +1003,7 @@ onBeforeUnmount(() => {
   color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
-  font-family: monospace;
+  font-family: var(--site-font-mono);
 }
 
 .saved-game-moves {

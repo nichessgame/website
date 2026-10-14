@@ -951,7 +951,7 @@ function formatDate(timestamp) {
 
 .status-info {
   color: var(--site-gold);
-  font-family: monospace;
+  font-family: var(--site-font-mono);
   font-size: 14px;
   text-align: center;
 }
@@ -1058,7 +1058,7 @@ function formatDate(timestamp) {
   color: var(--site-text-strong);
   font-weight: bold;
   font-size: 14px;
-  text-transform: capitalize;
+  font-family: var(--site-font-mono);
 }
 
 .saved-game-detail {
