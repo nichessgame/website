@@ -2,6 +2,8 @@
 
 Hosted at [https://www.nichess.org/](https://www.nichess.org/)
 
+![Nichess starting position](src/assets/nichess-starting-position.jpg)
+
 Build instructions:
 
 1. Install [Git LFS](https://git-lfs.com/) and run:
