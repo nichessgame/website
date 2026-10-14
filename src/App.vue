@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      :class="['site-app-bar', { 'mobile-scrolled': !isAtTop }]"
+      :class="['site-app-bar', { 'mobile-scrolled': !isAtTop, 'menu-open': drawer }]"
       color="transparent"
       elevation="0"
       scroll-behavior="collapse"
@@ -11,8 +11,10 @@
 
       <v-container class="nav-container d-flex align-center">
         <v-app-bar-nav-icon
-          aria-label="Open navigation"
+          :aria-expanded="drawer"
+          :aria-label="drawer ? 'Close navigation' : 'Open navigation'"
           class="mobile-menu-button d-sm-none"
+          :icon="drawer ? '$close' : '$menu'"
           @click="drawer = !drawer"
         />
 
@@ -32,6 +34,7 @@
 
     <v-navigation-drawer
       v-model="drawer"
+      location="top"
       temporary
       class="mobile-drawer d-sm-none"
     >
@@ -109,7 +112,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .site-app-bar {
   background: transparent !important;
-  transition: transform 180ms ease, opacity 180ms ease;
+  transition: transform 180ms ease, opacity 180ms ease, background-color 200ms ease;
 }
 
 .nav-container {
@@ -167,38 +170,71 @@ onBeforeUnmount(() => {
   margin-right: 8px;
 }
 
+.site-app-bar.menu-open {
+  background: #121212 !important;
+}
+
+/* Mobile menu: a panel that drops down from under the app bar */
 .mobile-drawer {
-  background: #15181d;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background: #121212;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+  height: auto !important;
+  transition-property: box-shadow, transform, visibility, opacity;
+}
+
+/*
+ * Vuetify hides a closed top drawer by shifting it up by its width prop,
+ * which doesn't match this panel's auto height, so hide it explicitly.
+ */
+.mobile-drawer:not(.v-navigation-drawer--active) {
+  opacity: 0;
+  transform: translateY(-8px) !important;
+  visibility: hidden;
+}
+
+.v-application :deep(.v-navigation-drawer__scrim) {
+  opacity: 0.6;
 }
 
 .mobile-nav-list {
+  background: transparent;
   display: grid;
-  gap: 4px;
-  padding: 12px;
+  gap: 2px;
+  padding: 8px 12px 16px;
 }
 
 .mobile-play-item,
 .mobile-nav-item {
   border-radius: 6px;
   color: var(--site-text-muted);
+  min-height: 48px;
+}
+
+.mobile-play-item :deep(.v-list-item-title),
+.mobile-nav-item :deep(.v-list-item-title) {
   font-size: 0.92rem;
   font-weight: 700;
-  min-height: 48px;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
-.mobile-play-item {
-  color: var(--site-text-muted);
-}
-
+.mobile-play-item:hover,
 .mobile-nav-item:hover {
   background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
 }
 
 .mobile-donate-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0 0 6px 6px;
   color: var(--site-gold);
+  margin-top: 6px;
+}
+
+.mobile-donate-item:hover {
+  background: rgba(242, 201, 76, 0.06);
+  color: var(--site-gold-hover);
 }
 
 @media (max-width: 599px) {
